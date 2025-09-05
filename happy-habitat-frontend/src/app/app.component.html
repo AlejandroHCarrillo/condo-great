@@ -1,0 +1,24 @@
+<div class="flex flex-col min-h-screen">
+  <header class="bg-base-200">
+        <hh-header/>
+  </header>
+
+  <main class="flex flex-1">
+      <aside class="w-1/8 bg-base-200">
+        <hh-left-menu/>
+      </aside>
+
+      <section class="flex-1 bg-base-100 p-4">
+        <router-outlet />
+      </section>
+
+      <aside class="w-1/8 bg-base-100 p-1">
+        <hh-right-bar/>
+      </aside>
+  </main>
+
+  <footer class="bg-base-200 text-center">
+    <hh-footer/>
+  </footer>
+
+</div>
