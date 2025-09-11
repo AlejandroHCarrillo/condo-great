@@ -27,8 +27,10 @@ Terminal
 ng serve
 Now you can use daisyUI class names!
 
-
-
+  ## Install cally para usar el control de calendario
+```
+  npm install cally
+```
 
 
 

@@ -1,0 +1,138 @@
+<p>Esta pagina permite registrar a una persona o grupo de personas que nos van a visitar</p>
+<!-- <h2>Reactivos: Básicos</h2>
+<hr>
+
+<span>
+    errors: 
+    <pre>Name: {{ myForm.controls['name'].errors | json }}</pre>
+    <pre>Price: {{ myForm.controls['price'].errors | json }}</pre>
+    <pre>In Storage: {{ myForm.controls['inStorage'].errors | json }}</pre>
+</span> -->
+
+MUDANZA
+<div class="hero bg-base-200">
+    <div class="card border-base-300 border shadow-lg w-full ">        
+        <form autocomplete="off" 
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4"
+        [formGroup]="myForm" (ngSubmit)="onSave()">
+                <div class="form-control">
+                    <label class="label-text">Residente:</label>
+                    <input type="text"
+                        class="input input-bordered"
+                        placeholder="Nombre del visitante"
+                        formControlName="residentname"
+                        >
+                    <!-- Con este validador verificamos los errores del campo -->
+                    <show-form-error-template
+                            [isValid]="formUtils.isValidField(myForm, 'residentname')"
+                            [errorMessage]="formUtils.getFieldError(myForm, 'residentname')"
+                    />
+                </div>
+
+                <!-- Campo Numero de personas -->
+                <div class="form-control">
+                    <legend class="label-text">Direccion:</legend>
+                    <input type="number"
+                            class="input input-bordered w-1x"
+                            placeholder="Direccion"
+                            formControlName="address"
+                            >
+                    <!-- Con este validador verificamos los errores del campo -->
+                    <show-form-error-template
+                            [isValid]="formUtils.isValidField(myForm, 'address')"
+                            [errorMessage]="formUtils.getFieldError(myForm, 'address')"
+                    />
+                </div>
+
+                <div></div>
+
+                <div class="form-control pr-5">
+                    <legend class="label-text">Compañia / vehiculo</legend>
+                    <input type="text"
+                            class="input input-bordered w-50"
+                            placeholder="Compañia o vehiculo"
+                            formControlName="company"
+                            >
+                    <p class="label">Opcional</p>
+                    <!-- Con este validador verificamos los errores del campo -->
+                    <show-form-error-template
+                            [isValid]="formUtils.isValidField(myForm, 'company')"
+                            [errorMessage]="formUtils.getFieldError(myForm, 'company')"
+                    />
+                </div>
+
+                <div class="form-control">
+                    <legend class="label-text">Placas del vehiculo:</legend>
+                    <input type="text"
+                            class="input input-bordered w-50"
+                            placeholder="Placas"
+                            formControlName="carplates"
+                            >
+                    <p class="label">Opcional</p>
+                    <!-- Con este validador verificamos los errores del campo -->
+                    <show-form-error-template
+                            [isValid]="formUtils.isValidField(myForm, 'carplates')"
+                            [errorMessage]="formUtils.getFieldError(myForm, 'carplates')"
+                    />
+                </div>
+
+            <div class="form-control pr-5">
+                <legend class="label-text">Fecha de llegada:</legend>
+                <input type="text"
+                        class="date"
+                        placeholder="Fecha de llegada:"
+                        formControlName="arriveDate"
+                        >
+                    <!-- <calendar-date class="cally" onchange={document.getElementById('cally1').innerText = this.value}>
+                        <svg aria-label="Previous" class="fill-current size-4" slot="previous" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.75 19.5 8.25 12l7.5-7.5"></path></svg>
+                        <svg aria-label="Next" class="fill-current size-4" slot="next" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m8.25 4.5 7.5 7.5-7.5 7.5"></path></svg>
+                        <calendar-month></calendar-month>
+                    </calendar-date> -->
+                <!-- Con este validador verificamos los errores del campo -->
+                <show-form-error-template
+                        [isValid]="formUtils.isValidField(myForm, 'arriveDate')"
+                        [errorMessage]="formUtils.getFieldError(myForm, 'arriveDate')"
+                />
+            </div>
+
+            <div class="col-span-3 text-center">
+                <!-- [disabled]="myForm.invalid" -->
+                <button type="submit"
+                        class="btn btn-primary text-white"
+                        >
+                    Guardar
+                </button>
+            </div>
+
+
+
+        </form>
+
+    </div>
+</div>
+
+
+
+
+<div class="row">
+    <div class="col">
+
+        <span>Valid</span>
+        <pre>{{ myForm.valid| json }}</pre>
+
+        <span>Pristine</span>
+        <pre>{{ myForm.pristine| json }}</pre>
+
+        <span>Touched</span>
+        <pre>{{ myForm.touched| json }}</pre>
+
+        <span>Value</span>
+        <pre>{{ myForm.value | json }}</pre>
+
+        <span>Visitante</span>
+        <pre>{{ myForm.controls['residentname'].value | json }}</pre>
+
+        <span>personas</span>
+        <pre>{{ myForm.controls['residentname'].value | json }}</pre>
+    </div>
+</div>

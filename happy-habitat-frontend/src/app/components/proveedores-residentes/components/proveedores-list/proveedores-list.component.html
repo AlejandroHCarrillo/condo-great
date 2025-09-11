@@ -1,0 +1,81 @@
+Aqui se deberia ver la liste de proveedores
+<hr>
+<section class="mt-5">
+    <!-- Filtrar por: {{ filtro() }} -->
+    <table class="table table-md mt-2 w-full">
+        <thead>
+            <tr>
+                <th class="hidden lg:inline" >#</th>
+                <th class="hidden lg:inline">Servicio</th>
+                <th>Nombre</th>
+                <th>Telefono</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @for (proveedor of proveedores(); track proveedor.id; let index = $index) {
+          <tr>
+            <td class="hidden lg:inline">{{ $index + 1 }}</td>
+            <td class="hidden lg:inline">{{ proveedor.kindservice }}</td>
+            <td>{{ proveedor.name }}</td>
+            <td class="text-right"><span class="badge badge-secondary">{{ proveedor.phone }}</span></td>
+            <td>
+              <button class="btn btn-ghost btn-outline btn-xs cursor-pointer" 
+                      (click)="modalRef.showModal()">ver...</button>                      
+              <dialog #modalRef id="my_modal_1" class="modal">
+                <div class="modal-box">
+                  <h3 class="text-lg font-bold py-2">{{ proveedor.name }}</h3>
+                  <hr>
+                  <p class="py-4">
+                    <strong>Servicio:</strong> {{proveedor.kindservice}}
+                  </p>
+                  <p class="py-4">
+                    <strong>Descripcion:</strong> {{proveedor.description}}
+                  </p>
+                    <p class="py-4">
+                    <strong>Telefono:</strong> {{proveedor.phone}}
+                  </p>
+                    <p class="py-4">
+                    <strong>Correo electrónico:</strong> {{proveedor.emai}}
+                  </p>
+                    <div class="modal-action">
+                    <form method="dialog">
+                      <!-- if there is a button in form, it will close the modal -->
+                      <button class="btn">Cerrar</button>
+                    </form>
+                  </div>
+                </div>
+              </dialog>
+
+            </td>
+          </tr>
+        }
+        <!--  -->
+        @if (errorMessage()) {
+          <tr>
+            <td colspan="7" class="text-center text-danger">{{ errorMessage() }}</td>
+          </tr>
+        }
+        <!--  -->
+        @if (proveedores().length === 0 && !isLoading()) {
+          <tr>
+            <td colspan="7" class="text-center text-warning">No se encontraron países</td>
+          </tr>
+        }
+        <!--  -->
+        @if (isLoading()) {
+          <tr>
+            <td colspan="7" class="text-center">
+              <span class="loading loading-spinner loading-lg"></span>
+              Estamos trabajando...
+            </td>
+          </tr>
+        }
+        </tbody>
+    </table>
+</section>
+<!-- <p>  Errores {{errorMessage()}} </p>
+<p>  Esta cargando? {{isLoading()}}</p>
+<p>  Los países son: {{ proveedores() | json }}</p> -->
+
+<!-- {{proveedores() | json}} -->

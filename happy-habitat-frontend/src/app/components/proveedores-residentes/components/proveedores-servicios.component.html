@@ -1,0 +1,22 @@
+<p>proveedores-servicios works!</p>
+<hh-search-input
+placeholder="Buscar por capital"
+[debounceTime]="500"
+(buscar)="query.set($event)" 
+/>
+<!-- 
+initialValue="{{ query() }}"
+> -->
+<!-- <hh-proveedores-list [proveedores]="provedores()"/> -->
+
+<hh-proveedores-list [proveedores]="provedores()"
+      [errorMessage]=""
+      [isLoading]="false"
+      [isEmpty]="provedores().length === 0"
+    />
+<!-- <hh-proveedores-list [proveedores]="countryResource.value()??[]"
+      [errorMessage]="countryResource.error()"
+      [isLoading]="countryResource.isLoading()"
+      [isEmpty]="countryResource.value()?.length === 0"
+    /> -->
+{{ provedores() | json }}

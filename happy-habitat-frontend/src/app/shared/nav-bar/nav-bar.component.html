@@ -1,7 +1,5 @@
 <div class="navbar bg-base-200 shadow-sm">
-  <div class="flex-1 pl-8">
-     <img src="/images/HappyHab64x64.png" alt="Happy Habitat">
-  </div>
+
 
   <div class="flex-3/5 gap-1">
     <hh-breadcrums/>
@@ -12,10 +10,9 @@
     <div class="dropdown dropdown-end">
       <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
         <div class="w-10 rounded-full">
-          <img
-            alt="Nombre del usuario"
-            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-        </div>
+          <img alt="Nombre del usuario"
+          src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+          </div>
       </div>
       <ul
         tabindex="0"
@@ -56,4 +53,17 @@
       </svg>
     </label>
   </div>
+
+  <section>
+    <select 
+    class="select select-bordered w-full max-w-xs" 
+    (change)="onSeleccion($event)">
+  <option value="lemonade">Lemonade</option>
+  <option value="dark">Oscuro</option>
+  <option value="winter">Winter</option>
+  <option value="forest">Bosque</option>
+  <option value="autumn">Autumn</option>
+  <option value="lofi">Lofi</option>
+</select>
+  </section>
 </div>

@@ -1,1 +1,165 @@
-<p>home-page works!</p>
+<div class="carousel w-full">
+  <div id="item1" class="carousel-item w-full">
+    <img
+      src="https://img.daisyui.com/images/stock/photo-1625726411847-8cbb60cc71e6.webp"
+      class="w-full" />
+  </div>
+  <div id="item2" class="carousel-item w-full">
+    <img
+      src="https://img.daisyui.com/images/stock/photo-1609621838510-5ad474b7d25d.webp"
+      class="w-full" />
+  </div>
+  <div id="item3" class="carousel-item w-full">
+    <img
+      src="https://img.daisyui.com/images/stock/photo-1414694762283-acccc27bca85.webp"
+      class="w-full" />
+  </div>
+  <div id="item4" class="carousel-item w-full">
+    <img
+      src="https://img.daisyui.com/images/stock/photo-1665553365602-b2fb8e5d1707.webp"
+      class="w-full" />
+  </div>
+</div>
+<div class="flex w-full justify-center gap-2 py-2">
+  <a href="#item1" class="btn btn-xs">1</a>
+  <a href="#item2" class="btn btn-xs">2</a>
+  <a href="#item3" class="btn btn-xs">3</a>
+  <a href="#item4" class="btn btn-xs">4</a>
+</div>
+
+<section>
+  @for (anuncio of anuncios; track anuncio.id) {
+  <div class="hero bg-base-200">
+    <div class="hero-content flex-col lg:flex-row items-start">
+      <img 
+        src="{{anuncio.imagen}}"
+        class="max-w-sm rounded-lg shadow-2xl w-1/3"
+      />
+      <div>
+        <h1 class="text-2xl font-bold">{{anuncio.titulo}}</h1>
+        <h2 class="text-xl">{{anuncio.subtitulo}}</h2>
+        <hr>
+        <p>{{anuncio.fecha}}</p>
+        <p class="py-6">{{anuncio.descripcion}}
+        </p>
+        <!-- <button class="btn btn-primary">Get Started</button> -->
+      </div>
+    </div>
+  </div>
+  }
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="pl-4">
+Color buttons
+<section class="flex gap-2 py-2">
+  <button class="btn btn-neutral">Neutral</button>
+  <button class="btn btn-primary">Primary</button>
+  <button class="btn btn-secondary">Secondary</button>
+  <button class="btn btn-accent">Accent</button>
+  <button class="btn btn-info">Info</button>
+  <button class="btn btn-success">Success</button>
+  <button class="btn btn-warning">Warning</button>
+  <button class="btn btn-error">Error</button>
+</section>
+
+Outline Color buttons
+<section class="flex gap-2 py-2">
+  <button class="btn btn-neutral btn-outline">Neutral</button>
+  <button class="btn btn-primary  btn-outline">Primary</button>
+  <button class="btn btn-secondary  btn-outline">Secondary</button>
+  <button class="btn btn-accent  btn-outline">Accent</button>
+  <button class="btn btn-info  btn-outline">Info</button>
+  <button class="btn btn-success  btn-outline">Success</button>
+  <button class="btn btn-warning  btn-outline">Warning</button>
+  <button class="btn btn-error  btn-outline">Error</button>
+</section>
+
+Soft buttons
+<section class="flex gap-2 py-2">
+  <button class="btn btn-soft">Default</button>
+  <button class="btn btn-soft btn-primary">Primary</button>
+  <button class="btn btn-soft btn-secondary">Secondary</button>
+  <button class="btn btn-soft btn-accent">Accent</button>
+  <button class="btn btn-soft btn-info">Info</button>
+  <button class="btn btn-soft btn-success">Success</button>
+  <button class="btn btn-soft btn-warning">Warning</button>
+  <button class="btn btn-soft btn-error">Error</button>
+</section>
+
+Dash buttons
+
+<section class="flex gap-2 py-2">
+  <button class="btn btn-dash">Default</button>
+  <button class="btn btn-dash btn-primary">Primary</button>
+  <button class="btn btn-dash btn-secondary">Secondary</button>
+  <button class="btn btn-dash btn-accent">Accent</button>
+  <button class="btn btn-dash btn-info">Info</button>
+  <button class="btn btn-dash btn-success">Success</button>
+  <button class="btn btn-dash btn-warning">Warning</button>
+  <button class="btn btn-dash btn-error">Error</button>
+</section>
+
+Active buttons
+
+<section class="flex gap-2 py-2">
+  <button class="btn btn-active">Default</button>
+  <button class="btn btn-active btn-primary">Primary</button>
+  <button class="btn btn-active btn-secondary">Secondary</button>
+  <button class="btn btn-active btn-accent">Accent</button>
+  <button class="btn btn-active btn-info">Info</button>
+  <button class="btn btn-active btn-success">Success</button>
+  <button class="btn btn-active btn-warning">Warning</button>
+  <button class="btn btn-active btn-error">Error</button>
+</section>
+
+</div>

@@ -1,0 +1,11 @@
+@for (aviso of avisos; track aviso.id) {
+    <div class="card w-full bg-base-100 card-xs shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title">{{aviso.title}}</h2>
+            <p>{{aviso.description}}</p>
+            <div class="justify-end card-actions">
+                <button class="btn btn-secondary btn-xs">ver</button>
+            </div>
+        </div>
+    </div>
+}

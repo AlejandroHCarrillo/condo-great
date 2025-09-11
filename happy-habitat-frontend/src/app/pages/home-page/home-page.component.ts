@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { anunciosdata } from '../../shared/data/announcement.data';
 
 @Component({
   selector: 'hh-home-page',
@@ -7,5 +8,5 @@ import { Component } from '@angular/core';
   styles: ``
 })
 export class HomePageComponent {
-
+  anuncios = [...anunciosdata]
 }

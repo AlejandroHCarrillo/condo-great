@@ -1,7 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
 @plugin "daisyui"{
-  themes: lemonade --default, dark --prefersdark, winter, lemonade, autumn;
+  themes: lemonade --default, dark --prefersdark, forest, winter, lemonade, autumn, lofi;
   root: ":root";
   include: ;
   exclude: ;

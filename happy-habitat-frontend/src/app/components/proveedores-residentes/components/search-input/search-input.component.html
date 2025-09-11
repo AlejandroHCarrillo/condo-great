@@ -1,0 +1,11 @@
+<section class="flex flex-row gap-2">
+    <input type="text" class="input input-bordered w-56"
+     [placeholder] = "placeholder()"
+     autofocus 
+     #txtSearch
+     (keyup.enter)="buscar.emit(txtSearch.value)"
+     (keyup)="inputValue.set(txtSearch.value)"
+        [value]="initialValue()"
+      />
+      <button class="btn btn-primary text-white" (click)="buscar.emit(txtSearch.value)">Buscar</button>
+</section>
