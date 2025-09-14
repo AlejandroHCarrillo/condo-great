@@ -1,9 +1,9 @@
-import { ProveedorServicio } from './../../../shared/interfaces/proveedor-servicio.inteface';
+import { EntradaDirectorio } from '../../../shared/interfaces/entrada-directorio.inteface';
 import type { RESTProveedorServicioResidente } from '../interfaces/rest-proveedor-servicio-residente.interface';
 
 export class ProveedorServicioMapper {
 
-    static mapRESTProveedorServicioToProveedorServicio(restProvServicio: RESTProveedorServicioResidente): ProveedorServicio {
+    static mapRESTProveedorServicioToProveedorServicio(restProvServicio: RESTProveedorServicioResidente): EntradaDirectorio {
         return {
                     id: restProvServicio.id,
                     name: restProvServicio.name,
@@ -14,7 +14,7 @@ export class ProveedorServicioMapper {
                 };    
     }
 
-    static mapRESTProveedoresToProveedoresArray(restProveedores: RESTProveedorServicioResidente[]): ProveedorServicio[] {
+    static mapRESTProveedoresToProveedoresArray(restProveedores: RESTProveedorServicioResidente[]): EntradaDirectorio[] {
         return restProveedores.map((proveedor) => this.mapRESTProveedorServicioToProveedorServicio(proveedor));
     }
 }

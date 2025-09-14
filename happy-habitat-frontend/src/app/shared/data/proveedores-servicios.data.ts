@@ -1,6 +1,6 @@
-import { ProveedorServicio } from "../interfaces/proveedor-servicio.inteface";
+import { EntradaDirectorio } from "../interfaces/entrada-directorio.inteface";
 
-export const proveedoresResidentes: ProveedorServicio[] = 
+export const proveedoresResidentes: EntradaDirectorio[] = 
 [
   {
     id: 0,

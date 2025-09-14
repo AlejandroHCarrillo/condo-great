@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { ProveedorServicio } from '../../../../shared/interfaces/proveedor-servicio.inteface';
+import { EntradaDirectorio } from '../../../../shared/interfaces/entrada-directorio.inteface';
 import * as router from '@angular/router';
 
 @Component({
@@ -8,7 +8,7 @@ import * as router from '@angular/router';
   templateUrl: './proveedores-list.component.html'
 })
 export class ProveedoresListComponent {
-  proveedores = input.required<ProveedorServicio[]>();
+  proveedores = input.required<EntradaDirectorio[]>();
   
   errorMessage = input<string|unknown|null|undefined>('');
   isLoading = input<boolean>(false);

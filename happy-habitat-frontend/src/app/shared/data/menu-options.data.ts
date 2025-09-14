@@ -42,9 +42,9 @@ export const menuOptions: menuItem[] = [
   },
   {
     id: 2,
-    title: 'Prov. de Servicios',
+    title: 'Directorio de Servicios',
     path: "proveedores",
-    icon: "fa-solid fa-bell-concierge"
+    icon: "fa-solid fa-phone-volume"
   },
   {
     id: 3,

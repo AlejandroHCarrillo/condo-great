@@ -1,4 +1,4 @@
-export interface ProveedorServicio {
+export interface EntradaDirectorio {
     id?: number;
     name: string;
     description: string;

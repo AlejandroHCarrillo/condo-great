@@ -1,0 +1,34 @@
+<div class="max-w-xl mx-auto p-4 bg-base-200 rounded-box shadow-md">
+  <h2 class="text-2xl font-bold mb-4 flex flex-row">
+    <span class="text-2xl">
+      <i class="fa-solid fa-car-side"></i>&nbsp;
+    </span>
+    <span> Registrar Auto</span>
+  </h2>
+
+  <form [formGroup]="autoForm" (ngSubmit)="registrarAuto()" class="flex flex-col gap-4">
+
+    <input formControlName="id" type="number" placeholder="ID del auto"
+      class="input input-bordered w-full" />
+
+    <input formControlName="marca" type="text" placeholder="Marca"
+      class="input input-bordered w-full" />
+
+    <input formControlName="modelo" type="text" placeholder="Modelo"
+      class="input input-bordered w-full" />
+
+    <input formControlName="año" type="number" placeholder="Año"
+      class="input input-bordered w-full" />
+
+    <input formControlName="color" type="text" placeholder="Color"
+      class="input input-bordered w-full" />
+
+    <input formControlName="placas" type="text" placeholder="Placas (ej. ABC-123)"
+      class="input input-bordered w-full" />
+
+    <input formControlName="idResidente" type="number" placeholder="ID del residente"
+      class="input input-bordered w-full" />
+
+    <button type="submit" class="btn btn-primary text-white">Registrar Auto</button>
+  </form>
+</div>

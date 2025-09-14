@@ -1,0 +1,20 @@
+<div class="mt-4">
+    <h4 class="font-semibold mb-2">💬 Comentarios</h4>
+    <!-- <div *ngIf="comentarios.length > 0; else sinComentarios"> -->
+    @if (comentarios().length > 0) {
+        @for (comentario of comentarios(); track comentario.id ) {
+            <div class="border-l-4 border-accent pl-3 mb-2">
+                <p class="text-sm">{{ comentario.contenido }}</p>
+                <div class="text-xs text-gray-400">
+                    Autor #{{ comentario.autorId }} · {{ comentario.fechaCreacion | date:'short' }}
+                </div>
+            </div>
+        }
+    }
+    <!-- </div> -->
+        @else {
+        <div #sinComentarios>
+            <p class="text-sm text-gray-500">No hay comentarios aún.</p>
+        </div>
+    }
+</div>

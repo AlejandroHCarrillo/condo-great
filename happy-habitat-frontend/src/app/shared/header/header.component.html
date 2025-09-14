@@ -1,26 +1,20 @@
 <section class="flex flex-row items-center w-full">
-    <div class="flex flex-col w-13/80 items-center justify-center min-w-18">
+    <div class="flex flex-col w-3/20 items-center justify-center min-w-18">
         <a routerLink="/home">
             <img src="/images/HappyHab64x64.png" alt="Happy Habitat" class="p-2">
-        </a>          
-        <div class="text-xs text-neutral">
-            <div>
-                <i class="fa-solid fa-user"></i>
-                Alejandro Hernandez
-            </div>
-            <div>
-                <i class="fa-solid fa-house-user"></i>
-                120
-            </div>
-        </div>
+        </a>
     </div>        
-    <div class="w-3/10">
-        <h1 class="text-4xl font-bold text-primary text-left pl-2">{{title}}</h1>
+    <div class="w-8/20">
+        <h1 class="text-4xl font-bold text-primary text-left pl-5">{{title}}</h1>
     </div>
-
-    <div class="w-11/20">
+    <div class="w-6/20">
         <hh-nav-bar/>
-</div>
-        
+    </div>
+    <div class="w-11/80">
+        <hh-user-info class=" sm: w-full"/>
+    </div>
 </section>
+<div class="flex flex-row px-0">
+    <hh-breadcrums class="w-full"/>
+</div>
 

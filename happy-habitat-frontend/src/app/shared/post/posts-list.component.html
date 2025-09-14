@@ -1,0 +1,39 @@
+<div class="max-w-3xl mx-auto p-4 space-y-6">
+  <h2 class="text-3xl font-bold mb-4">📋 Publicaciones recientes</h2>
+
+  @for (post of posts(); track post.id) {
+    <div class="card bg-white shadow-md">
+        <div class="card-body">
+        <h3 class="card-title text-xl">{{ post.titulo }}</h3>
+        <p>{{ post.contenido }}</p>
+
+        <div class="text-sm text-gray-500">
+            Publicado el {{ post.fechaCreacion | date:'mediumDate' }} · Autor #{{ post.autorId }}
+        </div>
+
+        <div class="mt-2 flex flex-wrap gap-2">
+            <span *ngFor="let tag of post.etiquetas" class="badge badge-outline">{{ tag }}</span>
+            <span *ngIf="post.esDestacado" class="badge badge-primary">Destacado</span>
+        </div>
+
+        <hh-list-comments [comentarios]="obtenerComentarios(post.id)"/>
+        <!-- 
+        <div class="mt-4">
+            <h4 class="font-semibold mb-2">💬 Comentarios</h4>
+            <div *ngIf="obtenerComentarios(post.id).length > 0; else sinComentarios">
+            <div *ngFor="let comentario of obtenerComentarios(post.id)" class="border-l-4 border-accent pl-3 mb-2">
+                <p class="text-sm">{{ comentario.contenido }}</p>
+                <div class="text-xs text-gray-400">
+                Autor #{{ comentario.autorId }} · {{ comentario.fechaCreacion | date:'short' }}
+                </div>
+            </div>
+            </div>
+            <ng-template #sinComentarios>
+            <p class="text-sm text-gray-500">No hay comentarios aún.</p>
+            </ng-template>
+        </div> -->
+
+        </div>
+    </div>
+    }
+</div>

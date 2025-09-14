@@ -3,6 +3,6 @@ export interface Anuncio {
   titulo: string;
   subtitulo: string;
   descripcion: string;
-  fecha: string; // formato ISO: 'YYYY-MM-DD'
+  fecha: Date; // formato ISO: 'YYYY-MM-DD'
   imagen: string;
 }

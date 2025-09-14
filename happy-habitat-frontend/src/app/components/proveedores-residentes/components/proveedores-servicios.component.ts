@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { of } from 'rxjs';
 import { proveedoresResidentes } from '../../../shared/data/proveedores-servicios.data';
-import { ProveedorServicio } from '../../../shared/interfaces/proveedor-servicio.inteface';
+import { EntradaDirectorio } from '../../../shared/interfaces/entrada-directorio.inteface';
 
 @Component({
   selector: 'hh-proveedores-servicios',
@@ -15,7 +15,7 @@ import { ProveedorServicio } from '../../../shared/interfaces/proveedor-servicio
   styles: ``
 })
 export class ProveedoresServiciosComponent {
-  provedores = signal<ProveedorServicio[]>([...proveedoresResidentes])
+  provedores = signal<EntradaDirectorio[]>([...proveedoresResidentes])
   // _service = inject(ProveedoresResidentesService);
   
   router = inject(Router);

@@ -1,0 +1,34 @@
+<div class="max-w-xl mx-auto p-4 bg-base-200 rounded-box shadow-md">
+    <h2 class="text-2xl font-bold mb-4 flex flex-row">
+    <span class="text-2xl">
+      <i class="fa-solid fa-dog"></i>&nbsp;
+    </span>
+    <span>Registrar Mascota</span>
+  </h2>
+
+  <form [formGroup]="mascotaForm" (ngSubmit)="registrarMascota()" class="flex flex-col gap-4">
+
+    <input formControlName="id" type="number" placeholder="ID de la mascota"
+      class="input input-bordered w-full" />
+
+    <input formControlName="nombre" type="text" placeholder="Nombre"
+      class="input input-bordered w-full" />
+
+    <input formControlName="especie" type="text" placeholder="Especie (ej. perro, gato)"
+      class="input input-bordered w-full" />
+
+    <input formControlName="raza" type="text" placeholder="Raza (opcional)"
+      class="input input-bordered w-full" />
+
+    <input formControlName="edad" type="number" placeholder="Edad en años"
+      class="input input-bordered w-full" />
+
+    <input formControlName="color" type="text" placeholder="Color"
+      class="input input-bordered w-full" />
+
+    <input formControlName="idResidente" type="number" placeholder="ID del residente"
+      class="input input-bordered w-full" />
+    <button type="submit" class="btn btn-primary text-white">Registrar mascota</button>
+  </form>  
+</div>
+<hh-upload-image/>

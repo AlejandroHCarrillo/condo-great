@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 // import { CountryMapper } from '../mappers/country.mapper';
 import { catchError, delay, map, Observable, of, tap, throwError } from 'rxjs';
-import { ProveedorServicio } from '../../../shared/interfaces/proveedor-servicio.inteface';
+import { EntradaDirectorio } from '../../../shared/interfaces/entrada-directorio.inteface';
 import { RESTProveedorServicioResidente } from '../interfaces/rest-proveedor-servicio-residente.interface';
 import { ProveedorServicioMapper } from '../mappers/proveedor-residente.mapper';
 // import type { Country } from '../interfaces/country.interface';
@@ -16,11 +16,11 @@ const API_URL = 'https://restcountries.com/v3.1';
 })
 export class ProveedoresResidentesService {
 private http =  inject(HttpClient);
-private queryCacheProveedores = new Map<string, ProveedorServicio[]>();
+private queryCacheProveedores = new Map<string, EntradaDirectorio[]>();
 // private queryCacheCountry = new Map<string, Country[]>();
 // private queryCacheRegion = new Map<string, Country[]>();
 
-searchByServiceKind(query: string): Observable<ProveedorServicio[]> {
+searchByServiceKind(query: string): Observable<EntradaDirectorio[]> {
   query = query.trim().toLowerCase();
   console.log(`Se recibio el emit en el servicio: ${query}`);
   

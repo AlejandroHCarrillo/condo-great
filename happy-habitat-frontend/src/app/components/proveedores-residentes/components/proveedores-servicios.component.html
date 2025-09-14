@@ -1,6 +1,5 @@
-<p>proveedores-servicios works!</p>
 <hh-search-input
-placeholder="Buscar por capital"
+placeholder="Buscar ..."
 [debounceTime]="500"
 (buscar)="query.set($event)" 
 />
@@ -19,4 +18,4 @@ initialValue="{{ query() }}"
       [isLoading]="countryResource.isLoading()"
       [isEmpty]="countryResource.value()?.length === 0"
     /> -->
-{{ provedores() | json }}
+<!-- {{ provedores() | json }} -->
