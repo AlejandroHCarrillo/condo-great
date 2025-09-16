@@ -32,9 +32,38 @@ Now you can use daisyUI class names!
   npm install cally
 ```
 
+## Instalar graficas
+https://tradingview.github.io/lightweight-charts/docs
 
+npm install lightweight-charts
 
+Ejemplos:
 
+https://tradingview.github.io/lightweight-charts/docs/series-types
+
+Notas:
+* El componente debe tener un templente incluido no un archivo html
+```
+  template: `<div #container id="container" style="width: 400px; height: 300px;" class="bg-base-300"></div>` 
+```
+
+* Para acceder al templete debemos usar 
+``` 
+  @ViewChild('container', { static: true }) containerRef!: ElementRef<HTMLDivElement>;
+```
+
+* Debe implementar el metodo **AfterViewInit** para disparar la configuracion de las graficas
+
+* La informacion viene en arreglos de  objetos json con el siguiente formato:
+```
+[
+  { value: 1, time: 'yyyy-MM-dd' },
+  { value: 1, time: '2025-09-15' },
+  { value: 3, time: '2025-10-15', color: 'green' },
+  { value: 4, time: '2025-10-15', color: '#F37824' },
+ ]
+```
+* Tambien se puede cambiar el color de la columna agregando la propiedad color y el nombre o codigo exadecimal.
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.15.
 

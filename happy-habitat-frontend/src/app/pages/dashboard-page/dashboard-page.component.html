@@ -1,4 +1,14 @@
-<div class="stats shadow w-full">
+<h1 class="text-2xl">Ideas para el Dashboard</h1>
+<ul>
+  <li>Grafica de cobranza del mes</li>
+  <li>Grafica de Morosidad de los ultimos meses</li>
+  <li>Grafica de tickets levantados, tiempo de respuesta y % de resolusion</li>
+  <li>Numero de morosos en el mes</li>
+  <li>Saldo en el banco de los meses anteriores</li>
+  <li>Total de ingresos y egresos del mes</li>
+</ul>
+<!-- Data enviada: {{ reportSignal() | json }} -->
+<div class="stats shadow w-full mx-5">
   <div class="stat">
     <div class="stat-figure text-secondary">
       <svg
@@ -62,6 +72,42 @@
     <div class="stat-desc">↘︎ 90 (14%)</div>
   </div>
 </div>
+
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 p-5 w-full bg-base-300 ">
+
+  <div class="card bg-base-100 shadow-sm">
+    <div class="card-body items-center">
+      <h2 class="card-title">Morosos del mes</h2>
+      <hh-bar-chart [data]="reportSignal()" />
+    </div>
+  </div>
+
+  <div class="card bg-base-100 shadow-sm">
+    <div class="card-body items-center">
+      <h2 class="card-title">Cobranza</h2>
+      <hh-bar-chart [data]="reportSignal()" />
+    </div>
+  </div>
+
+  <div class="card bg-base-100 shadow-sm">
+    <div class="card-body items-center">
+      <h2 class="card-title">Saldo en la cuenta</h2>
+      <hh-bar-chart [data]="reportSignal()" />
+    </div>
+  </div>
+
+    <div class="card bg-base-100 shadow-sm">
+    <div class="card-body items-center">
+      <h2 class="card-title">Cobranza</h2>
+      <hh-bar-chart [data]="reportSignal()" />
+    </div>
+  </div>
+
+</section>
+
+
+
+
 
 <div class="stats shadow w-full">
   <div class="stat">

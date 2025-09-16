@@ -1,16 +1,13 @@
-import { JsonPipe } from '@angular/common';
 import { Component, inject, linkedSignal, signal } from '@angular/core';
 import { ProveedoresListComponent } from "./proveedores-list/proveedores-list.component";
 import { SearchInputComponent } from "./search-input/search-input.component";
 import { ActivatedRoute, Router } from '@angular/router';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { of } from 'rxjs';
 import { proveedoresResidentes } from '../../../shared/data/proveedores-servicios.data';
 import { EntradaDirectorio } from '../../../shared/interfaces/entrada-directorio.inteface';
 
 @Component({
   selector: 'hh-proveedores-servicios',
-  imports: [JsonPipe, ProveedoresListComponent, SearchInputComponent],
+  imports: [ProveedoresListComponent, SearchInputComponent],
   templateUrl: './proveedores-servicios.component.html',
   styles: ``
 })
