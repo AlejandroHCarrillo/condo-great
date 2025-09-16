@@ -17,14 +17,14 @@ export class RegistroVisitanteComponent {
   colores = [...colors];
 
   myForm: FormGroup = this.fb.group({
-    name: ['', [Validators.required, Validators.minLength(5)]], //this.fb.control('', Validators.required),
-    totalpersons: [1, [Validators.required, Validators.min(1)]], //this.fb.control(0, [Validators.required, Validators.min(0)]),
-    cardescription: ['', ], //this.fb.control(0, [Validators.required, Validators.min(0)])
-    carcolor: ['', ], //this.fb.control(0, [Validators.required, Validators.min(0)])
-    carplates: ['', ], //this.fb.control(0, [Validators.required, Validators.min(0)])
-    subject: ['', [Validators.required, Validators.minLength(10)]], //this.fb.control(0, [Validators.required, Validators.min(0)])
-    arriveDate: ['', [Validators.required]], //this.fb.control(0, [Validators.required, Validators.min(0)])
-    departureDate: ['', ], //this.fb.control(0, [Validators.required, Validators.min(0)])
+    name: ['', [Validators.required, Validators.minLength(5)]], 
+    totalpersons: [1, [Validators.required, Validators.min(1)]], 
+    cardescription: ['', ], 
+    carcolor: ['', ], 
+    carplates: ['', ], 
+    subject: ['', [Validators.required, Validators.minLength(10)]], 
+    arriveDate: ['', [Validators.required]], 
+    departureDate: ['', ], 
   });
 
     onSave(): void {

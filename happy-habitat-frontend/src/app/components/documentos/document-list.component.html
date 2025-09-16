@@ -1,0 +1,28 @@
+<p>Documentos encontrados</p>
+<table class="bg-base-200 rounded-2xl">
+    <thead>
+        <tr>
+            <th class="py-5 bottom">Titulo</th>
+            <th>Descripcion</th>
+            <th>Fecha</th>
+            <th>Usuario</th>
+            <th>Doc</th>
+        </tr>        
+    </thead>
+    <tbody>
+        @for (doc of docs; track doc.id) {
+            <tr>
+                <td  class="p-2">{{doc.titulo}}</td>
+                <td>{{doc.descripcion}}</td>
+                <td class="text-xs text-nowrap">{{doc.fecha}}</td>
+                <td  class="text-xs">{{doc.usuarioSubio}}</td>
+                <td>
+                    <a [href]="doc.urlDoc" class="link btn-link text-secondary">
+                        {{doc.nombreDocumento}}
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<!-- {{ docs | json }} -->

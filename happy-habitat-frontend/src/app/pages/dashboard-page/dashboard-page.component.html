@@ -73,30 +73,30 @@
   </div>
 </div>
 
-<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 p-5 w-full bg-base-300 ">
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4 p-5 sm:w-full bg-base-300 2xl:grid-cols-4">
 
-  <div class="card bg-base-100 shadow-sm">
+  <div class="card bg-base-100 shadow-sm w-fit sm:w-full">
     <div class="card-body items-center">
       <h2 class="card-title">Morosos del mes</h2>
       <hh-bar-chart [data]="reportSignal()" />
     </div>
   </div>
 
-  <div class="card bg-base-100 shadow-sm">
+  <div class="card bg-base-100 shadow-sm w-fit sm:w-full">
     <div class="card-body items-center">
       <h2 class="card-title">Cobranza</h2>
-      <hh-bar-chart [data]="reportSignal()" />
+      <hh-area-chart [data]="reportSignal()" />
     </div>
   </div>
 
-  <div class="card bg-base-100 shadow-sm">
+  <div class="card bg-base-100 shadow-sm w-fit sm:w-full">
     <div class="card-body items-center">
       <h2 class="card-title">Saldo en la cuenta</h2>
-      <hh-bar-chart [data]="reportSignal()" />
+      <hh-area-chart [data]="reportSignal()" />
     </div>
   </div>
 
-    <div class="card bg-base-100 shadow-sm">
+    <div class="card bg-base-100 shadow-sm w-fit sm:w-full">
     <div class="card-body items-center">
       <h2 class="card-title">Cobranza</h2>
       <hh-bar-chart [data]="reportSignal()" />

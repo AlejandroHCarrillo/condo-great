@@ -12,19 +12,11 @@ export class BarChartComponent implements AfterViewInit  {
   @ViewChild('container', { static: true }) containerRef!: ElementRef<HTMLDivElement>;
   data = input.required<LineData[]>();
 
-numDateToStrDate(timestamp: number): string {
-  const msDate = new Date(timestamp * 1000); // convertir a milisegundos
-
-  const formattedDate = msDate.toISOString().split('T')[0]; // 'yyyy-MM-dd'
-  // console.log('fecha formateada', formattedDate); // "2022-01-19"
-  return formattedDate;
-}
-
 ngAfterViewInit(): void {  
   const container = this.containerRef.nativeElement;
   // console.log({container});
 
-  let barChartOptions = { layout: { 
+  let chartOptions = { layout: { 
                                       textColor: 'black', 
                                       background: { 
                                         type: ColorType.Solid, 
@@ -32,7 +24,7 @@ ngAfterViewInit(): void {
                                   } 
                         };
 
-  let chart = createChart(container, barChartOptions);
+  let chart = createChart(container, chartOptions);
   let histogramSeries = chart.addSeries(HistogramSeries, 
     { color: 'green', 
       // title: 'histogram title',

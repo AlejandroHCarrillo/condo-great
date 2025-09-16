@@ -1,10 +1,11 @@
 import { Component, signal } from '@angular/core';
 import { BarChartComponent } from "../../shared/charts/bar-chart.component";
 import { LineData } from 'lightweight-charts';
+import { AreaChartComponent } from '../../shared/charts/area-chart.component';
 
 @Component({
   selector: 'app-dashboard-page',
-  imports: [BarChartComponent],
+  imports: [BarChartComponent, AreaChartComponent],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.css'
 })

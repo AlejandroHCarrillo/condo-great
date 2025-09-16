@@ -6,14 +6,14 @@ import { PostsListComponent } from "../../../shared/post/posts-list.component";
 
 @Component({
   selector: 'hh-anuncios-list',
-  imports: [PostsListComponent],
+  imports: [],
   templateUrl: './anuncios-list.component.html',
   styles: ``
 })
 export class AnunciosListComponent {
   anuncios = input.required<Anuncio[]>();
-  posts = computed(()=>{
-    return AnuncioPostMapper.mapAnunciosToPostsArray(this.anuncios());
-  }) 
+  // posts = computed(()=>{
+  //   return AnuncioPostMapper.mapAnunciosToPostsArray(this.anuncios());
+  // }) 
   
 }

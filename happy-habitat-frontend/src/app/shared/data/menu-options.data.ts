@@ -46,6 +46,12 @@ export const menuOptions: menuItem[] = [
     path: "proveedores",
     icon: "fa-solid fa-phone-volume"
   },
+    {
+    id: 2,
+    title: 'Social network',
+    path: "social",
+    icon: "fa-solid fa-users-rays"
+  },
   {
     id: 3,
     title: 'Administracion',
@@ -99,7 +105,7 @@ export const menuOptions: menuItem[] = [
     {
     id: 2,
     title: 'Documentos',
-    path: "documentos",
+    path: "documents",
     icon: "fa-solid fa-file-lines"
   },
     {

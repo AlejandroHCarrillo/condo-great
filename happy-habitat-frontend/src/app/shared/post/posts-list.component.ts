@@ -12,8 +12,9 @@ import { CommentsListComponent } from './comments-list.component';
   templateUrl: './posts-list.component.html'
 })
 export class PostsListComponent {
-  posts = input.required<Post[]>();
-  // posts = Posts;
+  // posts = input.required<Post[]>();
+  
+  posts = Posts;
   comentarios = PostComments; 
 
   obtenerComentarios(postId: number): Comentario[] {
