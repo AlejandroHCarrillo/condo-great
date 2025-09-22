@@ -65,6 +65,14 @@ Notas:
 ```
 * Tambien se puede cambiar el color de la columna agregando la propiedad color y el nombre o codigo exadecimal.
 
+## Instalar UUID para asignar ids
+Es un paquete muy utilizado
+
+```
+    npm i uuid
+```
+
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.15.
 
 ## Development server

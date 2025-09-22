@@ -1,6 +1,6 @@
     <li class="py-1 m-0">
       <a [routerLink]="menuitem().path" routerLinkActive="bg-primary text-white" >
-      @if(menuitem().icon) {
+      @if(menuitem().icon) {        
         <span class="relative group">
           <span class="hidden lg:inline text-2xl">
             <i [class]="menuitem().icon" class="text-primary" routerLinkActive="text-white" ></i> 
@@ -11,5 +11,6 @@
           </span>
         </span>
       }
-       <span class="hidden lg:inline">{{ menuitem().title }}</span>
+       <span class="hidden lg:inline">{{ menuitem().title }}
+       </span>
     </a></li>

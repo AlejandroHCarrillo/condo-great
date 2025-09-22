@@ -3,10 +3,11 @@ import { menuItem } from '../interfaces/menu-item.interface';
 import { menuOptions } from '../data/menu-options.data';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MenuItemComponent } from "./menu-item/menu-item.component";
+import { MenuPanicButtonComponent } from "./menu-panic-button/panic-button.component";
 
 @Component({
   selector: 'hh-left-menu',
-  imports: [MenuItemComponent],
+  imports: [MenuItemComponent, MenuPanicButtonComponent],
   templateUrl: './left-menu.component.html'
 })
 export class LeftMenuComponent {

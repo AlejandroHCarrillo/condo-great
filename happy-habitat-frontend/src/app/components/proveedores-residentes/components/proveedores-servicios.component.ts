@@ -2,7 +2,7 @@ import { Component, inject, linkedSignal, signal } from '@angular/core';
 import { ProveedoresListComponent } from "./proveedores-list/proveedores-list.component";
 import { SearchInputComponent } from "./search-input/search-input.component";
 import { ActivatedRoute, Router } from '@angular/router';
-import { proveedoresResidentes } from '../../../shared/data/proveedores-servicios.data';
+import { directorioProveedoresResidentes } from '../../../shared/data/directorio-servicios.data';
 import { EntradaDirectorio } from '../../../shared/interfaces/entrada-directorio.inteface';
 
 @Component({
@@ -12,7 +12,7 @@ import { EntradaDirectorio } from '../../../shared/interfaces/entrada-directorio
   styles: ``
 })
 export class ProveedoresServiciosComponent {
-  provedores = signal<EntradaDirectorio[]>([...proveedoresResidentes])
+  provedores = signal<EntradaDirectorio[]>([...directorioProveedoresResidentes])
   // _service = inject(ProveedoresResidentesService);
   
   router = inject(Router);

@@ -6,9 +6,11 @@ import { BreadcrumsComponent } from "../breadcrums/breadcrums.component";
   templateUrl: './nav-bar.component.html'
 })
 export class NavBarComponent implements OnInit {
+  
   ngOnInit(): void {
     this.checkThemeStored();
   }
+
   title = "Happy Habitat";
   themeKey = 'HHTheme';
   

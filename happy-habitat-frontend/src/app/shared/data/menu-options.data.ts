@@ -1,19 +1,21 @@
-import { menuItem } from "../interfaces/menu-item.interface";
+import { v4 as UUIDV4 } from 'uuid';
+import type { menuItem } from "../interfaces/menu-item.interface";
+
 const adminOptions: menuItem[] = [
   {
-    id: 301,
+    id: "301",
     title: 'Usuarios',
     path: "usuarios",
     icon: "fa-regular fa-circle-user"
   },
   {
-    id: 302,
+    id: "302",
     title: 'Coto',
     path: "colonia",
     icon: ""
   },
     {
-    id: 303,
+    id: "303",
     title: 'Residente',
     path: "colonia",
     icon: ""
@@ -23,108 +25,114 @@ const adminOptions: menuItem[] = [
 
 export const menuOptions: menuItem[] = [
   {
-    id: 1,
+    id: UUIDV4(),
     title: 'Inicio',
     path: "home",
     icon: `fa-solid fa-house`
   },
   {
-    id: 2,
+    id: UUIDV4(),
     title: 'Dashboard',
     path: "dashboard",
     icon: "fa-solid fa-gauge"
   },
   {
-    id: 2,
+    id: UUIDV4(),
     title: 'Registro',
     path: "registro",
     icon: "fa-solid fa-address-book"
   },
   {
-    id: 2,
+    id: UUIDV4(),
     title: 'Directorio de Servicios',
     path: "proveedores",
     icon: "fa-solid fa-phone-volume"
   },
     {
-    id: 2,
+    id: UUIDV4(),
     title: 'Social network',
     path: "social",
     icon: "fa-solid fa-users-rays"
   },
   {
-    id: 3,
+    id: UUIDV4(),
     title: 'Administracion',
     path: "administracion",
     icon: "fa-solid fa-user-tie",
     child: [...adminOptions]
   },
   {
-    id: 3,
+    id: UUIDV4(),
     title: 'Seguridad',
     path: "Seguridad",
     icon: "fa-solid fa-user-shield"
   },
   {
-    id: 3,
+    id: UUIDV4(),
     title: 'Finanzas',
     path: "Supervisor",
     icon: "fa-solid fa-file-invoice-dollar"
   },
   {
-    id: 3,
+    id: UUIDV4(),
     title: 'Pagos',
     path: "Supervisor",
     icon: "fa-solid fa-money-bill-1-wave"
   },
   {
-    id: 3,
+    id: UUIDV4(),
     title: 'Transparencia',
     path: "Supervisor",
     icon: "fa-solid fa-eye"
   },
   {
-    id: 3,
+    id: UUIDV4(),
     title: 'Morosos',
     path: "Supervisor",
     icon: "fa-solid fa-person-burst"
   },
   {
-    id: 2,
+    id: UUIDV4(),
     title: 'Amenidades',
     path: "Amenidades",
     icon: "fa-solid fa-people-roof"
   },
 
     {
-    id: 2,
+    id: UUIDV4(),
     title: 'Mis tickets',
     path: "mistickets",
     icon: "fa-solid fa-ticket"
   },
     {
-    id: 2,
+    id: UUIDV4(),
     title: 'Documentos',
     path: "documents",
     icon: "fa-solid fa-file-lines"
   },
     {
-    id: 2,
+    id: UUIDV4(),
     title: 'Encuestas',
     path: "encuestas",
     icon: "fa-solid fa-chart-simple"
   },
     {
-    id: 2,
+    id: UUIDV4(),
     title: 'Avisos',
     path: "avisos",
     icon: "fa-solid fa-bullhorn"
   },
-    {
-    id: 2,
+  {
+    id: UUIDV4(),
     title: 'Configuracion',
     path: "configuracion",
     icon: "fa-solid fa-gears"
+  },
+  {
+    id: UUIDV4(),
+    title: 'Boton de pánico',
+    path: "panicbutton",
+    icon: "fa-solid fa-house-fire"
   },
 ];
 

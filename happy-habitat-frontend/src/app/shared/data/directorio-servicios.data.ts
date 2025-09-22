@@ -1,13 +1,13 @@
 import { EntradaDirectorio } from "../interfaces/entrada-directorio.inteface";
 
-export const proveedoresResidentes: EntradaDirectorio[] = 
+export const directorioProveedoresResidentes: EntradaDirectorio[] = 
 [
   {
     id: 0,
     name: "Aluminium Martinez",
     description: "Herrero, Balconero, aluminio",
     kindservice: "Herrero",
-    phone: "+524272196845",
+    phone: "+524272196945",
     emai: "", 
     img: "",
   }, 
@@ -19,6 +19,24 @@ export const proveedoresResidentes: EntradaDirectorio[] =
     phone: '442-123-4567',
     emai: 'contacto@gasqueretano.com',
     img: 'https://example.com/img/gas.png'
+  },
+  {
+    id: 2,
+    name: 'URBAN GAS Queretaro',
+    description: 'GAS Queretaro Pedidos',
+    kindservice: 'Gas',
+    phone: '442-488-7953',
+    emai: '',
+    img: ''
+  },
+  {
+    id: 3,
+    name: 'Juan Servin',
+    description: 'Jardineria',
+    kindservice: 'Jardineria',
+    phone: '442 327 9133',
+    emai: '',
+    img: ''
   },
   {
     id: 2,
@@ -102,4 +120,3 @@ export const proveedoresResidentes: EntradaDirectorio[] =
     img: 'https://example.com/img/eventos.png'
   }
 ];
-

@@ -1,10 +1,8 @@
 import { Component } from '@angular/core';
 import { documentos } from '../../shared/data/documentos.data';
-import { JsonPipe } from '@angular/common';
-
 @Component({
   selector: 'hh-document-list',
-  imports: [JsonPipe],
+  imports: [],
   templateUrl: './document-list.component.html',
   styles: ``
 })
