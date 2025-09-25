@@ -56,6 +56,13 @@ export const menuOptions: menuItem[] = [
   },
   {
     id: UUIDV4(),
+    title: 'Sysadmin',
+    path: "sysadmin",
+    icon: "fa-solid fa-user-tie",
+    child: [...adminOptions]
+  },
+  {
+    id: UUIDV4(),
     title: 'Administracion',
     path: "administracion",
     icon: "fa-solid fa-user-tie",
@@ -127,12 +134,6 @@ export const menuOptions: menuItem[] = [
     title: 'Configuracion',
     path: "configuracion",
     icon: "fa-solid fa-gears"
-  },
-  {
-    id: UUIDV4(),
-    title: 'Boton de pánico',
-    path: "panicbutton",
-    icon: "fa-solid fa-house-fire"
   },
 ];
 

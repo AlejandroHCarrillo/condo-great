@@ -1,10 +1,21 @@
 import { EntradaDirectorio } from "../interfaces/entrada-directorio.inteface";
+import { v4 as UUIDV4 } from 'uuid';
 
 export const directorioProveedoresResidentes: EntradaDirectorio[] = 
 [
   {
-    id: 0,
-    name: "Aluminium Martinez",
+    id: UUIDV4(),
+    name: "Servicios generales de Jardineria la Doble R",
+    description: `Ofrezco servicio de limpieza, mantenimiento de plantas, árboles y pasto 🌳🌺🌴
+                  contamos con 10 años de experiencia TODO A DOMICILIO. SAN JUAN DEL RÍO. Querétaro #laDobleR`,
+    kindservice: "Jardineria",
+    phone: "+52 1 427 126 9116",
+    emai: "", 
+    img: "",
+  }, 
+    {
+    id: UUIDV4(),
+    name: "Aluminium Martinezs",
     description: "Herrero, Balconero, aluminio",
     kindservice: "Herrero",
     phone: "+524272196945",
@@ -12,7 +23,7 @@ export const directorioProveedoresResidentes: EntradaDirectorio[] =
     img: "",
   }, 
   {
-    id: 1,
+    id: UUIDV4(),
     name: 'Gas Exprés Queretano',
     description: 'Distribución de gas LP a domicilio con cobertura en El Pueblito y zonas cercanas.',
     kindservice: 'Gas',
@@ -21,7 +32,7 @@ export const directorioProveedoresResidentes: EntradaDirectorio[] =
     img: 'https://example.com/img/gas.png'
   },
   {
-    id: 2,
+    id: UUIDV4(),
     name: 'URBAN GAS Queretaro',
     description: 'GAS Queretaro Pedidos',
     kindservice: 'Gas',
@@ -30,7 +41,7 @@ export const directorioProveedoresResidentes: EntradaDirectorio[] =
     img: ''
   },
   {
-    id: 3,
+    id: UUIDV4(),
     name: 'Juan Servin',
     description: 'Jardineria',
     kindservice: 'Jardineria',
@@ -39,7 +50,7 @@ export const directorioProveedoresResidentes: EntradaDirectorio[] =
     img: ''
   },
   {
-    id: 2,
+    id: UUIDV4(),
     name: 'Herrería El Forjador',
     description: 'Fabricación y reparación de portones, barandales y estructuras metálicas.',
     kindservice: 'Herrería',
@@ -48,7 +59,7 @@ export const directorioProveedoresResidentes: EntradaDirectorio[] =
     img: 'https://example.com/img/herreria.png'
   },
   {
-    id: 3,
+    id: UUIDV4(),
     name: 'Fumigaciones La Plaga',
     description: 'Control de plagas en áreas comunes, jardines y cisternas. Servicio certificado.',
     kindservice: 'Fumigación',
@@ -57,7 +68,7 @@ export const directorioProveedoresResidentes: EntradaDirectorio[] =
     img: 'https://example.com/img/fumigacion.png'
   },
   {
-    id: 4,
+    id: UUIDV4(),
     name: 'Jardinería Verde Vivo',
     description: 'Mantenimiento de áreas verdes, poda de árboles y diseño de jardines.',
     kindservice: 'Jardinería',
@@ -66,7 +77,7 @@ export const directorioProveedoresResidentes: EntradaDirectorio[] =
     img: 'https://example.com/img/jardineria.png'
   },
   {
-    id: 5,
+    id: UUIDV4(),
     name: 'Electricista Don Chuy',
     description: 'Instalaciones eléctricas, reparación de luminarias y revisión de medidores.',
     kindservice: 'Electricidad',
@@ -75,7 +86,7 @@ export const directorioProveedoresResidentes: EntradaDirectorio[] =
     img: 'https://example.com/img/electricista.png'
   },
   {
-    id: 6,
+    id: UUIDV4(),
     name: 'Fontanería El Goteo',
     description: 'Reparación de fugas, mantenimiento de cisternas y redes hidráulicas.',
     kindservice: 'Fontanería',
@@ -84,7 +95,7 @@ export const directorioProveedoresResidentes: EntradaDirectorio[] =
     img: 'https://example.com/img/fontaneria.png'
   },
   {
-    id: 7,
+    id: UUIDV4(),
     name: 'Seguridad Integral',
     description: 'Instalación de cámaras, alarmas y monitoreo remoto para zonas residenciales.',
     kindservice: 'Seguridad',
@@ -93,7 +104,7 @@ export const directorioProveedoresResidentes: EntradaDirectorio[] =
     img: 'https://example.com/img/seguridad.png'
   },
   {
-    id: 8,
+    id: UUIDV4(),
     name: 'Pinturas y Acabados JR',
     description: 'Pintura de muros, fachadas y señalización en espacios comunes.',
     kindservice: 'Pintura',
@@ -102,7 +113,7 @@ export const directorioProveedoresResidentes: EntradaDirectorio[] =
     img: 'https://example.com/img/pintura.png'
   },
   {
-    id: 9,
+    id: UUIDV4(),
     name: 'Reparaciones Express',
     description: 'Servicio general de mantenimiento: carpintería, albañilería y ajustes menores.',
     kindservice: 'Mantenimiento general',
@@ -111,7 +122,7 @@ export const directorioProveedoresResidentes: EntradaDirectorio[] =
     img: 'https://example.com/img/mantenimiento.png'
   },
   {
-    id: 10,
+    id: UUIDV4(),
     name: 'Eventos y Toldos Queretaro',
     description: 'Renta de toldos, sillas y sonido para reuniones vecinales y eventos comunitarios.',
     kindservice: 'Eventos',

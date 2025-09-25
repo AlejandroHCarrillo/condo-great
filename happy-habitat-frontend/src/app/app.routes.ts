@@ -31,6 +31,11 @@ export const routes: Routes = [
         loadChildren: () => import('./components/registro/registro-routes'),   
     },
     {
+        path: 'sysadmin',
+        loadChildren: () => import('./components/system-administation/system-admin-routes'),   
+    },
+
+    {
         path: 'proveedores',
         component: ProveedoresServiciosComponent,   
     },

@@ -1,5 +1,5 @@
 export interface EntradaDirectorio {
-    id?: number;
+    id?: string;
     name: string;
     description: string;
     kindservice: string;

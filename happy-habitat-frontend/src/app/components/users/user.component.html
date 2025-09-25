@@ -1,0 +1,242 @@
+<div class="max-w-xl mx-auto p-4 bg-base-200 rounded-box shadow-md">
+  <!-- <h2 class="text-2xl font-bold mb-4 flex flex-row">
+    <span class="text-2xl">
+      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 640 512"><path fill="currentColor" d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0S96 57.3 96 128s57.3 128 128 128m89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h274.9c-2.4-6.8-3.4-14-2.6-21.3l6.8-60.9l1.2-11.1l7.9-7.9l77.3-77.3c-24.5-27.7-60-45.5-99.9-45.5m45.3 145.3l-6.8 61c-1.1 10.2 7.5 18.8 17.6 17.6l60.9-6.8l137.9-137.9l-71.7-71.7zM633 268.9L595.1 231c-9.3-9.3-24.5-9.3-33.8 0l-37.8 37.8l-4.1 4.1l71.8 71.7l41.8-41.8c9.3-9.4 9.3-24.5 0-33.9"/></svg> &nbsp;
+      &nbsp;
+    </span>
+    <span>Alta de usuarios</span>
+  </h2> -->
+    <h2 class="text-2xl font-bold mb-4 flex flex-row justify-between">
+    <span class="flex justify-around text-2xl">
+      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 640 512"><path fill="currentColor" d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0S96 57.3 96 128s57.3 128 128 128m89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h274.9c-2.4-6.8-3.4-14-2.6-21.3l6.8-60.9l1.2-11.1l7.9-7.9l77.3-77.3c-24.5-27.7-60-45.5-99.9-45.5m45.3 145.3l-6.8 61c-1.1 10.2 7.5 18.8 17.6 17.6l60.9-6.8l137.9-137.9l-71.7-71.7zM633 268.9L595.1 231c-9.3-9.3-24.5-9.3-33.8 0l-37.8 37.8l-4.1 4.1l71.8 71.7l41.8-41.8c9.3-9.4 9.3-24.5 0-33.9"/></svg> &nbsp;
+      <span>Alta de usuarios</span>
+    </span>
+    <span>
+        <button class="btn bg-gray-300 float-end" (click)="goBack();">Regresar</button>
+    </span>
+  </h2>
+  <!-- <form [formGroup]="myForm" (ngSubmit)="onSave()" class="flex flex-col gap-4"> -->
+  <form autocomplete="off" class="flex flex-col gap-4" [formGroup]="myForm" (ngSubmit)="onSave()">
+
+    <div class="flex gap-4 flex-wrap sm:flex-nowrap">
+      <div class="col">
+        <div>
+          <label class="label">Rol</label>
+          <select formControlName="role" class="select select-bordered w-full">
+              @for (rol of roles; track $index) {
+                  <option [value]="rol.value">{{ rol.text }}</option>
+              }    
+          </select>
+          <!-- Con este validador verificamos los errores del campo -->
+          <show-form-error-template
+                  [isValid]="formUtils.isValidField(myForm, 'role')"
+                  [errorMessage]="formUtils.getFieldError(myForm, 'role')"
+          />
+        </div>
+
+        <div>
+          <label class="label">Nombre completo</label>
+          <input formControlName="fullname" type="text" class="input input-bordered w-full" />
+          <show-form-error-template
+                  [isValid]="formUtils.isValidField(myForm, 'fullname')"
+                  [errorMessage]="formUtils.getFieldError(myForm, 'fullname')"
+          />
+        </div>
+
+        <div>
+          <label class="label">Usuario</label>
+          <input formControlName="username" type="text" class="input input-bordered w-full" />
+          <show-form-error-template
+                  [isValid]="formUtils.isValidField(myForm, 'username')"
+                  [errorMessage]="formUtils.getFieldError(myForm, 'username')"
+          />
+        </div>
+
+        <div>
+          <label class="label">Correo electrónico</label>
+          <input formControlName="email" type="email" class="input input-bordered w-full" />
+          <show-form-error-template
+                  [isValid]="formUtils.isValidField(myForm, 'email')"
+                  [errorMessage]="formUtils.getFieldError(myForm, 'email')"
+          />
+        </div>
+
+        <div>
+          <label class="label">Dirección</label>
+          <input formControlName="address" type="text" class="input input-bordered w-full" />
+          <show-form-error-template
+                  [isValid]="formUtils.isValidField(myForm, 'address')"
+                  [errorMessage]="formUtils.getFieldError(myForm, 'address')"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary w-full text-white mt-5">Guardar</button>
+      </div>
+
+      <div class="col w-[50%]">
+        <fieldset>
+        <!-- Agregar Favorito -->
+          <div class="mb-3 row">
+            <div class="input-group">
+              <label class="label">Comunidades</label>
+              <div class="flex justify-center">
+                <select class="select select-bordered w-[80%] mr-1"
+                      placeholder="Seleccione una unidad habitacional"
+                      [formControl]  = "newComunidad"
+                >
+                    @for (selectoption of comunidadesCombo; track $index) {
+                        <option [value]="selectoption.value">{{ selectoption.text }}</option>
+                    }    
+                </select>
+                <button type="button"
+                        class="btn btn-primary"
+                        [disabled] = "!newComunidad.value"                        
+                        (click)="onAddCommunity()"
+                        >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M19 12.998h-6v6h-2v-6H5v-2h6v-6h2v6h6z"/></svg>
+                </button>
+              </div>            
+            </div>
+            <!-- Mandamos el error directo por que no lo tenemos en las utils 
+                como sacar los errores de un campo externo 
+            -->
+            <!-- <show-form-error-template
+                [isValid]="newComunidad.errors===null"
+                [errorMessage]="formUtils.getFiedErrorDescription(newComunidad.errors)"
+            /> -->
+              <!-- new Favorite is valid: {{ newComunidad.valid |  json}}
+              new Favorite errors: {{ newComunidad.errors |  json}} -->
+          </div>
+          <!-- Lista de Juegos Favoritos -->
+          <div class="mb-3 row bg-base-300">
+            <label class="col-sm-3 col-form-label  bg-base-100 font-bold m-2 w-full p-1 mb-5">Comunidades seleccionadas</label>
+            <div class="col-sm-9 " formArrayName="comunidades">
+                @for (comunidad of comunidadesSeleccionadas; track $index; let i = $index) {
+                <div class="mb-1 w-full">
+                    <div class="input-group flex justify-between items-baseline px-1">
+                        {{ comunidad.text }}
+                        <button class="btn btn-outline-danger bg-red-500 text-white"
+                                type="button"
+                                (click)="onDeleteFavorite(comunidad.value)"
+                                >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7.616 20q-.672 0-1.144-.472T6 18.385V6H5V5h4v-.77h6V5h4v1h-1v12.385q0 .69-.462 1.153T16.384 20zM17 6H7v12.385q0 .269.173.442t.443.173h8.769q.23 0 .423-.192t.192-.424zM9.808 17h1V8h-1zm3.384 0h1V8h-1zM7 6v13z"/></svg>
+                      </button>
+                    </div>
+                </div>
+                }
+                @empty {
+                  <div>No hay comunidades asociadas</div>
+                }
+                <!-- Con este validador verificamos los errores del campo -->
+                <show-form-error-template
+                        [isValid]="formUtils.isValidField(myForm, 'comunidades')"
+                        [errorMessage]="formUtils.getFieldError(myForm, 'comunidades')?.replace('caracteres', 'comunidades')"
+                />
+
+            <!-- <span class="form-text text-danger">Error general</span> -->
+                <!-- @if (!formUtils.isValidField(myForm, 'favoriteGames')) {
+                        <span class="form-text text-danger">
+                            Debe elegir 3 juegos favoritos
+                        </span>
+                } -->
+<pre>
+  <!-- {{allcomunities|json}} -->
+  <!-- {{comunidadesSeleccionadas|json}} -->
+</pre>
+            </div>
+          </div>
+        </fieldset>
+
+      </div>
+    </div>
+  </form>
+
+<pre>
+  {{ myForm.value | json}}
+</pre>
+
+
+<h1 class="text-2xl">Roles:</h1>
+<div class="join join-vertical bg-base-100">
+  <div class="collapse collapse-arrow join-item border-base-300 border">
+    <input type="radio" name="my-accordion-4" />
+    <div class="collapse-title font-semibold">SysAdmin:</div>
+    <div class="collapse-content text-sm">
+        <br>Puedecrear unidades habitacionales 
+        <br>usuarios administradores 
+        <br>Asignar 1 o mas unidades habitacionales a los usuarios administradores.
+    </div>
+  </div>
+  <div class="collapse collapse-arrow join-item border-base-300 border">
+    <input type="radio" name="my-accordion-4" />
+    <div class="collapse-title font-semibold">Administrador</div>
+    <div class="collapse-content text-sm">
+        Este usuario pertenece a una compañia de administracion de comunidades, 
+        puede:
+        <br>Crear Residentes y Residentes de la mesa directiva.
+        <br>Ver y responder los tickets creados por los Residentes.
+        <br>Hacer y publicar avisos comunicados.
+        <br>Hacer y publicar encuestas.
+        <br>Subir documentos a la biblioteca de documentos.
+        <br>Administrar a los proveedores del coto.
+        <br>Subir comprobantes de pagos a proveedores.
+        <br>Subir comprobantes de pagos a residentes.
+        <br>Autorizar reservaciones.
+        <br>Generar balances de finanzas.
+        <br>Generar sanciones a los residentes.
+        <br>Hacer cargos extraordinarios a los residentes.
+    </div>
+  </div>
+  <div class="collapse collapse-arrow join-item border-base-300 border">
+    <input type="radio" name="my-accordion-4" />
+    <div class="collapse-title font-semibold">Vigilancia:</div>
+    <div class="collapse-content text-sm">
+        El vigilante puede:
+            <br>Ver la informacion y preferencias de los residentes.
+            <br>Ver y registrar visitas / mudanzas registradas del residente.
+            <br>Revisar las reservaciones / cupo de la alberca.
+            <br>Levantar reportes a los residentes.
+            <br>Registrar incidentes.
+            <br>Responder al boton de panico.
+            <br>Registrar paqueteria recibida para el usuario. (seleccionar la casa dueña del paquete y sacar foto del paquete y la etiqueta).
+            <br>Verificar que el usuario recibe el paquete.
+            <br>
+            <br>
+            <br>Generar el reporte de incidentes de su turno.
+    </div>
+  </div>
+  <div class="collapse collapse-arrow join-item border-base-300 border">
+    <input type="radio" name="my-accordion-4" />
+    <div class="collapse-title font-semibold">Residente:</div>
+    <div class="collapse-content text-sm">
+    Puede:
+            <br>Ver los avisos y comunicados.
+            <br>Ver el directorio de proveedores asi como dar like o dislike a los proveedores.
+            <br>Levantar y ver tickets asi como ver las respuestas de sus tickets.
+            <br>Ver documentos de la biblioteca.
+            <br>Registrar sus visitas, mudanzas, mascotas, autos y miembros de su familia o residentes de su casa.
+            <br>Ver balances de finanzas.
+            <br>Ver y hacer publicaciones en la red social
+            <br>Ver y responder a los comentarios de las publicaciones de la red social
+            <br>Hacer los pagos de sus cuotas u otros cargos como pago de multas y pago de amenidades.
+            <br>
+    </div>
+  </div>
+  <div class="collapse collapse-arrow join-item border-base-300 border">
+    <input type="radio" name="my-accordion-4" />
+    <div class="collapse-title font-semibold">Residente MD:</div>
+    <div class="collapse-content text-sm">
+        Puede:
+        <br>Ademas de las funciones de un residente normal.
+        <br>Ver todos los tickets levantados de todos los residentes.
+        <br>Responder los tickets de los residentes.
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+    </div>
+  </div>
+
+</div>

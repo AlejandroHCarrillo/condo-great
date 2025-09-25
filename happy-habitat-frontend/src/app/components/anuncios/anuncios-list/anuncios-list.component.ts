@@ -1,8 +1,5 @@
-import { AnuncioPostMapper } from './../../proveedores-residentes/mappers/proveedor-residente.mapper copy';
-import { Post } from './../../../shared/interfaces/post.interface';
-import { Component, computed, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { Anuncio } from '../../../shared/interfaces/announcement.interface';
-import { PostsListComponent } from "../../../shared/post/posts-list.component";
 
 @Component({
   selector: 'hh-anuncios-list',

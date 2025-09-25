@@ -1,9 +1,10 @@
+import { tipoComunidadEnum } from "../../enums/tipo-comunidad.enum";
+
 export interface Residente {
-  id: number;
-  nombreCompleto: string;
-  numeroCasa: string;
-  address: string;
-  phone?: string;
+  id?: string;
+  fullname: string;
   email?: string;
-  rol: 'residente';
+  phone?: string;
+  address: string;
+  comunidades: string[];
 }
