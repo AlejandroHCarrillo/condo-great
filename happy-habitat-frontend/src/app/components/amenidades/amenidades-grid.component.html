@@ -1,0 +1,32 @@
+<section class="bg-base-300">
+    <div class="grid grid-cols-1 lg:grid-cols-2">
+        @for (amenidad of amenidades(); track amenidad.id) {            
+            <div class="card bg-base-100 w-96 shadow-sm m-5">
+                <figure class="max-h-40 w-full">
+                    <img [src]="amenidad.imagen"
+                    [alt]="amenidad.nombre" />
+                </figure>
+                <div class="card-body">
+                    <h2 class="card-title">
+                        {{amenidad.nombre}}
+                    </h2>
+                    <p>{{amenidad.descripcion}}</p>
+                    <p>{{amenidad.reglas}}</p>
+                    <p class="text-right">Costo: 
+                        <span class="badge badge-outline">{{amenidad.costo}}</span>
+                    </p>
+                    <div class="card-actions self-center">
+                        <!-- Open the modal using ID.showModal() method -->
+                         <hh-amenidad-horario-modal [horarios]="getHorariosAmenidad(amenidad.id!)"/>
+                        <div class="badge badge-secondary">Reservar</div>
+                    </div>
+                </div>
+            </div>
+
+        }
+    </div>
+</section>
+aqui deben verse las amenidades
+<pre>
+    {{ amenidades() | json }}
+</pre>

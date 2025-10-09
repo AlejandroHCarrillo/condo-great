@@ -1,0 +1,33 @@
+<!-- <hh-list-posts [posts]="posts()"/> -->
+<ul class="list bg-base-100 rounded-box shadow-md px-5">
+    <li class="flex p-4 pb-2 text-2xl opacity-60 tracking-wide justify-between">
+        <span>Amenidades</span>
+        <span>
+            <button class="btn bg-yellow-300 m-0 font-bold" (click)="new()" >
+                Nuevo
+            </button>
+        </span>
+    </li>
+
+    <hr>
+    @for (amenidad of amenidades(); track amenidad.id) {
+      <li class="list-row">
+        @if (amenidad.imagen) {
+          <div><img class="size-10 rounded-box" [src]="amenidad.imagen" [alt]="amenidad.nombre"/></div>
+        }
+        <div>
+          <div>{{amenidad.nombre }}</div>
+          <div class="text-xs uppercase font-semibold opacity-60">costo: {{amenidad.costo}} - <span class="">{{amenidad.fechaalta | date : 'dd MMM yyyy'}}</span> </div>
+        </div>
+        <p class="list-col-wrap text-xs text-justify">
+          {{amenidad.reglas}}
+        </p>
+        <button class="btn btn-square btn-ghost bg-yellow-500" (click)="edit(amenidad.id!)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="m6.4 14.1l1.3 1.3l6.9-6.9l-1.3-1.3zm6.3-7.5l-1.3-1.3l-6.9 6.9l1.4 1.4zm2.1-4.7l3.3 3.3c.6.6.5 1.5 0 2l-9.9 9.9l-6.9 1.4l1.4-6.9q9.3-9.45 9.9-9.9c.6-.4 1.6-.4 2.2.2"/></svg>
+        </button>
+        <button class="btn btn-square btn-ghost bg-red-500 text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7.616 20q-.672 0-1.144-.472T6 18.385V6H5V5h4v-.77h6V5h4v1h-1v12.385q0 .69-.462 1.153T16.384 20zM17 6H7v12.385q0 .269.173.442t.443.173h8.769q.23 0 .423-.192t.192-.424zM9.808 17h1V8h-1zm3.384 0h1V8h-1zM7 6v13z"/></svg>
+        </button>
+      </li>
+    }
+</ul>

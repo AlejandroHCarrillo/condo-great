@@ -5,9 +5,10 @@ import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.co
 import { NotFoundPageComponent } from './pages/not-found-page/not-found-page.component';
 import { ProveedoresServiciosComponent } from './components/proveedores-residentes/components/proveedores-servicios.component';
 import { AvisosListComponent } from './components/avisos/avisos-list/avisos-list.component';
-import { AnunciosListComponent } from './components/anuncios/anuncios-list/anuncios-list.component';
+import { ComunicadosListComponent } from './components/comunicados/comunicados-list.component';
 import { PostsListComponent } from './shared/post/posts-list.component';
 import { DocumentsPageComponent } from './pages/documents-page/documents-page.component';
+import { ComunicadosPostsComponent } from './components/comunicados/comunicados-posts.component';
 
 export const routes: Routes = [
     {
@@ -34,14 +35,21 @@ export const routes: Routes = [
         path: 'sysadmin',
         loadChildren: () => import('./components/system-administation/system-admin-routes'),   
     },
-
+    {
+        path: 'amenidades',
+        loadChildren: () => import('./components/amenidades/amenidades-routes'),   
+    },
+    {
+        path: 'comunicados',
+        component: ComunicadosListComponent,   
+    },
     {
         path: 'proveedores',
         component: ProveedoresServiciosComponent,   
     },
     {
         path: 'anuncios',
-        component: AnunciosListComponent,   
+        component: ComunicadosListComponent,   
     },
     {
         path: 'social',

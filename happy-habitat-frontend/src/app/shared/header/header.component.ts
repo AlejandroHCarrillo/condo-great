@@ -11,4 +11,5 @@ import { BreadcrumsComponent } from "../breadcrums/breadcrums.component";
 })
 export class HeaderComponent {
   title = 'Happy Habitat'
+  subtitle = 'Administrando comunidades en armonia';
 }

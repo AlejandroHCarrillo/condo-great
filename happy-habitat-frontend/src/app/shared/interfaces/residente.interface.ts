@@ -5,6 +5,8 @@ export interface Residente {
   fullname: string;
   email?: string;
   phone?: string;
+  number?:string;
   address: string;
-  comunidades: string[];
+  comunidades?: string[];
+  rol?: string;
 }

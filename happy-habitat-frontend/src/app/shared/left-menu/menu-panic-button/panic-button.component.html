@@ -16,13 +16,15 @@
 <dialog id="panic_modal" class="modal">
     <div class="modal-box">
         <h3 class="text-3xl font-bold text-red-700">Alarma</h3>
-        <p class="py-4">Se ha enviado un alarma a la caseta de vigilancia </p>
+        <p class="py-4">Se enviara una alarma a la caseta de vigilancia </p>
         <p class="py-4">De la casa XXXX a las XX:XX </p>
+        Tipo de alarma:
         <p class="py-4 text-xs text-bold">Todo abuso del boton de alarma será sancionado conforme al reglamento.</p>
         <div class="modal-action">
         <form method="dialog">
             <!-- if there is a button in form, it will close the modal -->
-            <button class="btn">Cerrar</button>
+            <button class="btn bg-red-500 text-white mr-5">Enviar alarma!</button>
+            <button class="btn">Cancelar</button>
         </form>
         </div>
     </div>

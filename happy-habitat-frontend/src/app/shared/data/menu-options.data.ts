@@ -48,11 +48,11 @@ export const menuOptions: menuItem[] = [
     path: "proveedores",
     icon: "fa-solid fa-phone-volume"
   },
-    {
+  {
     id: UUIDV4(),
-    title: 'Social network',
-    path: "social",
-    icon: "fa-solid fa-users-rays"
+    title: 'Amenidades',
+    path: "amenidades",
+    icon: "fa-solid fa-people-roof"
   },
   {
     id: UUIDV4(),
@@ -69,6 +69,11 @@ export const menuOptions: menuItem[] = [
     child: [...adminOptions]
   },
   {
+    id: UUIDV4(),
+    title: 'Comunidados',
+    path: "comunicados",
+    icon: "fa-solid fa-bullhorn"
+  },  {
     id: UUIDV4(),
     title: 'Seguridad',
     path: "Seguridad",
@@ -98,12 +103,6 @@ export const menuOptions: menuItem[] = [
     path: "Supervisor",
     icon: "fa-solid fa-person-burst"
   },
-  {
-    id: UUIDV4(),
-    title: 'Amenidades',
-    path: "Amenidades",
-    icon: "fa-solid fa-people-roof"
-  },
 
     {
     id: UUIDV4(),
@@ -123,17 +122,18 @@ export const menuOptions: menuItem[] = [
     path: "encuestas",
     icon: "fa-solid fa-chart-simple"
   },
-    {
-    id: UUIDV4(),
-    title: 'Avisos',
-    path: "avisos",
-    icon: "fa-solid fa-bullhorn"
-  },
+
   {
     id: UUIDV4(),
     title: 'Configuracion',
     path: "configuracion",
     icon: "fa-solid fa-gears"
+  },
+    {
+    id: UUIDV4(),
+    title: 'Social network',
+    path: "social",
+    icon: "fa-solid fa-users-rays"
   },
 ];
 

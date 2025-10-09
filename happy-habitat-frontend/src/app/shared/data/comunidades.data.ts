@@ -54,15 +54,15 @@ export const comunidadesData: Comunidad[] =
   },
   {
     id: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c",
-    tipoUnidadHabitacional: tipoComunidadEnum.COLONIA,
-    nombre: "Colonia Jardines",
-    ubicacion: "Calle Gardenia 10, El Marqués, QRO",
+    tipoUnidadHabitacional: tipoComunidadEnum.COTO,
+    nombre: "Capital Sur - Cot Berlin",
+    ubicacion: "El Marqués, QRO",
     latlng: {
       lat: 20.6105,
       lng: -100.3802
     },
-    cantidadviviendas: 95,
-    contacto: "jardines@comunidad.org"
+    cantidadviviendas: 240,
+    contacto: "capitalsur-cotoberlin@comunidad.org"
   }
 ];
 

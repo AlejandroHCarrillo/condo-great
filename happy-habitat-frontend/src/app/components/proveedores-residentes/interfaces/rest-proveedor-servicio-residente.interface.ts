@@ -1,5 +1,5 @@
 export interface RESTProveedorServicioResidente {
-    id?: number;
+    id?: string;
     name: string;
     description: string;
     kindservice: string;

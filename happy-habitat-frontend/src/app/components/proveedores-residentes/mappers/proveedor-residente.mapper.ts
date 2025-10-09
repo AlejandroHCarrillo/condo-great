@@ -8,7 +8,7 @@ export class ProveedorServicioMapper {
                     id: restProvServicio.id,
                     name: restProvServicio.name,
                     description: restProvServicio.description,
-                    kindservice: restProvServicio.kindservice,
+                    tipoServicio: restProvServicio.kindservice,
                     phone: restProvServicio.phone,
                     emai: restProvServicio.email
                 };    

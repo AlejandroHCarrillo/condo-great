@@ -1,0 +1,40 @@
+<button class="badge badge-primary" (click)="modalRef.showModal()">Horarios</button>
+<dialog #modalRef id="amenidad_modal" class="modal modal-bottom sm:modal-middle">
+<div class="modal-box">
+    <h3 class="text-lg font-bold">Horario</h3>    
+     <div class="overflow-x-auto">
+        <table class="table">
+            <!-- head -->
+            <thead>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @for (horario of horarios(); track horario.id; let idx = $index) {
+                <tr class="hover:bg-base-300">
+                    <th>{{idx}}</th>
+                    <td>{{horario.day}}</td>
+                    <td>de las {{horario.horainicio}} a las {{horario.horafin}} hrs.</td>
+                    <td>{{horario.isOpen?'abierto':'cerrado'}}</td>
+                    <td>{{horario.nota}}</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <p>
+        {{horarios() | json }}
+    </p>
+    <div class="modal-action">
+    <form method="dialog">
+        <!-- if there is a button in form, it will close the modal -->
+        <button class="btn">Cerrar</button>
+    </form>
+    </div>
+</div>
+</dialog>

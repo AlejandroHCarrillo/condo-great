@@ -1,6 +1,6 @@
 export interface Auto {
-  id: number;           // Identificador único del auto
-  idResidente: number;  // ID del residente propietario
+  id?: string;           // Identificador único del auto
+  residenteId: string;  // ID del residente propietario
   marca: string;        // Marca del vehículo (ej. Toyota, Ford)
   modelo: string;       // Modelo específico (ej. Corolla, Mustang)
   año: number;          // Año de fabricación

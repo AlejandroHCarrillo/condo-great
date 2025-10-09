@@ -1,0 +1,105 @@
+<!-- <p>{{diasSemana}}</p> -->
+<!-- <pre>Horario del lunes: {{ getHorarioByDayHour("Jueves", "22:00") | json }}</pre> -->
+<!-- <pre> {{ reservaciones  | json }}</pre> -->
+<!-- <pre> {{ amenidadesOptions  | json }}</pre> -->
+<!-- <pre>Todos los horarios de la amenidad {{horariosAmenidad | json }}</pre> -->
+<section class="p-2">
+    <div>
+        <!-- <label class="label">Amenidades: </label> -->
+        <select formControlName="amenidadseleccionada" class="select" (change)="onSeleccion($event)">
+            <option>Seleccione una amenidad</option>
+            @for (amenidad of amenidadesOptions; track $index) {
+                <option [value]="amenidad.value">{{ amenidad.text }}</option>
+            }
+        </select>
+        <pre>
+            {{amenidad | json}}
+        </pre>
+    </div>
+</section>
+<section class="p-2">
+    <table class="table-auto w-full border-2">
+        <thead class="text-center text-lg font-bold bg-base-300">
+            <tr class="border-2">
+            @for (dia of diasSemana; track dia; let i = $index) {
+                <td class="py-2 text-nowrap">
+                    @if(i===0){
+                        <div>
+                            <button class="btn-ghost btn-sm btn-primary cursor-pointer" (click)="prevWeek()"><</button>
+                            {{dia}}
+                        </div>
+                    } @else if (i===6){
+                        <div>{{dia}}
+                            <button class="btn-ghost btn-sm btn-primary cursor-pointer" (click)="nextWeek()">></button>
+                        </div>
+                    } @else {
+                        <div>{{dia}}</div>
+                    }
+                    <div class="text-xs bg-base-100 w-full">{{sumDays(i) | date: 'dd-MMM'}}</div>
+                </td>
+            }
+            </tr>
+        </thead>
+        <tbody>
+            @for (hora of horasDelDia; track hora) {
+                <tr class="border-1">
+                    @for (dia of diasSemana; track dia; let i = $index) {
+                        @let s = getHorarioByDayHour(dia, hora);
+                        @let fecha = setDatetime(sumDays(i), hora);
+                        @let ocupacion = getReservationsByDate( fecha );
+
+                        <td class="hover:bg-base-300 min-h-[80px] align-top w-1/7 border-1 p-2" 
+                            [class.bg-base-100]= "s.isOpen"
+                            [class.bg-red-200]= "!s.isOpen"
+                            [class.bg-green-200]= "ocupacion>0 && ocupacion<=10"
+                            [class.bg-yellow-200]= "ocupacion>10 && ocupacion<=20"
+                            [class.bg-orange-300]= "ocupacion>20 && ocupacion<=capacidadMaxima"
+                            [class.bg-red-400]= "ocupacion>=capacidadMaxima"
+                            [class.text-bold]= "ocupacion>=capacidadMaxima"
+                            (click)="openModal(fecha)"
+                            onclick="reservarModal.showModal()"
+                        >
+                            <div class="text-xs text-right font-semibold">{{hora}}</div>
+                            @if(s.isOpen){
+                                @if(ocupacion > 0 ){
+                                    <div class="text-xs font-bold">Ocupacion:</div>
+                                    <span class="text-sm ">{{ ocupacion }} personas.</span>
+                                    @if (ocupacion >= capacidadMaxima ) {
+                                        <div class="text-xs font-extralight">Se ha alcanzado la capacidad máxima.</div>
+                                    }
+                                } @else {
+                                    <!-- <span  class="text-xs font-extralight">Libre</span>                                     -->
+                                }
+                                <div></div>
+                            } @else {
+                                <div class="text-xs text-center">{{ s.nota | json }}</div>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</section>
+
+
+<!-- Open the modal using ID.showModal() method -->
+<!-- <button class="btn" onclick="reservarModal.showModal()">open modal</button> -->
+<dialog id="reservarModal" class="modal modal-bottom sm:modal-middle">
+  <div class="modal-box">
+    <h1 class="text-lg font-bold pt-3 pl-2">Reservar {{ amenidad.nombre }}</h1>
+    <h3 class="text-md font-semibold  pl-2 pb-2">Horario: {{ fechaSeleccionada | date : "EEEE dd MMMM yyyy hh:mm"}}</h3>
+    <p class="font-bold py-5 bg-base-200 rounded-2xl p-3 mb-2">
+        Residente Casa: <span>120</span>
+    <br>Numero de personas: <span>5</span></p>
+    <p class="bg-base-200 p-3 rounded-2xl text-xs" [innerHTML]="sanitizeHTML(amenidad.reglas)"></p>
+    <p class="text-sm">He leido y acepto las reglas para reservar la {{amenidad.nombre | lowercase }}</p>
+    <div class="modal-action">
+        <p class="py-4 text-xs font-extralight">Para salir presione la tecla ESC o click en el boton cerrar de abajo.</p>
+      <form method="dialog">
+        <!-- if there is a button in form, it will close the modal -->
+        <button class="btn">Close</button>
+      </form>
+    </div>
+  </div>
+</dialog>

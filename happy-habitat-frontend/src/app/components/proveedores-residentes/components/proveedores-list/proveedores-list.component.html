@@ -15,7 +15,7 @@
         @for (proveedor of proveedores(); track proveedor.id; let index = $index) {
           <tr>
             <td class="hidden lg:inline">{{ $index + 1 }}</td>
-            <td class="hidden lg:inline">{{ proveedor.kindservice }}</td>
+            <td class="hidden lg:inline">{{ proveedor.tipoServicio }}</td>
             <td>{{ proveedor.name }}</td>
             <td class="text-right"><span class="badge badge-secondary">{{ proveedor.phone }}</span></td>
             <td>
@@ -26,7 +26,7 @@
                   <h3 class="text-lg font-bold py-2">{{ proveedor.name }}</h3>
                   <hr>
                   <p class="py-4">
-                    <strong>Servicio:</strong> {{proveedor.kindservice}}
+                    <strong>Servicio:</strong> {{proveedor.tipoServicio}}
                   </p>
                   <p class="py-4">
                     <strong>Descripcion:</strong> {{proveedor.description}}

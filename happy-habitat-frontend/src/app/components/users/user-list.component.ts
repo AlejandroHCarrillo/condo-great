@@ -37,8 +37,7 @@ export class UserListComponent {
   }
 
   delete(userId : string) {
-    console.log("Eliminar esta unidad", userId);
-    
+    console.log("Eliminar esta unidad", userId);    
   }
 }
 

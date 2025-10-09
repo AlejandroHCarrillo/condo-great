@@ -9,5 +9,6 @@ export interface Post {
   etiquetas: string[];     // Lista de etiquetas o categorías
   imagenUrl?: string;      // (Opcional) URL de imagen asociada
   esDestacado?: boolean;   // (Opcional) Si el post debe mostrarse como destacado
+  rank?: 1 | 2 | 3 | 4 | 5; // rango del 1 al 5 
   comentarios?: Comentario[];
 }
