@@ -81,7 +81,7 @@ export const horarioAmenidadesData : HorarioAmenidad[] = [
                 horainicio: HorasDelDia.H06_00,
                 horafin: HorasDelDia.H22_00,
                 isOpen: true,
-                nota: "abierto casa club"
+                nota: ""
             },
             {
                 id: UUIDV4(),
@@ -114,6 +114,22 @@ export const horarioAmenidadesData : HorarioAmenidad[] = [
                 horafin: HorasDelDia.H22_00,
                 isOpen: true,
                 nota: ""
+            },
+            {
+                id: UUIDV4(),
+                day: WeekDays.SATURDAY,
+                horainicio: HorasDelDia.H06_00,
+                horafin: HorasDelDia.H22_00,
+                isOpen: false,
+                nota: "Reservada con costo para eventos privados de los residentes."
+            },
+            {
+                id: UUIDV4(),
+                day: WeekDays.SUNDAY,
+                horainicio: HorasDelDia.H06_00,
+                horafin: HorasDelDia.H22_00,
+                isOpen: false,
+                nota: "Reservada con costo para eventos privados de los residentes."
             },
         ]
     },
@@ -126,47 +142,39 @@ export const horarioAmenidadesData : HorarioAmenidad[] = [
                 horainicio: HorasDelDia.H06_00,
                 horafin: HorasDelDia.H22_00,
                 isOpen: false,
-                nota: "Cerrada por mantenimiento"
+                nota: "Reservada para uso de los residentes."
             },
             {
                 id: UUIDV4(),
                 day: WeekDays.TUESDAY,
                 horainicio: HorasDelDia.H06_00,
                 horafin: HorasDelDia.H22_00,
-                isOpen: true,
-                nota: ""
+                isOpen: false,
+                nota: "Reservada para uso de los residentes."
             },
             {
                 id: UUIDV4(),
                 day: WeekDays.WEDNESDAY,
                 horainicio: HorasDelDia.H06_00,
                 horafin: HorasDelDia.H22_00,
-                isOpen: true,
-                nota: ""
+                isOpen: false,
+                nota: "Reservada para uso de los residentes."
             },
             {
                 id: UUIDV4(),
                 day: WeekDays.THURSDAY,
                 horainicio: HorasDelDia.H06_00,
-                horafin: HorasDelDia.H10_00,
-                isOpen: false,
-                nota: "Cerrada por mantenimiento"
-            },
-            {
-                id: UUIDV4(),
-                day: WeekDays.THURSDAY,
-                horainicio: HorasDelDia.H10_00,
                 horafin: HorasDelDia.H22_00,
-                isOpen: true,
-                nota: ""
+                isOpen: false,
+                nota: "Reservada para uso de los residentes."
             },
             {
                 id: UUIDV4(),
                 day: WeekDays.FRIDAY,
                 horainicio: HorasDelDia.H06_00,
                 horafin: HorasDelDia.H22_00,
-                isOpen: true,
-                nota: ""
+                isOpen: false,
+                nota: "Reservada para uso de los residentes."
             },
             {
                 id: UUIDV4(),

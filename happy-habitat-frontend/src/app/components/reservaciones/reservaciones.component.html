@@ -1,8 +1,10 @@
 <!-- <p>{{diasSemana}}</p> -->
 <!-- <pre>Horario del lunes: {{ getHorarioByDayHour("Jueves", "22:00") | json }}</pre> -->
-<!-- <pre> {{ reservaciones  | json }}</pre> -->
+<!-- <pre>inicioSemana(): {{ inicioSemana()  | json }}</pre> -->
+<!-- <pre>Reservaciones: {{ reservaciones  | json }}</pre> -->
 <!-- <pre> {{ amenidadesOptions  | json }}</pre> -->
 <!-- <pre>Todos los horarios de la amenidad {{horariosAmenidad | json }}</pre> -->
+ <!-- <pre>Mis Reservaciones: {{ misReservaciones() | json}}</pre> -->
 <section class="p-2">
     <div>
         <!-- <label class="label">Amenidades: </label> -->
@@ -12,14 +14,15 @@
                 <option [value]="amenidad.value">{{ amenidad.text }}</option>
             }
         </select>
-        <pre>
-            {{amenidad | json}}
-        </pre>
+<!-- <pre class="text-xs">
+    Amenidad seleccionada: {{amenidad | json}}
+</pre> -->
+    <span><button class="btn btn-primary btn-ghost" (click)="toggleVerReservas()">Mis reservas</button> </span>
     </div>
 </section>
 <section class="p-2">
     <table class="table-auto w-full border-2">
-        <thead class="text-center text-lg font-bold bg-base-300">
+        <thead class="text-center text-lg font-bold bg-base-200">
             <tr class="border-2">
             @for (dia of diasSemana; track dia; let i = $index) {
                 <td class="py-2 text-nowrap">
@@ -48,7 +51,7 @@
                         @let fecha = setDatetime(sumDays(i), hora);
                         @let ocupacion = getReservationsByDate( fecha );
 
-                        <td class="hover:bg-base-300 min-h-[80px] align-top w-1/7 border-1 p-2" 
+                        <td class="hover:bg-base-300 min-h-[80px] align-top w-1/7 border-1 border-gray-400 p-2" 
                             [class.bg-base-100]= "s.isOpen"
                             [class.bg-red-200]= "!s.isOpen"
                             [class.bg-green-200]= "ocupacion>0 && ocupacion<=10"
@@ -56,7 +59,7 @@
                             [class.bg-orange-300]= "ocupacion>20 && ocupacion<=capacidadMaxima"
                             [class.bg-red-400]= "ocupacion>=capacidadMaxima"
                             [class.text-bold]= "ocupacion>=capacidadMaxima"
-                            (click)="openModal(fecha)"
+                            (click)="setSelectedDate(fecha)"
                             onclick="reservarModal.showModal()"
                         >
                             <div class="text-xs text-right font-semibold">{{hora}}</div>
@@ -82,24 +85,57 @@
     </table>
 </section>
 
-
+@if(misReservaciones().length>0 ){
+<section class=" sm:fixed sm:w-[260px] bg-white sm:rounded sm:top-80 sm:right-50 p-5 overflow-y-scroll"
+    [class.h-[10vh]] ="!showMisReservas"
+    [class.h-[40vh]] ="showMisReservas"
+>
+    <h2 class="text-xl flex-bold gap-2 ">Mis reservaciones 
+        <button class="btn btn-xs btn-circle btn-ghost absolute right-2 top-5" (click)="toggleVerReservas()" >
+        <span class="text-2xl">
+            @if (showMisReservas) {
+                <i class="fa-solid fa-square-caret-down"></i>
+            }  @else {
+                <i class="fa-solid fa-square-caret-right"></i>
+            }
+        </span>
+        </button>
+    </h2>
+ <!-- <pre>Mis Reservaciones: {{ misReservaciones() | json}}</pre> -->
+        @if (showMisReservas) {
+        <ul>
+            @for (reservacion of misReservaciones(); track $index) {
+                <li class="text-xs pt-1">
+                    <button class="btn btn-xs btn-circle btn-ghost " (click)="deleteReservation(reservacion)">✕</button>            
+                    {{ reservacion.horario | date : "dd/MM/yyyy hh:mm"}} {{reservacion.numPersonas}} personas.
+                </li>
+            }
+        </ul>
+    }
+        
+    </section>
+}
 <!-- Open the modal using ID.showModal() method -->
-<!-- <button class="btn" onclick="reservarModal.showModal()">open modal</button> -->
+@if (amenidad) {
 <dialog id="reservarModal" class="modal modal-bottom sm:modal-middle">
   <div class="modal-box">
-    <h1 class="text-lg font-bold pt-3 pl-2">Reservar {{ amenidad.nombre }}</h1>
+    <form method="dialog">
+      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+    </form>
+    <h1 class="text-lg font-bold pt-3 pl-2">Reservar: {{ amenidad.nombre }}</h1>
     <h3 class="text-md font-semibold  pl-2 pb-2">Horario: {{ fechaSeleccionada | date : "EEEE dd MMMM yyyy hh:mm"}}</h3>
     <p class="font-bold py-5 bg-base-200 rounded-2xl p-3 mb-2">
-        Residente Casa: <span>120</span>
+        Residente Casa: <span>{{residente.casa}}</span>
     <br>Numero de personas: <span>5</span></p>
     <p class="bg-base-200 p-3 rounded-2xl text-xs" [innerHTML]="sanitizeHTML(amenidad.reglas)"></p>
     <p class="text-sm">He leido y acepto las reglas para reservar la {{amenidad.nombre | lowercase }}</p>
     <div class="modal-action">
-        <p class="py-4 text-xs font-extralight">Para salir presione la tecla ESC o click en el boton cerrar de abajo.</p>
+        <!-- <p class="py-4 text-xs font-extralight">Para salir presione la tecla ESC o click en el boton cerrar de abajo.</p> -->
       <form method="dialog">
         <!-- if there is a button in form, it will close the modal -->
-        <button class="btn">Close</button>
+        <button class="btn" (click)="doReservation(fechaSeleccionada, 5)">Reservar</button>
       </form>
     </div>
   </div>
 </dialog>
+}

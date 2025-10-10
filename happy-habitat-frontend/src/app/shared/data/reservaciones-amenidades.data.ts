@@ -46,5 +46,19 @@ export const reservacionesamenidadesdata: ReservacionAmenidad[] =
     numPersonas: 7,
     horario: new Date("2025-10-04 12:00")
   },
+  {
+    id: UUIDV4(),
+    amenidadId: "4f4f568d-78cc-498b-aaba-f9a02c783ccf", // Casa club Eventos
+    residenteId: "4f8ddeb4-01a3-4bdf-bc4a-7c43f5d27ef7", // Alejandro el grande
+    numPersonas: 70,
+    horario: new Date("2025-10-04 10:00")
+  },
+  {
+    id: UUIDV4(),
+    amenidadId: "efaaa463-7ab3-45e3-926d-4bb244c9dc95", // Casa club residentes
+    residenteId: "4f8ddeb4-01a3-4bdf-bc4a-7c43f5d27ef7", // Alejandro el grande
+    numPersonas: 7,
+    horario: new Date("2025-10-01 10:00")
+  },
 
 ];

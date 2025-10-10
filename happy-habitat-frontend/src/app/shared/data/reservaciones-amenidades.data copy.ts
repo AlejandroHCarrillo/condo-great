@@ -1,7 +1,7 @@
 import { Amenidad } from "../interfaces/amenidad.interface";
 import { v4 as UUIDV4 } from 'uuid';
 
-export const amenidadesdata: Amenidad[] = 
+export const reservacionesamenidadesdata: Amenidad[] = 
 [
   {
     id: "4f4f568d-78cc-498b-aaba-f9a02c783ccf", // UUIDV4(),
@@ -15,10 +15,8 @@ export const amenidadesdata: Amenidad[] =
              hacer uso de la alberca.
              `,
     costo: 1500,
-    capacidadMaxima: 35,
-    reservacionesSimultaneas: 1,
     fechaalta: new Date('2025-11-08'),
-    imagen: "images/amenidades/coto-berlin-casa-club.png", 
+    imagen: "images/amenidades/coto-berlin-casa-club.png",
     comunidad: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
   },
   {
@@ -27,16 +25,11 @@ export const amenidadesdata: Amenidad[] =
     descripcion: "Alberca del coto berlin.",
     reglas: `<div class="text-lg">Reglas:</div> 
               <ul class="list-disc list-inside text-base-content space-y-1">
-              <li>Capacidad maxima 35 personas.</li>
-              <li>5 personas por casa.</li>
-              <li>Maximo 3 horas por reservacion por dia.</li>
               <li>No se permiten bebidas embriagantes.</li>
               <li>Los niños deben ser supervisados por un adulto</li>
               <li>Antes de entar debe asearse en la regadera</li>
              </ul>`,
     costo: 0,
-    capacidadMaxima: 35,
-    reservacionesSimultaneas: 7,
     fechaalta: new Date('2025-11-08'),
     imagen: "images/amenidades/coto-berlin-alberca.jpg",
     comunidad: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
@@ -49,7 +42,6 @@ export const amenidadesdata: Amenidad[] =
              Se puede hacer uso NO es exclusivo de la alberca.
              `,
     costo: 0,
-    reservacionesSimultaneas: 1,
     fechaalta: new Date('2025-11-08'),
     imagen: "images/amenidades/coto-berlin-casa-club.png",
     comunidad: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
@@ -67,7 +59,6 @@ export const amenidadesdata: Amenidad[] =
              dando aviso a vigilancia y a la mesa directiva
              `,
     costo: 0,
-    reservacionesSimultaneas: 1,
     fechaalta: new Date('2025-11-08'),
     imagen: "images/amenidades/coto-berlin-escalera.png",
     comunidad: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
@@ -97,16 +88,6 @@ export const amenidadesdata: Amenidad[] =
     nombre: "Cancha de basquetbol",
     descripcion: "Cancha de basquetbol",
     reglas: `Debe registrarse el el sistma de TYA o al telefono...`,
-    costo: 0,
-    fechaalta: new Date('2025-11-08'),
-    imagen: "images/amenidades/",
-    comunidad: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
-  },
-  {
-    id: UUIDV4(),
-    nombre: "Gimnasio",
-    descripcion: "Gimnasio Berlin",
-    reglas: `Proximamente...`,
     costo: 0,
     fechaalta: new Date('2025-11-08'),
     imagen: "images/amenidades/",
