@@ -30,11 +30,23 @@ export class AppComponent {
   isAuthRoute = signal<boolean>(false);
 
   constructor() {
+    let previousUrl = this.router.url;
+    
     // Suscribirse a los cambios de ruta para detectar si estamos en /auth
+    // y guardar la URL anterior para la página 404
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
-        this.isAuthRoute.set(event.url?.startsWith('/auth') || false);
+        const currentUrl = event.url;
+        this.isAuthRoute.set(currentUrl?.startsWith('/auth') || false);
+        
+        // Guardar la URL anterior en sessionStorage para la página 404
+        // Solo si no es la misma URL y no es una ruta de autenticación
+        if (previousUrl && previousUrl !== currentUrl && !currentUrl.startsWith('/auth')) {
+          sessionStorage.setItem('hh_previous_url', previousUrl);
+        }
+        
+        previousUrl = currentUrl;
       });
     
     // Verificar la ruta inicial

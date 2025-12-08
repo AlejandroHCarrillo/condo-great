@@ -1,0 +1,38 @@
+/* Estilos específicos para el componente de registro de visitantes */
+
+/* Asegurar que el contenedor principal ocupe el ancho disponible */
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* Mejorar la apariencia de los campos en dispositivos móviles */
+@media (max-width: 640px) {
+  .form-control {
+    width: 100%;
+  }
+  
+  /* Asegurar que los inputs ocupen todo el ancho en móviles */
+  input, select, textarea {
+    width: 100% !important;
+  }
+}
+
+/* Ajustes para tablets */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+/* Mejoras visuales para campos con error */
+.input-error,
+.textarea-error {
+  border-color: hsl(var(--er));
+}
+
+.input-error:focus,
+.textarea-error:focus {
+  outline-color: hsl(var(--er));
+}
+

@@ -79,7 +79,6 @@ export const routes: Routes = [
     },
     {
         path: '**',
-        // component: NotFoundPageComponent
-        redirectTo: ''
+        component: NotFoundPageComponent
     }
 ];

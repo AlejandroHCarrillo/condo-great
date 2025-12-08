@@ -8,7 +8,8 @@ import { colors } from '../../../shared/data/colors.data';
 @Component({
   selector: 'hh-registro-visitante',
   imports: [JsonPipe, ReactiveFormsModule, ShowFormErrorTemplateComponent, TitleCasePipe],
-  templateUrl: './registro-visitante.component.html'
+  templateUrl: './registro-visitante.component.html',
+  styleUrl: './registro-visitante.component.css'
 })
 export class RegistroVisitanteComponent {
   private fb = inject(FormBuilder);
@@ -27,7 +28,7 @@ export class RegistroVisitanteComponent {
     departureDate: ['', ], 
   });
 
-    onSave(): void {
+  onSave(): void {
     if (this.myForm.invalid) {
       this.myForm.markAllAsTouched();
       return;
@@ -35,6 +36,16 @@ export class RegistroVisitanteComponent {
 
     console.log('Visitante registrado', this.myForm.value);
 
-    this.myForm.reset({ name: '', price: 0, inStorage: 0 });
+    // Resetear el formulario con valores por defecto
+    this.myForm.reset({ 
+      name: '', 
+      totalpersons: 1, 
+      cardescription: '', 
+      carcolor: '', 
+      carplates: '', 
+      subject: '', 
+      arriveDate: '', 
+      departureDate: '' 
+    });
   }
 }

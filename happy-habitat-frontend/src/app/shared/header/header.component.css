@@ -1,4 +1,10 @@
 /* Optimizaciones adicionales para el header */
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
 section {
   /* Asegurar que el contenido no se desborde */
   min-width: 0;
@@ -13,6 +19,8 @@ section {
     gap: 0.25rem;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
+    width: 100%;
+    max-width: 100%;
   }
 }
 
@@ -27,6 +35,23 @@ header {
   min-height: 4rem; /* 64px base */
   width: 100%;
   max-width: 100%;
+  overflow-x: hidden; /* Evitar scroll horizontal */
+}
+
+/* En móviles, asegurar que el header ocupe el 100% del ancho */
+@media (max-width: 640px) {
+  header {
+    width: 100vw;
+    max-width: 100vw;
+    min-height: 4rem;
+    overflow-x: hidden;
+  }
+  
+  :host {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+  }
 }
 
 @media (min-width: 640px) {
