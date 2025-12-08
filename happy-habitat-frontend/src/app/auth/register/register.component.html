@@ -1,1 +1,142 @@
-<p>register works!</p>
+<div class="w-full px-4 py-8">
+  <div class="card w-full max-w-md bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title justify-center text-2xl mb-4">Crear cuenta</h2>
+      
+      <show-form-error-template 
+        [isValid]="!errorMessage()"
+        [errorMessage]="errorMessage() || ''"
+      />
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <!-- Fullname -->
+        <div class="form-control w-full mb-4">
+          <label class="label">
+            <span class="label-text">Nombre Completo</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Ingresa tu nombre completo"
+            class="input input-bordered w-full"
+            [class.input-error]="!isValidField('fullname')"
+            formControlName="fullname"
+          />
+          <show-form-error-template 
+            [isValid]="isValidField('fullname')"
+            [errorMessage]="getFieldError('fullname') || ''"
+          />
+        </div>
+
+        <!-- Username -->
+        <div class="form-control w-full mb-4">
+          <label class="label">
+            <span class="label-text">Usuario</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Ingresa tu usuario"
+            class="input input-bordered w-full"
+            [class.input-error]="!isValidField('username')"
+            formControlName="username"
+          />
+          <show-form-error-template 
+            [isValid]="isValidField('username')"
+            [errorMessage]="getFieldError('username') || ''"
+          />
+        </div>
+
+        <!-- Email -->
+        <div class="form-control w-full mb-4">
+          <label class="label">
+            <span class="label-text">Correo Electrónico</span>
+          </label>
+          <input
+            type="email"
+            placeholder="correo@ejemplo.com"
+            class="input input-bordered w-full"
+            [class.input-error]="!isValidField('email')"
+            formControlName="email"
+          />
+          <show-form-error-template 
+            [isValid]="isValidField('email')"
+            [errorMessage]="getFieldError('email') || ''"
+          />
+        </div>
+
+        <!-- Phone (Optional) -->
+        <div class="form-control w-full mb-4">
+          <label class="label">
+            <span class="label-text">Teléfono <span class="text-base-content/60">(Opcional)</span></span>
+          </label>
+          <input
+            type="tel"
+            placeholder="1234567890"
+            class="input input-bordered w-full"
+            formControlName="phone"
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="form-control w-full mb-4">
+          <label class="label">
+            <span class="label-text">Contraseña</span>
+          </label>
+          <input
+            type="password"
+            placeholder="Mínimo 6 caracteres"
+            class="input input-bordered w-full"
+            [class.input-error]="!isValidField('password')"
+            formControlName="password"
+          />
+          <show-form-error-template 
+            [isValid]="isValidField('password')"
+            [errorMessage]="getFieldError('password') || ''"
+          />
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-control w-full mb-4">
+          <label class="label">
+            <span class="label-text">Confirmar Contraseña</span>
+          </label>
+          <input
+            type="password"
+            placeholder="Confirma tu contraseña"
+            class="input input-bordered w-full"
+            [class.input-error]="!isValidField('confirmPassword')"
+            formControlName="confirmPassword"
+          />
+          <show-form-error-template 
+            [isValid]="isValidField('confirmPassword')"
+            [errorMessage]="getFieldError('confirmPassword') || ''"
+          />
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-control mt-6">
+          <button
+            type="submit"
+            class="btn btn-primary w-full text-white"
+            [disabled]="isLoading()"
+          >
+            @if (isLoading()) {
+              <span class="loading loading-spinner loading-sm"></span>
+              Registrando...
+            } @else {
+              Registrarse
+            }
+          </button>
+        </div>
+      </form>
+
+      <div class="divider">O</div>
+
+      <div class="text-center">
+        <p class="text-sm">
+          ¿Ya tienes una cuenta?
+          <a routerLink="/auth/login" class="link link-primary">Inicia sesión aquí</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

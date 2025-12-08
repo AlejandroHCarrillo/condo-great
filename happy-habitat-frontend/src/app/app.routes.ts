@@ -9,55 +9,73 @@ import { ComunicadosListComponent } from './components/comunicados/comunicados-l
 import { PostsListComponent } from './shared/post/posts-list.component';
 import { DocumentsPageComponent } from './pages/documents-page/documents-page.component';
 import { ComunicadosPostsComponent } from './components/comunicados/comunicados-posts.component';
+import { authGuard } from './guards/auth.guard';
+import { roleGuard } from './guards/role.guard';
+import { RolesEnum } from './enums/roles.enum';
 
 export const routes: Routes = [
+    // Rutas públicas de autenticación con layout propio (sin header/menu/footer)
+    // Estas rutas NO requieren autenticación
+    {
+        path: 'auth',
+        loadChildren: () => import('./auth/auth-routes')
+    },
+    // Ruta raíz - redirigir a home (el authGuard en /home manejará la autenticación)
     {
         path: '',
-        component: HomePageComponent
+        redirectTo: '/home',
+        pathMatch: 'full'
     },
-    // {
-    //     path: 'dashboard',
-    //     loadChildren: () => import('./pages/dashboard-page'),   
-    // },
+    // Rutas protegidas
     {
         path: 'home',
-        component: HomePageComponent
+        component: HomePageComponent,
+        canActivate: [authGuard]
     },
     {
         path: 'dashboard',
-        component: DashboardPageComponent
+        component: DashboardPageComponent,
+        canActivate: [authGuard]
     },
     {
         path: 'registro',
-        loadChildren: () => import('./components/registro/registro-routes'),   
+        loadChildren: () => import('./components/registro/registro-routes'),
+        canActivate: [authGuard]
     },
     {
         path: 'sysadmin',
-        loadChildren: () => import('./components/system-administation/system-admin-routes'),   
+        loadChildren: () => import('./components/system-administation/system-admin-routes'),
+        canActivate: [roleGuard([RolesEnum.SYSTEM_ADMIN, RolesEnum.ADMIN_COMPANY])]
     },
     {
         path: 'amenidades',
-        loadChildren: () => import('./components/amenidades/amenidades-routes'),   
+        loadChildren: () => import('./components/amenidades/amenidades-routes'),
+        canActivate: [authGuard]
     },
     {
         path: 'comunicados',
-        component: ComunicadosListComponent,   
+        component: ComunicadosListComponent,
+        canActivate: [authGuard]
     },
     {
         path: 'proveedores',
-        component: ProveedoresServiciosComponent,   
+        component: ProveedoresServiciosComponent,
+        canActivate: [authGuard]
     },
     {
         path: 'anuncios',
-        component: ComunicadosListComponent,   
+        component: ComunicadosListComponent,
+        canActivate: [authGuard]
     },
     {
         path: 'social',
-        component: PostsListComponent,   
+        component: PostsListComponent,
+        canActivate: [authGuard]
     },
     {
         path: 'documents',
-        component: DocumentsPageComponent,   
+        component: DocumentsPageComponent,
+        canActivate: [authGuard]
     },
     {
         path: '**',

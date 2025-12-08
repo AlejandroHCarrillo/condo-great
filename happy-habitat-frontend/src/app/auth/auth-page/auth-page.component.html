@@ -1,1 +1,10 @@
-<p>auth-page works!</p>
+<!-- Layout de autenticación independiente (sin header/menu/footer del layout principal) -->
+<div class="auth-layout min-h-screen bg-base-200">
+  <!-- Contenedor de notificaciones globales -->
+  <hh-notification-container />
+  
+  <!-- Contenedor principal para las páginas de autenticación -->
+  <div class="auth-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+/* Optimizaciones adicionales para el header */
+section {
+  /* Asegurar que el contenido no se desborde */
+  min-width: 0;
+  /* Asegurar que el header ocupe el 100% del ancho */
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 640px) {
+  section {
+    gap: 0.25rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+/* Asegurar que los textos no se desborden */
+h1, h2 {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Asegurar que el header tenga suficiente altura para mostrar toda la información */
+header {
+  min-height: 4rem; /* 64px base */
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 640px) {
+  header {
+    min-height: 5rem; /* 80px en pantallas pequeñas */
+  }
+}
+
+@media (min-width: 768px) {
+  header {
+    min-height: 6rem; /* 96px en tablets y desktop */
+  }
+}
+

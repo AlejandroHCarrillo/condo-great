@@ -1,14 +1,25 @@
-<div class="text-xs text-primary w-full pl-5 py-2 bg-base-100 rounded-lg">
-    <div class="">
-        <i class="fa-regular fa-user"></i>
-        Alejandro Hernandez
+@if (currentUser(); as user) {
+  <div class="flex flex-col items-start text-left shadow-sm p-2 rounded-lg text-primary">
+    <div class="flex items-center justify-start gap-1 sm:gap-2">
+      <i class="fa-regular fa-user"></i>
+      <span class="truncate hidden sm:inline text-left">{{ user.fullname }}</span>
+      <span class="truncate sm:hidden text-left">{{ user.fullname.split(' ')[0] }}</span>
     </div>
-    <div>
+    @if (user.unidadhabitacional) {
+      <div class="truncate hidden md:block text-left">
         <i class="fa-regular fa-house"></i>
-        120
+        <span class="truncate">{{ user.unidadhabitacional.nombre || 'N/A' }}</span>
+      </div>
+    }
+    <div class="truncate hidden lg:block text-left">
+      <i class="fa-regular fa-address-card"></i>
+      <span class="truncate">{{ getRoleDisplayName(user.role) }}</span>
     </div>
-    <div>
-        <i class="fa-regular fa-address-card"></i>
-        Residente
-    </div>
-</div>
+  </div>
+} @else {
+  <div class="text-xs text-base-content/60 flex justify-start">
+    <a routerLink="/auth/login" class="btn btn-sm btn-primary">
+      Iniciar Sesión
+    </a>
+  </div>
+}

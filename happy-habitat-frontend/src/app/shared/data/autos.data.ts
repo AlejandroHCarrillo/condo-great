@@ -1,7 +1,7 @@
 import { Auto } from "../interfaces/auto.interface";
 import { v4 as UUIDV4 } from 'uuid';
 
-const autos: Auto[] = [
+export const autos: Auto[] = [
   {
     id: UUIDV4(),
     marca: "Nissan",

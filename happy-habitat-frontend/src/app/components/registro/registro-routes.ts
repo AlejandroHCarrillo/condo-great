@@ -5,6 +5,7 @@ import { RegistroMudanzaComponent } from './registro-mudanza/registro-mudanza.co
 import { RegistroPaqueteriaComponent } from './registro-paqueteria/registro-paqueteria.component';
 import { RegistroMascotaComponent } from './registro-mascota/registrar-mascota.component';
 import { RegistroAutoComponent } from './registro-auto/registrar-auto.component';
+import { RegistroPreferenciasComponent } from './registro-preferencias/registro-preferencias.component';
 
 export const registroRoutes: Routes = [
     {
@@ -15,6 +16,10 @@ export const registroRoutes: Routes = [
             path: 'visitantes',
             component: RegistroVisitanteComponent
         },
+        {
+            path: 'preferencias',
+            component: RegistroPreferenciasComponent
+        }, 
         {
             path: 'mudanza',
             component: RegistroMudanzaComponent

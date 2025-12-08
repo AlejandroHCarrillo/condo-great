@@ -1,9 +1,14 @@
-<div class="flex flex-col min-h-screen">
-  <header class="bg-base-200">
-        <hh-header/>
-  </header>
+@if (!isAuthRoute()) {
+  <!-- Layout principal con header/menu/footer para rutas protegidas -->
+  <div class="flex flex-col min-h-screen">
+    <!-- Contenedor de notificaciones globales -->
+    <hh-notification-container />
+    
+    <header class="bg-base-200 w-full">
+      <hh-header/>
+    </header>
 
-  <main class="flex flex-1">
+    <main class="flex flex-1">
       <aside class="lg:w-1/6 bg-base-200 sm:min-w-14">
         <hh-left-menu/>
       </aside>
@@ -15,10 +20,14 @@
       <aside class="w-1/8 bg-base-100 p-1 hidden lg:inline">
         <hh-right-bar/>
       </aside>
-  </main>
+    </main>
 
-  <footer class="bg-base-200 text-center">
-    <hh-footer/>
-  </footer>
-
-</div>
+    <footer class="bg-base-200 text-center">
+      <hh-footer/>
+    </footer>
+  </div>
+} @else {
+  <!-- Layout de autenticación sin header/menu/footer -->
+  <!-- Las rutas de auth se cargan directamente aquí, fuera del layout principal -->
+  <router-outlet />
+}
