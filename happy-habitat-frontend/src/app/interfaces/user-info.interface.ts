@@ -1,6 +1,16 @@
 import { RolesEnum } from "../enums/roles.enum";
 import { Comunidad } from "./comunidad.interface";
 
+export interface ResidentInfo {
+    id?: string;
+    fullname: string;
+    email?: string;
+    phone?: string;
+    number?: string;
+    address: string;
+    comunidades?: string[];
+}
+
 export interface UserInfo{
     id?: string;
     fullname: string;
@@ -8,5 +18,6 @@ export interface UserInfo{
     email: string;
     addres?: string;
     role: RolesEnum;
-    unidadhabitacional?: Comunidad;    
+    unidadhabitacional?: Comunidad;
+    residentInfo?: ResidentInfo;
 }

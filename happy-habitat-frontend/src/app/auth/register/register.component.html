@@ -9,21 +9,39 @@
       />
 
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-        <!-- Fullname -->
+        <!-- First Name -->
         <div class="form-control w-full mb-4">
           <label class="label">
-            <span class="label-text">Nombre Completo</span>
+            <span class="label-text">Nombre</span>
           </label>
           <input
             type="text"
-            placeholder="Ingresa tu nombre completo"
+            placeholder="Ingresa tu nombre"
             class="input input-bordered w-full"
-            [class.input-error]="!isValidField('fullname')"
-            formControlName="fullname"
+            [class.input-error]="!isValidField('firstName')"
+            formControlName="firstName"
           />
           <show-form-error-template 
-            [isValid]="isValidField('fullname')"
-            [errorMessage]="getFieldError('fullname') || ''"
+            [isValid]="isValidField('firstName')"
+            [errorMessage]="getFieldError('firstName') || ''"
+          />
+        </div>
+
+        <!-- Last Name -->
+        <div class="form-control w-full mb-4">
+          <label class="label">
+            <span class="label-text">Apellido</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Ingresa tu apellido"
+            class="input input-bordered w-full"
+            [class.input-error]="!isValidField('lastName')"
+            formControlName="lastName"
+          />
+          <show-form-error-template 
+            [isValid]="isValidField('lastName')"
+            [errorMessage]="getFieldError('lastName') || ''"
           />
         </div>
 
@@ -63,18 +81,6 @@
           />
         </div>
 
-        <!-- Phone (Optional) -->
-        <div class="form-control w-full mb-4">
-          <label class="label">
-            <span class="label-text">Teléfono <span class="text-base-content/60">(Opcional)</span></span>
-          </label>
-          <input
-            type="tel"
-            placeholder="1234567890"
-            class="input input-bordered w-full"
-            formControlName="phone"
-          />
-        </div>
 
         <!-- Password -->
         <div class="form-control w-full mb-4">

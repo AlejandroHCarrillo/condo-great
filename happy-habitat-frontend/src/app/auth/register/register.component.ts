@@ -22,15 +22,26 @@ export class RegisterComponent {
   isLoading = signal<boolean>(false);
 
   registerForm: FormGroup = this.fb.group({
+    firstName: ['', [Validators.required, Validators.minLength(2)]],
+    lastName: ['', [Validators.required, Validators.minLength(2)]],
     username: ['', [Validators.required, Validators.minLength(3), FormUtils.checkBlacklist]],
     email: ['', [Validators.required, Validators.pattern(FormUtils.emailPattern)]],
     password: ['', [Validators.required, Validators.minLength(6)]],
     confirmPassword: ['', [Validators.required]],
-    fullname: ['', [Validators.required, Validators.minLength(3)]],
-    phone: ['']
+    roleId: ['', [Validators.required]] // GUID del rol (por defecto Resident)
   }, {
     validators: [FormUtils.compareFormFields('password', 'confirmPassword')]
   });
+
+  constructor() {
+    // Establecer roleId por defecto (Resident)
+    // Nota: En producción, esto debería obtenerse del backend o de una lista de roles disponibles
+    // Por ahora usamos un GUID hardcodeado que corresponde al rol "Resident" en el seed
+    // En el futuro, deberíamos hacer una llamada a /api/roles para obtener los roles disponibles
+    this.registerForm.patchValue({
+      roleId: '00000000-0000-0000-0000-000000000000' // Placeholder - debería obtenerse dinámicamente
+    });
+  }
 
   onSubmit(): void {
     if (this.registerForm.invalid) {
@@ -41,9 +52,16 @@ export class RegisterComponent {
     this.errorMessage.set(null);
     this.isLoading.set(true);
 
-    const { username, email, password, fullname, phone } = this.registerForm.value;
+    const { firstName, lastName, username, email, password, roleId } = this.registerForm.value;
 
-    this.authService.register({ username, email, password, fullname, phone }).subscribe({
+    this.authService.register({ 
+      firstName, 
+      lastName, 
+      username, 
+      email, 
+      password, 
+      roleId 
+    }).subscribe({
       next: () => {
         // Redirigir al home después del registro exitoso
         this.router.navigate(['/home']);

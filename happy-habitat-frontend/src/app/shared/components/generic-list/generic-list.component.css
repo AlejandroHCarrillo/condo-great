@@ -1,0 +1,37 @@
+/* Estilos adicionales para el componente generic-list */
+.table {
+  @apply w-full;
+}
+
+.table th {
+  @apply bg-base-300;
+}
+
+.table tbody tr {
+  @apply transition-colors;
+}
+
+.table tbody tr:hover {
+  @apply bg-base-300;
+}
+
+/* Asegurar que las celdas no se desborden */
+.table td {
+  @apply max-w-xs truncate;
+  word-break: break-word;
+}
+
+/* Estilos para el estado vacío */
+.card-body {
+  @apply min-h-[200px];
+}
+
+/* Estilos para botones de acción */
+.action-buttons {
+  white-space: nowrap;
+}
+
+.action-button {
+  @apply min-w-fit;
+}
+

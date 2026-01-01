@@ -1,34 +1,187 @@
-<div class="max-w-xl mx-auto p-4 bg-base-200 rounded-box shadow-md">
-  <h2 class="text-2xl font-bold mb-4 flex flex-row">
-    <span class="text-2xl">
-      <i class="fa-solid fa-car-side"></i>&nbsp;
-    </span>
-    <span> Registrar Auto</span>
-  </h2>
+<div class="w-full max-w-4xl p-4 sm:p-6 md:p-8">
+    <!-- Título y Botón Nuevo en la misma línea -->
+    <div class="flex flex-row items-center justify-between mb-4 sm:mb-6">
+        <h2 class="text-xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2">
+            <i class="fa-solid fa-car-side text-primary"></i>
+            <span>Registrar Auto</span>
+        </h2>
+        <button 
+            class="btn btn-primary text-white"
+            (click)="openNewVehicleModalForCreate()"
+        >
+            <i class="fa-solid fa-plus mr-2"></i>
+            Nuevo
+        </button>
+    </div>
 
-  <form [formGroup]="autoForm" (ngSubmit)="registrarAuto()" class="flex flex-col gap-4">
+    <!-- Lista de vehículos del residente -->
+    @if (isLoadingVehicles()) {
+        <div class="card bg-base-200 shadow mb-6">
+            <div class="card-body items-center py-8">
+                <span class="loading loading-spinner loading-lg text-primary"></span>
+                <p class="text-base-content/70 mt-4">Cargando vehículos...</p>
+            </div>
+        </div>
+    } @else {
+        <div class="mb-6">
+            
+            <!-- Lista de vehículos -->
+            <hh-generic-list
+                [items]="vehicles()"
+                [columns]="vehicleColumns"
+                [title]="'Mis Vehículos'"
+                [itemsPerPage]="5"
+                (rowClick)="onVehicleClick($event)"
+            ></hh-generic-list>
+        </div>
+    }
 
-    <input formControlName="id" type="number" placeholder="ID del auto"
-      class="input input-bordered w-full" />
+    <!-- Modal para registro de vehículo -->
+    <dialog 
+        id="newVehicleModal"
+        class="modal modal-bottom sm:modal-middle"
+    >
+        <div class="modal-box max-w-2xl">
+            <!-- Botón de cerrar -->
+            <form method="dialog">
+                <button 
+                    type="button"
+                    class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                    (click)="closeModal()"
+                >
+                    ✕
+                </button>
+            </form>
+            
+            <!-- Título del modal -->
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-car-side text-primary"></i>
+                <span>Registrar Nuevo Vehículo</span>
+            </h3>
+            
+            <!-- Formulario -->
+            <form [formGroup]="autoForm" (ngSubmit)="registrarAuto()" class="flex flex-col gap-4">
+                <div class="form-control">
+                    <label class="label font-semibold" for="marca">
+                        <span class="label-text">Marca</span>
+                    </label>
+                    <input 
+                        id="marca"
+                        formControlName="marca" 
+                        type="text" 
+                        placeholder="Ej: Toyota, Honda, Ford"
+                        class="input input-bordered w-full"
+                        [class.input-error]="autoForm.get('marca')?.invalid && autoForm.get('marca')?.touched"
+                    />
+                    @if (autoForm.get('marca')?.invalid && autoForm.get('marca')?.touched) {
+                        <label class="label">
+                            <span class="label-text-alt text-error">La marca es requerida</span>
+                        </label>
+                    }
+                </div>
 
-    <input formControlName="marca" type="text" placeholder="Marca"
-      class="input input-bordered w-full" />
+                <div class="form-control">
+                    <label class="label font-semibold" for="modelo">
+                        <span class="label-text">Modelo</span>
+                    </label>
+                    <input 
+                        id="modelo"
+                        formControlName="modelo" 
+                        type="text" 
+                        placeholder="Ej: Camry, Civic, F-150"
+                        class="input input-bordered w-full"
+                        [class.input-error]="autoForm.get('modelo')?.invalid && autoForm.get('modelo')?.touched"
+                    />
+                    @if (autoForm.get('modelo')?.invalid && autoForm.get('modelo')?.touched) {
+                        <label class="label">
+                            <span class="label-text-alt text-error">El modelo es requerido</span>
+                        </label>
+                    }
+                </div>
 
-    <input formControlName="modelo" type="text" placeholder="Modelo"
-      class="input input-bordered w-full" />
+                <div class="form-control">
+                    <label class="label font-semibold" for="año">
+                        <span class="label-text">Año</span>
+                    </label>
+                    <input 
+                        id="año"
+                        formControlName="año" 
+                        type="number" 
+                        placeholder="Año del vehículo"
+                        class="input input-bordered w-full"
+                        min="1980"
+                        [max]="currentYear"
+                        [class.input-error]="autoForm.get('año')?.invalid && autoForm.get('año')?.touched"
+                    />
+                    @if (autoForm.get('año')?.invalid && autoForm.get('año')?.touched) {
+                        <label class="label">
+                            <span class="label-text-alt text-error">El año es requerido (1980 - {{ currentYear }})</span>
+                        </label>
+                    }
+                </div>
 
-    <input formControlName="año" type="number" placeholder="Año"
-      class="input input-bordered w-full" />
+                <div class="form-control">
+                    <label class="label font-semibold" for="color">
+                        <span class="label-text">Color</span>
+                    </label>
+                    <input 
+                        id="color"
+                        formControlName="color" 
+                        type="text" 
+                        placeholder="Ej: Blanco, Negro, Rojo"
+                        class="input input-bordered w-full"
+                        [class.input-error]="autoForm.get('color')?.invalid && autoForm.get('color')?.touched"
+                    />
+                    @if (autoForm.get('color')?.invalid && autoForm.get('color')?.touched) {
+                        <label class="label">
+                            <span class="label-text-alt text-error">El color es requerido</span>
+                        </label>
+                    }
+                </div>
 
-    <input formControlName="color" type="text" placeholder="Color"
-      class="input input-bordered w-full" />
+                <div class="form-control">
+                    <label class="label font-semibold" for="placas">
+                        <span class="label-text">Placas</span>
+                    </label>
+                    <input 
+                        id="placas"
+                        formControlName="placas" 
+                        type="text" 
+                        placeholder="Ej: ABC123 o ABC-123"
+                        class="input input-bordered w-full uppercase"
+                        [class.input-error]="autoForm.get('placas')?.invalid && autoForm.get('placas')?.touched"
+                    />
+                    @if (autoForm.get('placas')?.invalid && autoForm.get('placas')?.touched) {
+                        <label class="label">
+                            <span class="label-text-alt text-error">Las placas son requeridas (formato: ABC123 o ABC-123)</span>
+                        </label>
+                    }
+                </div>
 
-    <input formControlName="placas" type="text" placeholder="Placas (ej. ABC-123)"
-      class="input input-bordered w-full" />
-
-    <input formControlName="idResidente" type="number" placeholder="ID del residente"
-      class="input input-bordered w-full" />
-
-    <button type="submit" class="btn btn-primary text-white">Registrar Auto</button>
-  </form>
+                <!-- Botones del modal -->
+                <div class="form-control mt-6 flex flex-col sm:flex-row justify-end gap-2">
+                    <button 
+                        type="button" 
+                        class="btn btn-ghost"
+                        (click)="closeModal()"
+                    >
+                        Cancelar
+                    </button>
+                    <button 
+                        type="submit" 
+                        class="btn btn-primary text-white"
+                        [disabled]="autoForm.invalid"
+                    >
+                        <i class="fa-solid fa-save mr-2"></i>
+                        Registrar Vehículo
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Backdrop para cerrar el modal -->
+        <form method="dialog" class="modal-backdrop">
+            <button (click)="closeModal()">Cerrar</button>
+        </form>
+    </dialog>
 </div>

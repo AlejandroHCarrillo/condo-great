@@ -2,7 +2,7 @@
     <!-- Título -->
     <h2 class="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
         <i class="fa-solid fa-users-viewfinder text-primary"></i>
-        <span>Registrar visitantes</span>
+        <span>Registro visitantes</span>
     </h2>
     
     <!-- Formulario -->
@@ -48,6 +48,42 @@
                             [errorMessage]="formUtils.getFieldError(myForm, 'totalpersons') || ''"
                         />
                     </div>
+                </div>
+
+                <!-- 📝 Motivo de la visita (Selección rápida) -->
+                <div class="form-control">
+                    <label class="label font-semibold" for="quickSubject">
+                        <span class="label-text">Motivo de la visita (Selección rápida)</span>
+                    </label>
+                    <select 
+                        id="quickSubject"
+                        class="select select-bordered w-full" 
+                        formControlName="quickSubject"
+                        (change)="onQuickSubjectChange()"
+                    >
+                        <option value="">Seleccione un motivo o escriba uno personalizado abajo</option>
+                        @for (motivo of motivosVisita; track $index) {
+                            <option [value]="motivo">{{ motivo }}</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- 📝 Asunto -->
+                <div class="form-control">
+                    <label class="label font-semibold" for="subject">
+                        <span class="label-text">Asunto de la visita</span>
+                    </label>
+                    <textarea 
+                        id="subject" 
+                        formControlName="subject" 
+                        class="textarea textarea-bordered w-full min-h-24"
+                        [class.textarea-error]="!formUtils.isValidField(myForm, 'subject')"
+                        placeholder="Describa el motivo de la visita o seleccione uno de la lista de arriba..."
+                    ></textarea>
+                    <show-form-error-template
+                        [isValid]="formUtils.isValidField(myForm, 'subject')"
+                        [errorMessage]="formUtils.getFieldError(myForm, 'subject') || ''"
+                    />
                 </div>
 
                 <!-- 🚗 Información del vehículo -->
@@ -110,24 +146,6 @@
                             [errorMessage]="formUtils.getFieldError(myForm, 'carplates') || ''"
                         />
                     </div>
-                </div>
-
-                <!-- 📝 Asunto -->
-                <div class="form-control">
-                    <label class="label font-semibold" for="subject">
-                        <span class="label-text">Asunto de la visita</span>
-                    </label>
-                    <textarea 
-                        id="subject" 
-                        formControlName="subject" 
-                        class="textarea textarea-bordered w-full min-h-24"
-                        [class.textarea-error]="!formUtils.isValidField(myForm, 'subject')"
-                        placeholder="Describa el motivo de la visita..."
-                    ></textarea>
-                    <show-form-error-template
-                        [isValid]="formUtils.isValidField(myForm, 'subject')"
-                        [errorMessage]="formUtils.getFieldError(myForm, 'subject') || ''"
-                    />
                 </div>
 
                 <!-- 📅 Fechas de ingreso y salida -->

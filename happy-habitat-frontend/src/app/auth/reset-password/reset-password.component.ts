@@ -25,7 +25,8 @@ export class ResetPasswordComponent {
   isLoading = signal<boolean>(false);
 
   resetPasswordForm: FormGroup = this.fb.group({
-    currentPassword: ['', [Validators.required]],
+    email: ['', [Validators.required, Validators.pattern(FormUtils.emailPattern)]],
+    token: ['', [Validators.required]], // Token recibido por email
     newPassword: ['', [Validators.required, FormUtils.strongPassword]],
     confirmPassword: ['', [Validators.required]]
   }, {
@@ -43,10 +44,10 @@ export class ResetPasswordComponent {
     this.successMessage.set(null);
     this.isLoading.set(true);
 
-    const { currentPassword, newPassword } = this.resetPasswordForm.value;
+    const { email, token, newPassword } = this.resetPasswordForm.value;
     this.logger.event('reset_password_requested', {}, 'ResetPasswordComponent');
 
-    this.authService.resetPassword(currentPassword, newPassword).subscribe({
+    this.authService.resetPassword(email, newPassword, token).subscribe({
       next: () => {
         this.isLoading.set(false);
         this.successMessage.set('Tu contraseña ha sido actualizada exitosamente.');
@@ -55,12 +56,12 @@ export class ResetPasswordComponent {
         // Limpiar el formulario y redirigir después de 2 segundos
         setTimeout(() => {
           this.resetPasswordForm.reset();
-          this.router.navigate(['/home']);
+          this.router.navigate(['/auth/login']);
         }, 2000);
       },
       error: (error) => {
         this.isLoading.set(false);
-        const errorMsg = error?.error?.message || 'Error al actualizar la contraseña. Verifica tu contraseña actual e intenta nuevamente.';
+        const errorMsg = error?.error?.message || 'Error al actualizar la contraseña. Verifica el token y el email e intenta nuevamente.';
         this.errorMessage.set(errorMsg);
         this.logger.event('reset_password_failed', { error: errorMsg }, 'ResetPasswordComponent');
       }

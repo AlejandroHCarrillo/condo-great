@@ -1,15 +1,25 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, catchError, throwError, of, delay } from 'rxjs';
+import { Observable, tap, catchError, throwError, of, delay, switchMap } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { LoginRequest, RegisterRequest, AuthResponse } from '../shared/interfaces/auth.interface';
+import { 
+  LoginRequest, 
+  RegisterRequest, 
+  AuthResponse, 
+  LoginResponse, 
+  UserDto,
+  ForgotPasswordRequest,
+  ResetPasswordRequest
+} from '../shared/interfaces/auth.interface';
 import { UserInfo } from '../interfaces/user-info.interface';
 import { SessionService } from './session.service';
+import { UsersService } from './users.service';
 import { LoggerService } from './logger.service';
 import { ErrorService } from './error.service';
 import { RolesEnum } from '../enums/roles.enum';
 import { tipoComunidadEnum } from '../enums/tipo-comunidad.enum';
+import { mapLoginResponseToAuthResponse, mapUserDtoToUserInfo, updateAuthResponseWithUser } from '../shared/mappers/auth.mapper';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +28,7 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
   private sessionService = inject(SessionService);
+  private usersService = inject(UsersService);
   private logger = inject(LoggerService);
   private errorService = inject(ErrorService);
 
@@ -35,7 +46,7 @@ export class AuthService {
 
   /**
    * Inicia sesión con username y password
-   * TEMPORAL: Si useMockAuth está activado, simula un login exitoso sin llamar a la API
+   * Conectado al backend AIGreatBackend
    */
   login(credentials: LoginRequest): Observable<AuthResponse> {
     this.isLoading.set(true);
@@ -47,12 +58,30 @@ export class AuthService {
       return this.mockLogin(credentials);
     }
     
-    // CÓDIGO REAL DE API - Se ejecutará cuando useMockAuth sea false
-    return this.http.post<AuthResponse>(`${this.API_URL}/login`, credentials).pipe(
+    // CÓDIGO REAL DE API - Conectado al backend
+    // El backend devuelve LoginResponse, necesitamos transformarlo a AuthResponse
+    return this.http.post<LoginResponse>(`${this.API_URL}/login`, credentials).pipe(
+      // Transformar LoginResponse a AuthResponse
+      switchMap((loginResponse) => {
+        const authResponse = mapLoginResponseToAuthResponse(loginResponse);
+        
+        // Intentar obtener información completa del usuario
+        // Nota: Por ahora usamos la información básica del LoginResponse
+        // En el futuro podríamos hacer una llamada adicional a /api/users/{id}
+        return of(authResponse);
+      }),
       tap((response) => {
         this.handleAuthSuccess(response);
         this.isLoading.set(false);
-        this.logger.info('Login successful', 'AuthService', { userId: response.user.id });
+        
+        this.currentUser.set(response.user);
+
+        console.log('Login successful: ', this.currentUser());
+
+        this.logger.info('Login successful', 'AuthService', { 
+          username: response.user.username,
+          role: response.user.role 
+        });
       }),
       catchError((error) => {
         this.isLoading.set(false);
@@ -124,7 +153,8 @@ export class AuthService {
 
   /**
    * Registra un nuevo usuario
-   * TEMPORAL: Si useMockAuth está activado, simula un registro exitoso sin llamar a la API
+   * Conectado al backend AIGreatBackend
+   * Nota: El backend requiere firstName, lastName y roleId
    */
   register(data: RegisterRequest): Observable<AuthResponse> {
     this.isLoading.set(true);
@@ -136,12 +166,18 @@ export class AuthService {
       return this.mockRegister(data);
     }
     
-    // CÓDIGO REAL DE API - Se ejecutará cuando useMockAuth sea false
-    return this.http.post<AuthResponse>(`${this.API_URL}/register`, data).pipe(
+    // CÓDIGO REAL DE API - Conectado al backend
+    // El backend devuelve UserDto, necesitamos transformarlo y luego hacer login
+    return this.http.post<UserDto>(`${this.API_URL}/register`, data).pipe(
+      // Después del registro, hacer login automáticamente
+      switchMap((userDto) => {
+        // Hacer login con las credenciales proporcionadas
+        return this.login({ username: data.username, password: data.password });
+      }),
       tap((response) => {
         this.handleAuthSuccess(response);
         this.isLoading.set(false);
-        this.logger.info('Registration successful', 'AuthService', { userId: response.user.id });
+        this.logger.info('Registration successful', 'AuthService', { username: response.user.username });
       }),
       catchError((error) => {
         this.isLoading.set(false);
@@ -179,7 +215,7 @@ export class AuthService {
   private createMockAuthResponseFromRegister(data: RegisterRequest): AuthResponse {
     const mockUser: UserInfo = {
       id: `mock-user-${Date.now()}`,
-      fullname: data.fullname,
+      fullname: `${data.firstName} ${data.lastName}`.trim(),
       username: data.username,
       email: data.email,
       role: RolesEnum.RESIDENT,
@@ -212,6 +248,8 @@ export class AuthService {
     this.sessionService.clearSession();
     this.isAuthenticated.set(false);
     this.currentUser.set(null);
+    // Limpiar usuario en UsersService
+    this.usersService.clearCurrentUser();
     this.router.navigate(['/auth/login']);
   }
 
@@ -252,6 +290,8 @@ export class AuthService {
     if (token && user && !this.sessionService.isTokenExpired()) {
       this.isAuthenticated.set(true);
       this.currentUser.set(user);
+      // Sincronizar con UsersService
+      this.usersService.setCurrentUser(user);
       return true;
     }
     
@@ -263,9 +303,20 @@ export class AuthService {
    * Maneja el éxito de autenticación
    */
   private handleAuthSuccess(response: AuthResponse): void {
+    // Guardar en localStorage
     this.sessionService.saveSession(response);
+    
+    // Actualizar signals reactivos en AuthService
     this.isAuthenticated.set(true);
     this.currentUser.set(response.user);
+    
+    // Guardar usuario en UsersService para uso en otros servicios
+    this.usersService.setCurrentUser(response.user);
+    
+    this.logger.debug('Auth success handled', 'AuthService', { 
+      userId: response.user.id, 
+      username: response.user.username 
+    });
   }
 
   /**
@@ -295,8 +346,9 @@ export class AuthService {
   }
 
   /**
-   * Solicita recuperación de contraseña enviando un correo con contraseña provisional
-   * TEMPORAL: Si useMockAuth está activado, simula el envío sin llamar a la API
+   * Solicita recuperación de contraseña
+   * Conectado al backend AIGreatBackend
+   * Nota: El backend espera solo el email, no usernameOrEmail
    */
   forgotPassword(usernameOrEmail: string): Observable<{ message: string }> {
     this.logger.info('Forgot password request', 'AuthService', { usernameOrEmail, useMock: environment.auth?.useMockAuth });
@@ -307,13 +359,19 @@ export class AuthService {
       return this.mockForgotPassword(usernameOrEmail);
     }
     
-    // CÓDIGO REAL DE API - Se ejecutará cuando useMockAuth sea false
-    return this.http.post<{ message: string }>(`${this.API_URL}/forgot-password`, { usernameOrEmail }).pipe(
+    // CÓDIGO REAL DE API - Conectado al backend
+    // El backend espera { email: string }
+    // Si el usuario proporciona un username, intentamos usarlo como email
+    const request: ForgotPasswordRequest = {
+      email: usernameOrEmail.includes('@') ? usernameOrEmail : `${usernameOrEmail}@email.com`
+    };
+    
+    return this.http.post<{ message: string }>(`${this.API_URL}/forgot-password`, request).pipe(
       tap(() => {
-        this.logger.info('Forgot password request successful', 'AuthService', { usernameOrEmail });
+        this.logger.info('Forgot password request successful', 'AuthService', { email: request.email });
       }),
       catchError((error) => {
-        this.logger.error('Forgot password request failed', error, 'AuthService', { usernameOrEmail });
+        this.logger.error('Forgot password request failed', error, 'AuthService', { email: request.email });
         return throwError(() => error);
       })
     );
@@ -337,28 +395,33 @@ export class AuthService {
   }
 
   /**
-   * Restablece la contraseña del usuario autenticado
-   * TEMPORAL: Si useMockAuth está activado, simula el cambio sin llamar a la API
+   * Restablece la contraseña usando el token de reset
+   * Conectado al backend AIGreatBackend
+   * Nota: El backend espera email, newPassword y token (no currentPassword)
    */
-  resetPassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
-    this.logger.info('Reset password request', 'AuthService', { useMock: environment.auth?.useMockAuth });
+  resetPassword(email: string, newPassword: string, token: string): Observable<{ message: string }> {
+    this.logger.info('Reset password request', 'AuthService', { email, useMock: environment.auth?.useMockAuth });
     
     // TEMPORAL: Modo mock - simula cambio exitoso sin llamar a la API
     // Para habilitar la API real, cambiar useMockAuth a false en environment.ts
     if (environment.auth?.useMockAuth) {
-      return this.mockResetPassword(currentPassword, newPassword);
+      return this.mockResetPassword(email, newPassword);
     }
     
-    // CÓDIGO REAL DE API - Se ejecutará cuando useMockAuth sea false
-    return this.http.post<{ message: string }>(`${this.API_URL}/reset-password`, { 
-      currentPassword, 
-      newPassword 
-    }).pipe(
+    // CÓDIGO REAL DE API - Conectado al backend
+    // El backend espera { email, newPassword, token }
+    const request: ResetPasswordRequest = {
+      email,
+      newPassword,
+      token
+    };
+    
+    return this.http.post<{ message: string }>(`${this.API_URL}/reset-password`, request).pipe(
       tap(() => {
-        this.logger.info('Reset password successful', 'AuthService');
+        this.logger.info('Reset password successful', 'AuthService', { email });
       }),
       catchError((error) => {
-        this.logger.error('Reset password failed', error, 'AuthService');
+        this.logger.error('Reset password failed', error, 'AuthService', { email });
         return throwError(() => error);
       })
     );
@@ -368,12 +431,13 @@ export class AuthService {
    * Simula el cambio de contraseña
    * TEMPORAL: Solo para desarrollo sin backend
    */
-  private mockResetPassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
+  private mockResetPassword(email: string, newPassword: string): Observable<{ message: string }> {
     // Simular delay de red (800ms) para simular el cambio
     return of({ message: 'Tu contraseña ha sido actualizada exitosamente.' }).pipe(
       delay(800),
       tap(() => {
         this.logger.info('Mock reset password successful', 'AuthService', { 
+          email,
           note: 'Using mock authentication - API calls disabled'
         });
       })

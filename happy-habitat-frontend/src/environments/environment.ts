@@ -2,7 +2,7 @@ import { LogLevel } from '../app/shared/interfaces/log.interface';
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api', // Cambiar según tu backend
+  apiUrl: 'http://localhost:5080/api', // Backend: AIGreatBackend
   apiVersion: 'v1',
   appName: 'Happy Habitat',
   appVersion: '0.0.0',
@@ -15,9 +15,8 @@ export const environment = {
   },
   // Configuración de autenticación
   auth: {
-    // TEMPORAL: Deshabilitar llamadas a la API de autenticación
-    // Cambiar a false para habilitar las llamadas reales a la API
-    useMockAuth: true
+    // Habilitar llamadas reales a la API del backend
+    useMockAuth: false
   }
 };
 

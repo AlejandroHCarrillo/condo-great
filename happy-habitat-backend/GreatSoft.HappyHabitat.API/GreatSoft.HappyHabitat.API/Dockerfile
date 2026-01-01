@@ -12,16 +12,30 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["GreatSoft.HappyHabitat.API/GreatSoft.HappyHabitat.API.csproj", "GreatSoft.HappyHabitat.API/"]
-RUN dotnet restore "./GreatSoft.HappyHabitat.API/GreatSoft.HappyHabitat.API.csproj"
+
+# Copy solution file
+COPY ["GreatSoft.HappyHabitat.API.sln", "."]
+
+# Copy project files
+COPY ["GreatSoft.HappyHabitat.API/GreatSoft.HappyHabitat.API/GreatSoft.HappyHabitat.API.csproj", "GreatSoft.HappyHabitat.API/GreatSoft.HappyHabitat.API/"]
+COPY ["GreatSoft.HappyHabitat.Application/GreatSoft.HappyHabitat.Application.csproj", "GreatSoft.HappyHabitat.Application/"]
+COPY ["GreatSoft.HappyHabitat.Domain/GreatSoft.HappyHabitat.Domain.csproj", "GreatSoft.HappyHabitat.Domain/"]
+COPY ["GreatSoft.HappyHabitat.Infrastructure/GreatSoft.HappyHabitat.Infrastructure.csproj", "GreatSoft.HappyHabitat.Infrastructure/"]
+
+# Restore dependencies
+RUN dotnet restore "GreatSoft.HappyHabitat.API.sln"
+
+# Copy all source files
 COPY . .
-WORKDIR "/src/GreatSoft.HappyHabitat.API"
-RUN dotnet build "./GreatSoft.HappyHabitat.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+# Build the project
+WORKDIR "/src/GreatSoft.HappyHabitat.API/GreatSoft.HappyHabitat.API"
+RUN dotnet build "GreatSoft.HappyHabitat.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./GreatSoft.HappyHabitat.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "GreatSoft.HappyHabitat.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final

@@ -21,13 +21,13 @@ namespace GreatSoft.HappyHabitat.Infrastructure.Persistence.Repositories {
         public async Task AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
-            await _context.SaveChangesAsync();
+            // Don't save here - let UnitOfWork handle it
         }
 
         public async Task UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
-            await _context.SaveChangesAsync();
+            // Don't save here - let UnitOfWork handle it
         }
 
         public async Task DeleteAsync(Guid id)
@@ -36,7 +36,7 @@ namespace GreatSoft.HappyHabitat.Infrastructure.Persistence.Repositories {
             if (entity is not null)
             {
                 _dbSet.Remove(entity);
-                await _context.SaveChangesAsync();
+                // Don't save here - let UnitOfWork handle it
             }
         }
     }
