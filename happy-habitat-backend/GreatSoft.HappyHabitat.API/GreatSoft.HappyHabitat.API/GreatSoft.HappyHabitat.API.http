@@ -1,6 +1,0 @@
-@GreatSoft.HappyHabitat.API_HostAddress = http://localhost:5086
-
-GET {{GreatSoft.HappyHabitat.API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

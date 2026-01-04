@@ -17,6 +17,16 @@ export interface RegisterRequest {
 }
 
 // Response interfaces del backend
+export interface CommunityDto {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  direccion: string;
+  contacto: string;
+  email: string;
+  phone: string;
+}
+
 export interface ResidentInfoDto {
   id?: string;
   fullname: string;
@@ -25,6 +35,7 @@ export interface ResidentInfoDto {
   number?: string;
   address: string;
   comunidades?: string[];
+  comunidad?: CommunityDto; // Full community information
 }
 
 export interface LoginResponse {

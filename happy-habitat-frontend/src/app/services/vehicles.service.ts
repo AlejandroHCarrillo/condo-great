@@ -18,7 +18,7 @@ export class VehiclesService {
   private logger = inject(LoggerService);
   private errorService = inject(ErrorService);
 
-  private readonly API_URL = `${environment.apiUrl}/vehicles`;
+  private readonly API_URL = `${environment.apiUrl}/Vehicles`;
 
   /**
    * Obtiene todos los vehículos
@@ -54,9 +54,11 @@ export class VehiclesService {
    * Obtiene todos los vehículos de un residente específico
    */
   getVehiclesByResidentId(residentId: string): Observable<VehicleDto[]> {
+    console.log('VehiclesService: Cargar vehículos del residente: ', residentId);
     this.logger.debug(`Fetching vehicles for resident: ${residentId}`, 'VehiclesService');
-    
-    return this.http.get<VehicleDto[]>(`${this.API_URL}/resident/${residentId}`).pipe(
+    const url = `${this.API_URL}/resident/${residentId}`;
+    console.log('VehiclesService: URL para cargar vehículos: ', url);
+    return this.http.get<VehicleDto[]>(url).pipe(
       catchError((error) => {
         this.logger.error(`Error fetching vehicles for resident ${residentId}`, error, 'VehiclesService');
         this.errorService.handleError(error);

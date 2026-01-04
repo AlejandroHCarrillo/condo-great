@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, throwError, tap } from 'rxjs';
+import { Observable, catchError, throwError, tap, map, filter, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { LoggerService } from './logger.service';
 import { ErrorService } from './error.service';
@@ -73,30 +73,35 @@ export class UsersService {
 
   /**
    * Obtiene el ResidentId del usuario actual autenticado
+   * Usa el currentUser guardado si está disponible, evita peticiones HTTP innecesarias
    */
-  getCurrentUserResidentId(): Observable<string> {
+  getCurrentUserResidentId(): Observable<string | null> {
     // Obtener el usuario actual desde el signal
     const currentUser = this.getCurrentUser();
-    const currentUserId = "4497F73C-C55E-4027-B50A-4D13CF3AD71E"; //currentUser?.id;
     
-    console.log('[UsersService] getCurrentUserResidentId - Current User ID:', currentUserId);
-    console.log('[UsersService] getCurrentUserResidentId - Current User Info:', currentUser);
+    // Si no hay usuario logueado, devolver null sin hacer petición HTTP
+    if (!currentUser) {
+      this.logger.warn('No current user found, cannot get resident ID', 'UsersService');
+      return of(null);
+    }
     
-    this.logger.debug('Fetching current user resident ID', 'UsersService', { userId: currentUserId });
+    // Si el usuario tiene residentInfo con id, usarlo directamente (evita petición HTTP)
+    if (currentUser.residentInfo?.id) {
+      const residentId = currentUser.residentInfo.id;
+      this.logger.debug('Resident ID found in current user', 'UsersService', { 
+        userId: currentUser.id, 
+        residentId 
+      });
+      return of(residentId);
+    }
     
-    return this.http.get<string>(`${this.API_URL}/me/resident`).pipe(
-      tap((residentId) => {
-        console.log('[UsersService] getCurrentUserResidentId - Received ResidentId:', residentId);
-        console.log('[UsersService] getCurrentUserResidentId - User ID used:', currentUserId, '| ResidentId received:', residentId);
-      }),
-      catchError((error) => {
-        console.error('[UsersService] getCurrentUserResidentId - Error:', error);
-        console.error('[UsersService] getCurrentUserResidentId - User ID that caused error:', currentUserId);
-        this.logger.error('Error fetching current user resident ID', error, 'UsersService');
-        this.errorService.handleError(error);
-        return throwError(() => error);
-      })
-    );
+    // Si el usuario está logueado pero no tiene residentInfo, devolver null
+    // No hacer petición HTTP para evitar errores de CORS/conexión
+    this.logger.debug('User logged in but no resident info available', 'UsersService', { 
+      userId: currentUser.id,
+      hasResidentInfo: !!currentUser.residentInfo
+    });
+    return of(null);
   }
 }
 

@@ -1,4 +1,5 @@
 import { RolesEnum } from "../enums/roles.enum";
+import { tipoComunidadEnum } from "../enums/tipo-comunidad.enum";
 import { Comunidad } from "./comunidad.interface";
 
 export interface ResidentInfo {
@@ -8,16 +9,16 @@ export interface ResidentInfo {
     phone?: string;
     number?: string;
     address: string;
-    comunidades?: string[];
+    tipoComunidad: tipoComunidadEnum;
+    comunidad?: Comunidad;
 }
 
-export interface UserInfo{
+export interface UserInfo {
     id?: string;
     fullname: string;
     username: string;
     email: string;
     addres?: string;
     role: RolesEnum;
-    unidadhabitacional?: Comunidad;
     residentInfo?: ResidentInfo;
 }

@@ -7,7 +7,7 @@ import { UsersService } from '../../../services/users.service';
 import { NotificationService } from '../../../services/notification.service';
 import { LoggerService } from '../../../services/logger.service';
 import { CreatePetRequest, PetDto, UpdatePetRequest } from '../../../shared/interfaces/pet.interface';
-import { catchError, switchMap, tap, of, throwError } from 'rxjs';
+import { catchError, tap, throwError, of } from 'rxjs';
 import { GenericListComponent, ColumnConfig } from "../../../shared/components/generic-list/generic-list.component";
 
 @Component({
@@ -85,29 +85,69 @@ export class RegistroMascotaComponent implements OnInit {
   }
 
   /**
-   * Carga las mascotas del residente actual
+   * Carga las mascotas del residente actual usando el residentId del currentUser
    */
   loadPets(): void {
     this.isLoadingPets.set(true);
     
-    this.usersService.getCurrentUserResidentId().pipe(
-      switchMap((residentId) => {
-        if (!residentId) {
-          return of([]);
-        }
-        return this.petsService.getPetsByResidentId(residentId);
-      }),
+    // Obtener el usuario actual del servicio
+    const currentUser = this.usersService.getCurrentUser();
+    
+    // Validar que existe el usuario y tiene residentInfo
+    if (!currentUser) {
+      this.logger.warn('No current user found. Cannot load pets.', 'RegistroMascotaComponent');
+      this.notificationService.showError(
+        'No se encontró información del usuario. Por favor, inicie sesión nuevamente.',
+        'Error de Usuario'
+      );
+      this.isLoadingPets.set(false);
+      this.pets.set([]);
+      return;
+    }
+    
+    // Obtener el residentId del currentUser
+    const residentId = currentUser.residentInfo?.id;
+    
+    // Validar que existe el residentId
+    if (!residentId || typeof residentId !== 'string' || residentId.trim() === '') {
+      this.logger.warn('No valid resident ID found in current user. Cannot load pets.', 'RegistroMascotaComponent', { 
+        userId: currentUser.id,
+        hasResidentInfo: !!currentUser.residentInfo 
+      });
+      this.notificationService.showWarning(
+        'No se encontró información del residente asociado a su cuenta.',
+        'Información no disponible'
+      );
+      this.isLoadingPets.set(false);
+      this.pets.set([]);
+      return;
+    }
+    
+    // Cargar las mascotas usando el residentId del currentUser
+    const residentIdString = residentId.trim();
+    this.logger.debug('Loading pets for resident', 'RegistroMascotaComponent', { residentId: residentIdString });
+    
+    this.petsService.getPetsByResidentId(residentIdString).pipe(
       catchError((error) => {
-        this.logger.error('Error loading pets', error, 'RegistroMascotaComponent');
+        this.logger.error('Error loading pets', error, 'RegistroMascotaComponent', { residentId: residentIdString });
+        this.notificationService.showError(
+          error.error?.message || 'Error al cargar las mascotas. Por favor, intente nuevamente.',
+          'Error'
+        );
         return of([]);
       })
     ).subscribe({
       next: (pets) => {
         this.pets.set(pets);
         this.isLoadingPets.set(false);
+        this.logger.debug('Pets loaded successfully', 'RegistroMascotaComponent', { 
+          count: pets.length,
+          residentId: residentIdString 
+        });
       },
       error: () => {
         this.isLoadingPets.set(false);
+        this.pets.set([]);
       }
     });
   }
@@ -275,40 +315,54 @@ export class RegistroMascotaComponent implements OnInit {
       return;
     }
 
-    this.isSubmitting = true;
+    // Obtener el usuario actual del servicio
+    const currentUser = this.usersService.getCurrentUser();
+    
+    // Validar que existe el usuario y tiene residentInfo
+    if (!currentUser) {
+      this.notificationService.showError(
+        'No se encontró información del usuario. Por favor, inicie sesión nuevamente.',
+        'Error de Usuario'
+      );
+      return;
+    }
+    
+    // Obtener el residentId del currentUser
+    const residentId = currentUser.residentInfo?.id;
+    
+    // Validar que existe el residentId
+    if (!residentId || typeof residentId !== 'string' || residentId.trim() === '') {
+      this.notificationService.showError(
+        'No se pudo obtener el ID del residente. Por favor, inicie sesión nuevamente.',
+        'Error de Residente'
+      );
+      return;
+    }
 
-    // Primero obtener el residentId del usuario actual
-    this.usersService.getCurrentUserResidentId().pipe(
-      switchMap((residentId) => {
-        const formValue = this.mascotaForm.value;
-        
-        // Si estamos editando, actualizar; si no, crear
-        if (this.editingPetId) {
-          // Actualizar mascota existente
-          const updateRequest: UpdatePetRequest = {
-            residentId: residentId,
-            name: formValue.nombre || '',
-            species: formValue.especie || '',
-            breed: formValue.raza || '',
-            age: formValue.edad || 0,
-            color: formValue.color || ''
-          };
-          
-          return this.petsService.updatePet(this.editingPetId, updateRequest);
-        } else {
-          // Crear nueva mascota
-          const createRequest: CreatePetRequest = {
-            residentId: residentId,
-            name: formValue.nombre || '',
-            species: formValue.especie || '',
-            breed: formValue.raza || '',
-            age: formValue.edad || 0,
-            color: formValue.color || ''
-          };
-          
-          return this.petsService.createPet(createRequest);
-        }
-      }),
+    this.isSubmitting = true;
+    const residentIdString = residentId.trim();
+    const formValue = this.mascotaForm.value;
+    
+    // Si estamos editando, actualizar; si no, crear
+    const petOperation = this.editingPetId
+      ? this.petsService.updatePet(this.editingPetId, {
+          residentId: residentIdString,
+          name: formValue.nombre || '',
+          species: formValue.especie || '',
+          breed: formValue.raza || '',
+          age: formValue.edad || 0,
+          color: formValue.color || ''
+        } as UpdatePetRequest)
+      : this.petsService.createPet({
+          residentId: residentIdString,
+          name: formValue.nombre || '',
+          species: formValue.especie || '',
+          breed: formValue.raza || '',
+          age: formValue.edad || 0,
+          color: formValue.color || ''
+        } as CreatePetRequest);
+
+    petOperation.pipe(
       tap(() => {
         const action = this.editingPetId ? 'actualizada' : 'registrada';
         this.notificationService.showSuccess(

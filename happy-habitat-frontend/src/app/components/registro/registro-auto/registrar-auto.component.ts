@@ -6,7 +6,7 @@ import { UsersService } from '../../../services/users.service';
 import { NotificationService } from '../../../services/notification.service';
 import { LoggerService } from '../../../services/logger.service';
 import { CreateVehicleRequest, VehicleDto } from '../../../shared/interfaces/vehicle.interface';
-import { catchError, switchMap, tap, of } from 'rxjs';
+import { catchError, tap, of } from 'rxjs';
 import { GenericListComponent, ColumnConfig } from "../../../shared/components/generic-list/generic-list.component";
 
 @Component({
@@ -89,21 +89,51 @@ export class RegistroAutoComponent implements OnInit {
   }
 
   /**
-   * Carga los vehículos del residente actual
+   * Carga los vehículos del residente actual usando el residentId del currentUser
    */
   loadVehicles(): void {
     this.isLoadingVehicles.set(true);
+    console.log('Cargando vehículos');
+    // Obtener el usuario actual del servicio
+    const currentUser = this.usersService.getCurrentUser();
+    console.log('Este es currentUser: ', currentUser);
+    // Validar que existe el usuario y tiene residentInfo
+    if (!currentUser) {
+      this.logger.warn('No current user found. Cannot load vehicles.', 'RegistroAutoComponent');
+      this.notificationService.showError(
+        'No se encontró información del usuario. Por favor, inicie sesión nuevamente.',
+        'Error de Usuario'
+      );
+      this.isLoadingVehicles.set(false);
+      this.vehicles.set([]);
+      return;
+    }
     
-    this.usersService.getCurrentUserResidentId().pipe(
-      switchMap((residentId) => {
-        if (!residentId) {
-          this.logger.warn('No resident ID found for current user. Cannot load vehicles.', 'RegistroAutoComponent');
-          return of([]);
-        }
-        return this.vehiclesService.getVehiclesByResidentId(residentId);
-      }),
+    // Obtener el residentId del currentUser
+    const residentId = currentUser.residentInfo?.id;
+    console.log('Este es residentId para cargar vehículos: ', residentId);
+    // Validar que existe el residentId
+    if (!residentId || typeof residentId !== 'string' || residentId.trim() === '') {
+      this.logger.warn('No valid resident ID found in current user. Cannot load vehicles.', 'RegistroAutoComponent', { 
+        userId: currentUser.id,
+        hasResidentInfo: !!currentUser.residentInfo 
+      });
+      this.notificationService.showWarning(
+        'No se encontró información del residente asociado a su cuenta.',
+        'Información no disponible'
+      );
+      this.isLoadingVehicles.set(false);
+      this.vehicles.set([]);
+      return;
+    }
+    
+    // Cargar los vehículos usando el residentId del currentUser
+    const residentIdString = residentId.trim();
+    this.logger.debug('Loading vehicles for resident', 'RegistroAutoComponent', { residentId: residentIdString });
+    
+    this.vehiclesService.getVehiclesByResidentId(residentIdString).pipe(
       catchError((error) => {
-        this.logger.error('Error loading vehicles', error, 'RegistroAutoComponent');
+        this.logger.error('Error loading vehicles', error, 'RegistroAutoComponent', { residentId: residentIdString });
         this.notificationService.showError(
           error.error?.message || 'Error al cargar los vehículos. Por favor, intente nuevamente.',
           'Error'
@@ -114,9 +144,14 @@ export class RegistroAutoComponent implements OnInit {
       next: (vehicles) => {
         this.vehicles.set(vehicles);
         this.isLoadingVehicles.set(false);
+        this.logger.debug('Vehicles loaded successfully', 'RegistroAutoComponent', { 
+          count: vehicles.length,
+          residentId: residentIdString 
+        });
       },
       error: () => {
         this.isLoadingVehicles.set(false);
+        this.vehicles.set([]);
       }
     });
   }
@@ -185,51 +220,65 @@ export class RegistroAutoComponent implements OnInit {
       return;
     }
 
-    // Primero obtener el residentId del usuario actual
-    this.usersService.getCurrentUserResidentId().pipe(
-      switchMap((residentId) => {
-        if (!residentId) {
-          this.notificationService.showError('No se pudo obtener el ID del residente. Por favor, inicie sesión nuevamente.', 'Error de Residente');
-          return of(null);
-        }
-        
-        // Preparar el request para crear el vehículo
-        const formValue = this.autoForm.value;
-        
-        // Obtener el tipo de vehículo: si el usuario ya tiene vehículos, usar el tipo del primero
-        // Si no, mostrar un error indicando que se necesita seleccionar el tipo
-        const existingVehicles = this.vehicles();
-        let vehicleTypeId = '';
-        
-        if (existingVehicles.length > 0) {
-          // Usar el tipo del primer vehículo existente como referencia
-          vehicleTypeId = existingVehicles[0].vehicleTypeId;
-        } else {
-          // Si no hay vehículos existentes, necesitamos que el usuario seleccione el tipo
-          // Por ahora, mostrar un mensaje de error
-          this.notificationService.showError(
-            'No se puede determinar el tipo de vehículo. Por favor, contacte al administrador o implemente un selector de tipos de vehículos.',
-            'Tipo de vehículo requerido'
-          );
-          return of(null);
-        }
-        
-        const request: CreateVehicleRequest = {
-          residentId: residentId,
-          brand: formValue.marca || '',
-          vehicleTypeId: vehicleTypeId,
-          model: formValue.modelo || '',
-          year: formValue.año || 0,
-          color: formValue.color || '',
-          licensePlate: formValue.placas || ''
-        };
+    // Obtener el usuario actual del servicio
+    const currentUser = this.usersService.getCurrentUser();
+    
+    // Validar que existe el usuario y tiene residentInfo
+    if (!currentUser) {
+      this.notificationService.showError(
+        'No se encontró información del usuario. Por favor, inicie sesión nuevamente.',
+        'Error de Usuario'
+      );
+      return;
+    }
+    
+    // Obtener el residentId del currentUser
+    const residentId = currentUser.residentInfo?.id;
+    
+    // Validar que existe el residentId
+    if (!residentId || typeof residentId !== 'string' || residentId.trim() === '') {
+      this.notificationService.showError(
+        'No se pudo obtener el ID del residente. Por favor, inicie sesión nuevamente.',
+        'Error de Residente'
+      );
+      return;
+    }
+    
+    const residentIdString = residentId.trim();
+    
+    // Preparar el request para crear el vehículo
+    const formValue = this.autoForm.value;
+    
+    // Obtener el tipo de vehículo: si el usuario ya tiene vehículos, usar el tipo del primero
+    // Si no, mostrar un error indicando que se necesita seleccionar el tipo
+    const existingVehicles = this.vehicles();
+    let vehicleTypeId = '';
+    
+    if (existingVehicles.length > 0) {
+      // Usar el tipo del primer vehículo existente como referencia
+      vehicleTypeId = existingVehicles[0].vehicleTypeId;
+    } else {
+      // Si no hay vehículos existentes, necesitamos que el usuario seleccione el tipo
+      // Por ahora, mostrar un mensaje de error
+      this.notificationService.showError(
+        'No se puede determinar el tipo de vehículo. Por favor, contacte al administrador o implemente un selector de tipos de vehículos.',
+        'Tipo de vehículo requerido'
+      );
+      return;
+    }
+    
+    const request: CreateVehicleRequest = {
+      residentId: residentIdString,
+      brand: formValue.marca || '',
+      vehicleTypeId: vehicleTypeId,
+      model: formValue.modelo || '',
+      year: formValue.año || 0,
+      color: formValue.color || '',
+      licensePlate: formValue.placas || ''
+    };
 
-        // Crear el vehículo
-        return this.vehiclesService.createVehicle(request);
-
-        // Crear el vehículo
-        return this.vehiclesService.createVehicle(request);
-      }),
+    // Crear el vehículo
+    this.vehiclesService.createVehicle(request).pipe(
       tap((vehicle) => {
         if (vehicle) {
           this.notificationService.showSuccess(

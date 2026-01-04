@@ -1,4 +1,4 @@
-import { JsonPipe, TitleCasePipe } from '@angular/common';
+import { TitleCasePipe } from '@angular/common';
 import { Component, inject, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormUtils } from '../../../utils/form-utils';
@@ -8,11 +8,11 @@ import { ResidentVisitsService } from '../../../services/resident-visits.service
 import { UsersService } from '../../../services/users.service';
 import { NotificationService } from '../../../services/notification.service';
 import { CreateResidentVisitRequest } from '../../../shared/interfaces/resident-visit.interface';
-import { catchError, switchMap, tap } from 'rxjs';
+import { catchError, tap, throwError } from 'rxjs';
 
 @Component({
   selector: 'hh-registro-visitante',
-  imports: [JsonPipe, ReactiveFormsModule, ShowFormErrorTemplateComponent, TitleCasePipe],
+  imports: [ReactiveFormsModule, ShowFormErrorTemplateComponent, TitleCasePipe],
   templateUrl: './registro-visitante.component.html',
   styleUrl: './registro-visitante.component.css'
 })
@@ -68,29 +68,50 @@ export class RegistroVisitanteComponent {
       return;
     }
 
+    // Obtener el usuario actual del servicio
+    const currentUser = this.usersService.getCurrentUser();
+    
+    // Validar que existe el usuario y tiene residentInfo
+    if (!currentUser) {
+      this.notificationService.showError(
+        'No se encontró información del usuario. Por favor, inicie sesión nuevamente.',
+        'Error de Usuario'
+      );
+      return;
+    }
+    
+    // Obtener el residentId del currentUser
+    const residentId = currentUser.residentInfo?.id;
+    
+    // Validar que existe el residentId
+    if (!residentId || typeof residentId !== 'string' || residentId.trim() === '') {
+      this.notificationService.showError(
+        'No se pudo obtener el ID del residente. Por favor, inicie sesión nuevamente.',
+        'Error de Residente'
+      );
+      return;
+    }
+
     this.isSubmitting = true;
+    const residentIdString = residentId.trim();
+    
+    // Preparar el request para crear la visita
+    const formValue = this.myForm.value;
+    const request: CreateResidentVisitRequest = {
+      residentId: residentIdString,
+      visitorName: formValue.name,
+      totalPeople: formValue.totalpersons,
+      vehicleColor: formValue.carcolor || null,
+      licensePlate: formValue.carplates || null,
+      subject: formValue.subject,
+      arrivalDate: new Date(formValue.arriveDate).toISOString(),
+      departureDate: formValue.departureDate 
+        ? new Date(formValue.departureDate).toISOString() 
+        : null
+    };
 
-    // Primero obtener el residentId del usuario actual
-    this.usersService.getCurrentUserResidentId().pipe(
-      switchMap((residentId) => {
-        // Preparar el request para crear la visita
-        const formValue = this.myForm.value;
-        const request: CreateResidentVisitRequest = {
-          residentId: residentId,
-          visitorName: formValue.name,
-          totalPeople: formValue.totalpersons,
-          vehicleColor: formValue.carcolor || null,
-          licensePlate: formValue.carplates || null,
-          subject: formValue.subject,
-          arrivalDate: new Date(formValue.arriveDate).toISOString(),
-          departureDate: formValue.departureDate 
-            ? new Date(formValue.departureDate).toISOString() 
-            : null
-        };
-
-        // Crear la visita
-        return this.residentVisitsService.createVisit(request);
-      }),
+    // Crear la visita
+    this.residentVisitsService.createVisit(request).pipe(
       tap(() => {
         this.notificationService.showSuccess(
           'Visitante registrado exitosamente',
@@ -115,7 +136,7 @@ export class RegistroVisitanteComponent {
           error.error?.message || 'Error al registrar el visitante. Por favor, intente nuevamente.',
           'Error'
         );
-        throw error;
+        return throwError(() => error);
       })
     ).subscribe({
       next: () => {

@@ -13,6 +13,7 @@ import {
   ResetPasswordRequest
 } from '../shared/interfaces/auth.interface';
 import { UserInfo } from '../interfaces/user-info.interface';
+import { Comunidad } from '../interfaces/comunidad.interface';
 import { SessionService } from './session.service';
 import { UsersService } from './users.service';
 import { LoggerService } from './logger.service';
@@ -123,6 +124,17 @@ export class AuthService {
     const isAdmin = username.toLowerCase() === 'admin' || username.toLowerCase().includes('admin');
     const role = isAdmin ? RolesEnum.SYSTEM_ADMIN : RolesEnum.RESIDENT;
     
+    // Crear comunidad mock
+    const mockComunidad: Comunidad = {
+      id: 'fcdc9a85-88b7-4109-84b3-a75107392d87',
+      tipoUnidadHabitacional: tipoComunidadEnum.FRACCIONAMIENTO,
+      nombre: 'Residencial El Pueblito',
+      ubicacion: 'Av. Paseo del Pueblito 123, El Pueblito, QRO',
+      latlng: { lat: 20.5821, lng: -100.3897 },
+      cantidadviviendas: 120,
+      contacto: 'admin@elpueblito.mx'
+    };
+    
     // Crear usuario mock basado en el username
     const mockUser: UserInfo = {
       id: `mock-user-${Date.now()}`,
@@ -132,14 +144,15 @@ export class AuthService {
       username: username,
       email: `${username}@happyhabitat.com`,
       role: role,
-      unidadhabitacional: {
-        id: 'fcdc9a85-88b7-4109-84b3-a75107392d87',
-        tipoUnidadHabitacional: tipoComunidadEnum.FRACCIONAMIENTO,
-        nombre: 'Residencial El Pueblito',
-        ubicacion: 'Av. Paseo del Pueblito 123, El Pueblito, QRO',
-        latlng: { lat: 20.5821, lng: -100.3897 },
-        cantidadviviendas: 120,
-        contacto: 'admin@elpueblito.mx'
+      residentInfo: {
+        id: `mock-resident-${Date.now()}`,
+        fullname: isAdmin 
+          ? 'Administrador del Sistema' 
+          : `${username.charAt(0).toUpperCase() + username.slice(1)} Usuario`,
+        email: `${username}@happyhabitat.com`,
+        address: 'Av. Paseo del Pueblito 123, El Pueblito, QRO',
+        tipoComunidad: tipoComunidadEnum.FRACCIONAMIENTO,
+        comunidad: mockComunidad
       }
     };
 
@@ -213,20 +226,30 @@ export class AuthService {
    * Crea una respuesta mock de autenticación desde datos de registro
    */
   private createMockAuthResponseFromRegister(data: RegisterRequest): AuthResponse {
+    // Crear comunidad mock
+    const mockComunidad: Comunidad = {
+      id: 'fcdc9a85-88b7-4109-84b3-a75107392d87',
+      tipoUnidadHabitacional: tipoComunidadEnum.FRACCIONAMIENTO,
+      nombre: 'Residencial El Pueblito',
+      ubicacion: 'Av. Paseo del Pueblito 123, El Pueblito, QRO',
+      latlng: { lat: 20.5821, lng: -100.3897 },
+      cantidadviviendas: 120,
+      contacto: 'admin@elpueblito.mx'
+    };
+    
     const mockUser: UserInfo = {
       id: `mock-user-${Date.now()}`,
       fullname: `${data.firstName} ${data.lastName}`.trim(),
       username: data.username,
       email: data.email,
       role: RolesEnum.RESIDENT,
-      unidadhabitacional: {
-        id: 'fcdc9a85-88b7-4109-84b3-a75107392d87',
-        tipoUnidadHabitacional: tipoComunidadEnum.FRACCIONAMIENTO,
-        nombre: 'Residencial El Pueblito',
-        ubicacion: 'Av. Paseo del Pueblito 123, El Pueblito, QRO',
-        latlng: { lat: 20.5821, lng: -100.3897 },
-        cantidadviviendas: 120,
-        contacto: 'admin@elpueblito.mx'
+      residentInfo: {
+        id: `mock-resident-${Date.now()}`,
+        fullname: `${data.firstName} ${data.lastName}`.trim(),
+        email: data.email,
+        address: 'Av. Paseo del Pueblito 123, El Pueblito, QRO',
+        tipoComunidad: tipoComunidadEnum.FRACCIONAMIENTO,
+        comunidad: mockComunidad
       }
     };
 
