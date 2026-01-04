@@ -1,6 +1,6 @@
 import { Mascota } from "../interfaces/mascota.interface";
 
-const mascotas: Mascota[] = [
+export const mascotas: Mascota[] = [
   { id: 1, nombre: "Luna", especie: "Perro", raza: "Labrador", edad: 3, color: "Negro", idResidente: 201 },
   { id: 2, nombre: "Milo", especie: "Gato", raza: "Siamés", edad: 2, color: "Gris", idResidente: 201 },
 

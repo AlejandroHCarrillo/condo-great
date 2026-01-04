@@ -1,0 +1,130 @@
+Prompt para crear una solución web api
+------------------------------------------------------------------------------------
+Proyecto Inicial
+------------------------------------------------------------------------------------
+Preparación del workspace
+------------------------------------------------------------------------------------
+En el workspace establece C:\Repos\condo-great\happy-habitat-backend como el backend, C:\Repos\condo-great\happy-habitat-frontend como el frontend y C:\Repos\condo-great\documentacion como documentaciion
+tambien establece los comentarios del codigo y las comment strings en ingles
+------------------------------------------------------------------------------------
+
+Crea una solucion .net 8 con arquitectura limpia donde cada capa sea un proyecto independiente, para la capa de datos usa EF conectado al servidor local de SQL con windows authenitcation la solucion guardala en C:\Repos\condo-great\happy-habitat-backend
+Habilita Swagger con la autorización habilitada y Cuando se arranque el backend debe abrir swagger 
+
+Genera una etidad llamada Role 
+id: guid
+code: string 15
+Decripcion: string 50
+
+Estos son los roles que deben existir 
+    SYSTEM_ADMIN = 'SYSTEM_ADMIN',
+    ADMIN_COMPANY = 'ADMIN_COMPANY',
+    COMITEE_MEMBER = 'COMITEE_MEMBER',
+    RESIDENT = 'RESIDENT',
+    TENANT = 'RENTER',
+    VIGILANCE = 'VIGILANCE'
+
+Crea una entidad llamada User con las siguientes propiedades
+  id: Guid;
+  roleId: Guide relacionada con un rol de la entidad Role
+  username: string 15
+  password: string 20
+isActive: bool = true
+  createdAt: string; // ISO date string
+
+Crea una clase seeder para poblar los datos minimos necesarios para arrancar la aplicación
+En el seeder crea un usuario inicial con el rol SysAdmin con username = elgrande, password = abc123
+En el seeder crea un roles 
+    SYSTEM_ADMIN = 'SYSTEM_ADMIN',
+    ADMIN_COMPANY = 'ADMIN_COMPANY',
+    COMITEE_MEMBER = 'COMITEE_MEMBER',
+    RESIDENT = 'RESIDENT',
+    TENANT = 'RENTER',
+    VIGILANCE = 'VIGILANCE'
+
+Crea otra clase seeder llamada DummySeeder para incluir datos de prueba
+
+--------------------------------------------------------------------------------------------------------------
+Authenticacion
+--------------------------------------------------------------------------------------------------------------
+Crea el CRUD para Usuarios
+ 
+Crea un controller de autenticación que use que use la entidad de usuario
+este endpoint debe tener un endpoint para login, registrer, change password y forgot password
+--------------------------------------------------------------------------------------------------------------
+
+Crea una entidad llamada Community con las siguientes propiedades
+id: Guid;
+nombre: string
+descripción: string
+Dirección: string
+Contacto: string
+email: string
+phone: string
+  createdAt: string; // ISO date string
+
+Crea una entidad Resident con las siguientes propiedades
+  id: guid;
+  fullname: string;
+  homeNumber: number;
+  email?: string;
+  phone?: string;
+  number?:string;
+  address: string;
+  comunities: commity[];
+  createdAt: string; // ISO date string
+
+Crea una entidad Mascota con las siguiente propiedades
+  id: guid;
+  ownerId: Guid asociado al un residente
+  name: string;
+  edad: number;
+  tipo: string (perro, gato, ave, pez, etc)
+  raza: string;
+  color: string
+  createdAt: string; // ISO date string
+
+Crea una entidad Vehiculo con las siguiente propiedades
+  id: guid;
+  ownerId: Guid asociado al un residente
+  Marca: string;
+  Model: string
+  Year: number;
+  tipo: string (Auto, camioneta, motocicleta, etc)
+  color: string
+  Placas: string
+  createdAt: string; // ISO date string
+
+Crea una entidad VisitaResidente con las siguiente propiedades
+  id: guid;
+  residentId: Guid asociado al un residente
+  residentName: string;
+  visitorName: string;
+  totalPeople: number;
+  vehicleColor?: string | null;
+  licensePlate?: string | null;
+  subject: string;
+  arrivalDate: string; // ISO date string
+  departureDate?: string | null; // ISO date string
+  createdAt: string; // ISO date string
+
+
+Crea un archivo dummyseeder para poblar información para probar
+En el dummy seeder 
+Crea 1 registro de resident asociado al usuario elgrandeahc tambien asociado la primer comunidad agregada al dummy seeder que tenga 3 autos asociados, 3 mascotas y 2 visitas antes del dia de hoy y 3 después de hoy
+
+Crea 2 usuarios AdminCompany, 4 comitee member, 10 residents y 1 vigilance
+Crea 2 comunidades ficticias
+Crea 1 residente asociado a cada usuario usuario con role residente o Comitee member 
+Crea entre 1 a 5 visitas para los residentes entre el 1 de enero del 2026 a la fecha de hoy
+
+
+
+
+crea usuarios de prueba para
+    SYSTEM_ADMIN = 'SYSTEM_ADMIN',
+    ADMIN_COMPANY = 'ADMIN_COMPANY',
+    COMITEE_MEMBER = 'COMITEE_MEMBER',
+    RESIDENT = 'RESIDENT',
+    TENANT = 'RENTER',
+    VIGILANCE = 'VIGILANCE'

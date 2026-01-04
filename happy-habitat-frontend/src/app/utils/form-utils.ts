@@ -74,6 +74,12 @@ export class FormUtils {
                   return `Ese correo ya esta siendo utilizado`;
             case 'foundInBlacklist':
                   return `El username ${ errors['username'] } no puede ser usado por que contiene palabras prohibidas ${ errors['forbidenWord'] }.`;
+            case 'passwordLength':
+            case 'passwordUppercase':
+            case 'passwordNumber':
+            case 'passwordSpecial':
+            case 'passwordInvalidChars':
+                  return FormUtils.getStrongPasswordError(errors);
             default: return `Error no controlado para ${ key }` 
         }
     } 
@@ -150,6 +156,73 @@ export class FormUtils {
     }
     // console.log(`La palabra ${searchText} puede ser usada.`);
     return null;
+  }
+
+  /**
+   * Validador personalizado para contraseñas seguras
+   * Requisitos:
+   * - 8 a 20 caracteres
+   * - Al menos una mayúscula
+   * - Al menos un número
+   * - Al menos un carácter especial
+   * - Las demás pueden ser letras minúsculas
+   */
+  static strongPassword(control: AbstractControl): ValidationErrors | null {
+    if (!control.value || control.value === '') {
+      return null; // Dejar que 'required' maneje campos vacíos
+    }
+
+    const password = control.value;
+    const errors: ValidationErrors = {};
+
+    // Verificar longitud (8 a 20 caracteres)
+    if (password.length < 8 || password.length > 20) {
+      errors['passwordLength'] = true;
+    }
+
+    // Verificar al menos una mayúscula
+    if (!/[A-Z]/.test(password)) {
+      errors['passwordUppercase'] = true;
+    }
+
+    // Verificar al menos un número
+    if (!/[0-9]/.test(password)) {
+      errors['passwordNumber'] = true;
+    }
+
+    // Verificar al menos un carácter especial
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      errors['passwordSpecial'] = true;
+    }
+
+    // Verificar que solo contenga caracteres permitidos (letras, números y caracteres especiales)
+    if (!/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/.test(password)) {
+      errors['passwordInvalidChars'] = true;
+    }
+
+    return Object.keys(errors).length > 0 ? errors : null;
+  }
+
+  /**
+   * Obtiene el mensaje de error para el validador de contraseña fuerte
+   */
+  static getStrongPasswordError(errors: ValidationErrors): string {
+    if (errors['passwordLength']) {
+      return 'La contraseña debe tener entre 8 y 20 caracteres.';
+    }
+    if (errors['passwordUppercase']) {
+      return 'La contraseña debe contener al menos una letra mayúscula.';
+    }
+    if (errors['passwordNumber']) {
+      return 'La contraseña debe contener al menos un número.';
+    }
+    if (errors['passwordSpecial']) {
+      return 'La contraseña debe contener al menos un carácter especial (!@#$%^&*()_+-=[]{};\':"|,.<>/?).';
+    }
+    if (errors['passwordInvalidChars']) {
+      return 'La contraseña contiene caracteres no permitidos.';
+    }
+    return 'La contraseña no cumple con los requisitos de seguridad.';
   }
 
 

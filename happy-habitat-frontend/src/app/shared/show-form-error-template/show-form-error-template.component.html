@@ -1,6 +1,7 @@
-@if (!isValid()) {
-    <br/>
-    <span class="text-red-500">
+@if (!isValid() && errorMessage()) {
+    <label class="label">
+        <span class="label-text-alt text-error">
             {{ errorMessage() }}
-    </span>
+        </span>
+    </label>
 }

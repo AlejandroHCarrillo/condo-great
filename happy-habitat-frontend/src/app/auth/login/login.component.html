@@ -1,1 +1,81 @@
-<p>login works!</p>
+<div class="w-full px-4">
+  <div class="card w-full max-w-md bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title justify-center text-2xl mb-4">Iniciar Sesión</h2>
+      
+      <show-form-error-template 
+        [isValid]="!errorMessage()"
+        [errorMessage]="errorMessage() || ''"
+      />
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <!-- Username -->
+        <div class="form-control w-full mb-4">
+          <label class="label">
+            <span class="label-text">Usuario</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Ingresa tu usuario"
+            class="input input-bordered w-full"
+            [class.input-error]="!formUtils.isValidField(loginForm, 'username')"
+            formControlName="username"
+          />
+          <show-form-error-template 
+            [isValid]="formUtils.isValidField(loginForm, 'username')"
+            [errorMessage]="formUtils.getFieldError(loginForm, 'username') || ''"
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="form-control w-full mb-4">
+          <label class="label">
+            <span class="label-text">Contraseña</span>
+          </label>
+          <input
+            type="password"
+            placeholder="Ingresa tu contraseña"
+            class="input input-bordered w-full"
+            [class.input-error]="!formUtils.isValidField(loginForm, 'password')"
+            formControlName="password"
+          />
+          <show-form-error-template 
+            [isValid]="formUtils.isValidField(loginForm, 'password')"
+            [errorMessage]="formUtils.getFieldError(loginForm, 'password') || ''"
+          />
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-control mt-6">
+          <button
+            type="submit"
+            class="btn btn-primary w-full text-white"
+            [disabled]="isLoading()"
+          >
+            @if (isLoading()) {
+              <span class="loading loading-spinner loading-sm"></span>
+              Iniciando sesión...
+            } @else {
+              Iniciar Sesión
+            }
+          </button>
+        </div>
+      </form>
+
+      <div class="text-center mb-2">
+        <p class="text-sm">
+          <a routerLink="/auth/forgot-password" class="link link-primary">¿Olvidaste tu contraseña?</a>
+        </p>
+      </div>
+
+      <div class="divider">O</div>
+
+      <div class="text-center">
+        <p class="text-sm">
+          ¿No tienes una cuenta?
+          <a routerLink="/auth/register" class="link link-primary">Regístrate aquí</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

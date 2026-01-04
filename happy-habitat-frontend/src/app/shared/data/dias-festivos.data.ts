@@ -1,4 +1,4 @@
-const diasFestivosMexico = [
+export const diasFestivosMexico = [
   {
     id: 'df-2025-01',
     fecha: '2025-01-01',

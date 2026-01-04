@@ -1,0 +1,32 @@
+/* Estilos específicos para el componente de registro de preferencias */
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* Mejorar la apariencia de los checkboxes */
+.checkbox {
+  flex-shrink: 0;
+}
+
+/* Espaciado entre preferencias */
+.form-control {
+  transition: all 0.2s ease;
+}
+
+/* Hover effect en las opciones */
+.label.cursor-pointer:hover {
+  background-color: hsl(var(--b2));
+  transition: background-color 0.2s ease;
+}
+
+/* Ajustes para móviles */
+@media (max-width: 640px) {
+  .form-control {
+    width: 100%;
+  }
+}
+
+
+

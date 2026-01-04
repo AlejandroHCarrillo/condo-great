@@ -1,34 +1,229 @@
-<div class="max-w-xl mx-auto p-4 bg-base-200 rounded-box shadow-md">
-    <h2 class="text-2xl font-bold mb-4 flex flex-row">
-    <span class="text-2xl">
-      <i class="fa-solid fa-dog"></i>&nbsp;
-    </span>
-    <span>Registrar Mascota</span>
-  </h2>
+<div class="w-full max-w-4xl p-4 sm:p-6 md:p-8">
+    <!-- Título y Botón Nuevo en la misma línea -->
+    <div class="flex flex-row items-center justify-between mb-4 sm:mb-6">
+        <h2 class="text-xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2">
+            <i class="fa-solid fa-dog text-primary"></i>
+            <span>Registrar mascota</span>
+        </h2>
+        <button 
+            class="btn btn-primary text-white"
+            (click)="openNewPetModalForCreate()"
+        >
+            <i class="fa-solid fa-plus mr-2"></i>
+            Nuevo
+        </button>
+    </div>
 
-  <form [formGroup]="mascotaForm" (ngSubmit)="registrarMascota()" class="flex flex-col gap-4">
+    <!-- Lista de mascotas del residente -->
+    @if (isLoadingPets()) {
+        <div class="card bg-base-200 shadow mb-6">
+            <div class="card-body items-center py-8">
+                <span class="loading loading-spinner loading-lg text-primary"></span>
+                <p class="text-base-content/70 mt-4">Cargando mascotas...</p>
+            </div>
+        </div>
+    } @else {
+        <div class="mb-6">
+            
+            <!-- Lista de mascotas -->
+            <hh-generic-list
+                [items]="pets()"
+                [columns]="petColumns"
+                [title]="'Mis Mascotas'"
+                [itemsPerPage]="5"
+                [showActions]="true"
+                (rowClick)="onPetClick($event)"
+                (edit)="onEditPet($event)"
+                (delete)="onDeletePet($event)"
+            ></hh-generic-list>
+        </div>
+    }
 
-    <input formControlName="id" type="number" placeholder="ID de la mascota"
-      class="input input-bordered w-full" />
+    <!-- Modal para registro de mascota -->
+    <dialog 
+        id="newPetModal"
+        class="modal modal-bottom sm:modal-middle"
+    >
+        <div class="modal-box max-w-2xl">
+            <!-- Botón de cerrar -->
+            <form method="dialog">
+                <button 
+                    type="button"
+                    class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                    (click)="closeModal()"
+                >
+                    ✕
+                </button>
+            </form>
+            
+            <!-- Título del modal -->
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-dog text-primary"></i>
+                <span>{{ editingPetId ? 'Editar Mascota' : 'Registrar Nueva Mascota' }}</span>
+            </h3>
+            
+            <!-- Formulario -->
+            <form [formGroup]="mascotaForm" (ngSubmit)="registrarMascota()" class="flex flex-col gap-4">
+                <div class="form-control">
+                    <label class="label font-semibold" for="nombre">
+                        <span class="label-text">Nombre</span>
+                    </label>
+                    <input 
+                        id="nombre"
+                        formControlName="nombre" 
+                        type="text" 
+                        placeholder="Nombre de la mascota"
+                        class="input input-bordered w-full"
+                        [class.input-error]="mascotaForm.get('nombre')?.invalid && mascotaForm.get('nombre')?.touched"
+                    />
+                    @if (mascotaForm.get('nombre')?.invalid && mascotaForm.get('nombre')?.touched) {
+                        <label class="label">
+                            <span class="label-text-alt text-error">El nombre es requerido (mínimo 2 caracteres)</span>
+                        </label>
+                    }
+                </div>
 
-    <input formControlName="nombre" type="text" placeholder="Nombre"
-      class="input input-bordered w-full" />
+                <div class="form-control">
+                    <label class="label font-semibold" for="especie">
+                        <span class="label-text">Especie</span>
+                    </label>
+                    <input 
+                        id="especie"
+                        formControlName="especie" 
+                        type="text" 
+                        placeholder="Ej: perro, gato, etc."
+                        class="input input-bordered w-full"
+                        [class.input-error]="mascotaForm.get('especie')?.invalid && mascotaForm.get('especie')?.touched"
+                    />
+                    @if (mascotaForm.get('especie')?.invalid && mascotaForm.get('especie')?.touched) {
+                        <label class="label">
+                            <span class="label-text-alt text-error">La especie es requerida (mínimo 2 caracteres)</span>
+                        </label>
+                    }
+                </div>
 
-    <input formControlName="especie" type="text" placeholder="Especie (ej. perro, gato)"
-      class="input input-bordered w-full" />
+                <div class="form-control">
+                    <label class="label font-semibold" for="raza">
+                        <span class="label-text">Raza (opcional)</span>
+                    </label>
+                    <input 
+                        id="raza"
+                        formControlName="raza" 
+                        type="text" 
+                        placeholder="Raza de la mascota"
+                        class="input input-bordered w-full"
+                    />
+                </div>
 
-    <input formControlName="raza" type="text" placeholder="Raza (opcional)"
-      class="input input-bordered w-full" />
+                <div class="form-control">
+                    <label class="label font-semibold" for="edad">
+                        <span class="label-text">Edad</span>
+                    </label>
+                    <input 
+                        id="edad"
+                        formControlName="edad" 
+                        type="number" 
+                        placeholder="Edad en años"
+                        class="input input-bordered w-full"
+                        min="0"
+                        max="30"
+                        [class.input-error]="mascotaForm.get('edad')?.invalid && mascotaForm.get('edad')?.touched"
+                    />
+                    @if (mascotaForm.get('edad')?.invalid && mascotaForm.get('edad')?.touched) {
+                        <label class="label">
+                            <span class="label-text-alt text-error">La edad es requerida (0-30 años)</span>
+                        </label>
+                    }
+                </div>
 
-    <input formControlName="edad" type="number" placeholder="Edad en años"
-      class="input input-bordered w-full" />
+                <div class="form-control">
+                    <label class="label font-semibold" for="color">
+                        <span class="label-text">Color</span>
+                    </label>
+                    <input 
+                        id="color"
+                        formControlName="color" 
+                        type="text" 
+                        placeholder="Color de la mascota"
+                        class="input input-bordered w-full"
+                        [class.input-error]="mascotaForm.get('color')?.invalid && mascotaForm.get('color')?.touched"
+                    />
+                    @if (mascotaForm.get('color')?.invalid && mascotaForm.get('color')?.touched) {
+                        <label class="label">
+                            <span class="label-text-alt text-error">El color es requerido (mínimo 2 caracteres)</span>
+                        </label>
+                    }
+                </div>
 
-    <input formControlName="color" type="text" placeholder="Color"
-      class="input input-bordered w-full" />
+                <!-- Botones del modal -->
+                <div class="form-control mt-6 flex flex-col sm:flex-row justify-end gap-2">
+                    <button 
+                        type="button" 
+                        class="btn btn-ghost"
+                        (click)="closeModal()"
+                        [disabled]="isSubmitting"
+                    >
+                        Cancelar
+                    </button>
+                    <button 
+                        type="submit" 
+                        class="btn btn-primary text-white"
+                        [disabled]="mascotaForm.invalid || isSubmitting"
+                    >
+                        @if (isSubmitting) {
+                            <span class="loading loading-spinner loading-sm"></span>
+                        }                         @else {
+                            <i class="fa-solid fa-save mr-2"></i>
+                        }
+                        {{ editingPetId ? 'Actualizar mascota' : 'Registrar mascota' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Backdrop para cerrar el modal -->
+        <form method="dialog" class="modal-backdrop">
+            <button (click)="closeModal()">Cerrar</button>
+        </form>
+    </dialog>
 
-    <input formControlName="idResidente" type="number" placeholder="ID del residente"
-      class="input input-bordered w-full" />
-    <button type="submit" class="btn btn-primary text-white">Registrar mascota</button>
-  </form>  
+    <!-- Modal de confirmación de eliminación -->
+    <dialog id="deletePetModal" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-error"></i>
+                <span>Confirmar Eliminación</span>
+            </h3>
+            
+            @if (petToDelete) {
+                <p class="py-4">
+                    ¿Está seguro de que desea eliminar a <strong>{{ petToDelete.name }}</strong>?
+                </p>
+                <p class="text-sm text-base-content/70 mb-4">
+                    Esta acción no se puede deshacer.
+                </p>
+            }
+            
+            <div class="modal-action">
+                <button 
+                    class="btn btn-ghost"
+                    (click)="closeDeleteModal()"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    class="btn btn-error text-white"
+                    (click)="confirmDeletePet()"
+                >
+                    <i class="fa-solid fa-trash mr-2"></i>
+                    Eliminar
+                </button>
+            </div>
+        </div>
+        
+        <form method="dialog" class="modal-backdrop">
+            <button (click)="closeDeleteModal()">Cerrar</button>
+        </form>
+    </dialog>
 </div>
 <hh-upload-image/>

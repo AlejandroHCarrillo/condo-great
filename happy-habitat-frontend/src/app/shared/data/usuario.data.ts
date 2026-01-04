@@ -2,7 +2,7 @@ import { RolesEnum } from "../../enums/roles.enum";
 import { Residente } from "../interfaces/residente.interface";
 import { Usuario } from "../interfaces/usuario-interface";
 
-const usuarioLoggeado: Usuario = {
+export const usuarioLoggeado: Usuario = {
     id: 'EWQ-RETRTFC-ERTDSF-EFGHT-SDSD',
     role: RolesEnum.SYSTEM_ADMIN,
     username: "ahcarrillo",

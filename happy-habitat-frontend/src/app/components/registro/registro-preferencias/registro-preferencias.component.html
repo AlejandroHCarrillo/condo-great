@@ -1,0 +1,97 @@
+<div class="w-full max-w-4xl p-4 sm:p-6 md:p-8">
+    <!-- Título -->
+    <h2 class="text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-6 flex items-center gap-2">
+        <i class="fa-solid fa-sliders text-primary"></i>
+        <span>Registro de Preferencias</span>
+    </h2>
+
+    <!-- Mensajes de éxito y error -->
+    @if (successMessage()) {
+        <div class="alert alert-success mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{{ successMessage() }}</span>
+        </div>
+    }
+
+    @if (errorMessage()) {
+        <div class="alert alert-error mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{{ errorMessage() }}</span>
+        </div>
+    }
+
+    <!-- Formulario -->
+    <div class="card bg-base-200 shadow-lg">
+        <div class="card-body p-4 sm:p-6 md:p-8">
+            <form [formGroup]="preferenciasForm" (ngSubmit)="onSave()" class="space-y-6">
+                
+                <!-- Lista de preferencias -->
+                <div formArrayName="preferencias" class="space-y-6">
+                    @for (preferencia of preferenciasList; track preferencia.id; let i = $index) {
+                        <div class="form-control border-b border-base-300 pb-6 last:border-b-0">
+                            <!-- Título de la preferencia -->
+                            <label class="label">
+                                <span class="label-text font-semibold text-lg">
+                                    {{ preferencia.descripcion }}
+                                </span>
+                            </label>
+
+                            <!-- Si tiene opciones, mostrar checkboxes -->
+                            @if (hasOpciones(i)) {
+                                <div class="mt-2 space-y-2">
+                                    @for (opcion of getOpciones(i); track $index; let opcionIndex = $index) {
+                                        <label class="label cursor-pointer justify-start gap-3 hover:bg-base-200 p-2 rounded">
+                                            <input 
+                                                type="checkbox" 
+                                                class="checkbox checkbox-primary"
+                                                [formControl]="getOpcionControl(i, opcionIndex)"
+                                            />
+                                            <span class="label-text">{{ opcion }}</span>
+                                        </label>
+                                    }
+                                </div>
+                            } @else {
+                                <!-- Si no tiene opciones, mostrar input de texto -->
+                                <div class="mt-2">
+                                    <input 
+                                        type="text" 
+                                        class="input input-bordered w-full"
+                                        [class.input-error]="!formUtils.isValidField(getPreferenciaGroup(i), 'valorTexto')"
+                                        [formControl]="getValorTextoControl(i)"
+                                        [placeholder]="'Ingrese ' + preferencia.descripcion.toLowerCase()"
+                                    />
+                                    <show-form-error-template
+                                        [isValid]="formUtils.isValidField(getPreferenciaGroup(i), 'valorTexto')"
+                                        [errorMessage]="formUtils.getFieldError(getPreferenciaGroup(i), 'valorTexto') || ''"
+                                    />
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Botón de guardar -->
+                <div class="form-control mt-8 flex justify-start sm:justify-end">
+                    <button 
+                        type="submit" 
+                        class="btn btn-primary text-white w-full sm:w-auto min-w-32"
+                        [disabled]="preferenciasForm.invalid || isLoading()"
+                    >
+                        @if (isLoading()) {
+                            <span class="loading loading-spinner loading-sm"></span>
+                            Guardando...
+                        } @else {
+                            <i class="fa-solid fa-save mr-2"></i>
+                            Guardar Preferencias
+                        }
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

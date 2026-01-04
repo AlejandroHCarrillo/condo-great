@@ -1,0 +1,10 @@
+/* Estilos para el contenedor de notificaciones */
+:host {
+  display: block;
+  pointer-events: none;
+}
+
+:host ::ng-deep hh-notification {
+  pointer-events: auto;
+}
+

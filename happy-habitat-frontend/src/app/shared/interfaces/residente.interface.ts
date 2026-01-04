@@ -8,5 +8,4 @@ export interface Residente {
   number?:string;
   address: string;
   comunidades?: string[];
-  rol?: string;
 }

@@ -1,0 +1,125 @@
+<div class="w-full">
+    <!-- Título opcional -->
+    @if (title) {
+        <h3 class="text-xl font-bold mb-4">{{ title }}</h3>
+    }
+
+    <!-- Controles superiores: Elementos por página -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text font-semibold">Elementos por página:</span>
+            </label>
+            <select 
+                class="select select-bordered select-sm w-full sm:w-auto"
+                [ngModel]="itemsPerPageSignal()"
+                (ngModelChange)="onItemsPerPageChange($event)"
+            >
+                @for (option of itemsPerPageOptions; track option) {
+                    <option [value]="option">{{ option }}</option>
+                }
+            </select>
+        </div>
+
+        <!-- Información de paginación -->
+        <div class="text-sm text-base-content/70">
+            Mostrando {{ paginationInfo().start }} - {{ paginationInfo().end }} de {{ paginationInfo().total }} elementos
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    @if (items.length > 0) {
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr>
+                        @for (column of displayedColumns(); track column.key) {
+                            <th class="font-semibold">{{ column.label }}</th>
+                        }
+                        @if (showActions === true) {
+                            <th class="font-semibold text-right whitespace-nowrap">Acciones</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (item of paginatedItems(); track $index) {
+                        <tr 
+                            class="cursor-pointer hover:bg-base-300 transition-colors"
+                            (click)="onRowClick(item, $event)"
+                        >
+                            @for (column of displayedColumns(); track column.key) {
+                                <td>{{ getCellValue(item, column) }}</td>
+                            }
+                            @if (showActions === true) {
+                                <td class="text-right whitespace-nowrap">
+                                    <div class="flex justify-end gap-2 action-buttons">
+                                        <button class="btn btn-square btn-ghost bg-yellow-500" (click)="onEdit(item, $event)" title="Editar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><path fill="currentColor" d="m6.4 14.1l1.3 1.3l6.9-6.9l-1.3-1.3zm6.3-7.5l-1.3-1.3l-6.9 6.9l1.4 1.4zm2.1-4.7l3.3 3.3c.6.6.5 1.5 0 2l-9.9 9.9l-6.9 1.4l1.4-6.9q9.3-9.45 9.9-9.9c.6-.4 1.6-.4 2.2.2"/></svg>
+                                        </button>
+                                        <button class="btn btn-square btn-ghost bg-red-500 text-white" (click)="onDelete(item, $event)" title="Eliminar">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7.616 20q-.672 0-1.144-.472T6 18.385V6H5V5h4v-.77h6V5h4v1h-1v12.385q0 .69-.462 1.153T16.384 20zM17 6H7v12.385q0 .269.173.442t.443.173h8.769q.23 0 .423-.192t.192-.424zM9.808 17h1V8h-1zm3.384 0h1V8h-1zM7 6v13z"/></svg>
+                                        </button>
+                                  </div>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Controles de paginación -->
+        @if (totalPages() > 1) {
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
+                <!-- Botones de navegación -->
+                <div class="join">
+                    <button 
+                        class="join-item btn btn-sm"
+                        [disabled]="currentPage() === 1"
+                        (click)="previousPage()"
+                    >
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    
+                    @for (page of getPageNumbers(); track $index) {
+                        @if (page === -1) {
+                            <button class="join-item btn btn-sm btn-disabled" disabled>
+                                <span>...</span>
+                            </button>
+                        } @else {
+                            <button 
+                                class="join-item btn btn-sm"
+                                [class.btn-active]="page === currentPage()"
+                                (click)="goToPage(page)"
+                            >
+                                {{ page }}
+                            </button>
+                        }
+                    }
+                    
+                    <button 
+                        class="join-item btn btn-sm"
+                        [disabled]="currentPage() === totalPages()"
+                        (click)="nextPage()"
+                    >
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <!-- Información de página actual -->
+                <div class="text-sm text-base-content/70">
+                    Página {{ currentPage() }} de {{ totalPages() }}
+                </div>
+            </div>
+        }
+    } @else {
+        <!-- Estado vacío -->
+        <div class="card bg-base-200 shadow">
+            <div class="card-body items-center text-center py-12">
+                <i class="fa-solid fa-inbox text-4xl text-base-content/30 mb-4"></i>
+                <p class="text-base-content/70">No hay elementos para mostrar</p>
+            </div>
+        </div>
+    }
+</div>
+
