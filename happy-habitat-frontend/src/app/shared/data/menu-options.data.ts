@@ -32,15 +32,42 @@ export const menuOptions: menuItem[] = [
   },
   {
     id: UUIDV4(),
-    title: 'Dashboard',
-    path: "dashboard",
-    icon: "fa-solid fa-gauge"
+    title: 'Super Admin',
+    path: "sysadmin",
+    icon: "fa-solid fa-user-tie",
+    child: [...adminOptions]
+  },
+  {
+    id: UUIDV4(),
+    title: 'Administración',
+    path: "admincompany",
+    icon: "fa-solid fa-building",
+  },
+  {
+    id: UUIDV4(),
+    title: 'Vigilancia',
+    path: "vigilancia",
+    icon: "fa-solid fa-user-shield",
   },
   {
     id: UUIDV4(),
     title: 'Residentes',
     path: "resident",
     icon: "fa-solid fa-address-book"
+  },
+/*
+  {
+    id: UUIDV4(),
+    title: 'Seguridad',
+    path: "Seguridad",
+    icon: "fa-solid fa-user-shield"
+  },
+*/
+  {
+    id: UUIDV4(),
+    title: 'Dashboard',
+    path: "dashboard",
+    icon: "fa-solid fa-gauge"
   },
   {
     id: UUIDV4(),
@@ -54,31 +81,20 @@ export const menuOptions: menuItem[] = [
     path: "amenidades",
     icon: "fa-solid fa-people-roof"
   },
-  {
-    id: UUIDV4(),
-    title: 'Sysadmin',
-    path: "sysadmin",
-    icon: "fa-solid fa-user-tie",
-    child: [...adminOptions]
-  },
-  {
-    id: UUIDV4(),
-    title: 'Administracion',
-    path: "administracion",
-    icon: "fa-solid fa-user-tie",
-    child: [...adminOptions]
-  },
+
   {
     id: UUIDV4(),
     title: 'Comunidados',
     path: "comunicados",
     icon: "fa-solid fa-bullhorn"
-  },  {
+  },  
+/*  {
     id: UUIDV4(),
     title: 'Seguridad',
     path: "Seguridad",
     icon: "fa-solid fa-user-shield"
   },
+*/
   {
     id: UUIDV4(),
     title: 'Finanzas',
