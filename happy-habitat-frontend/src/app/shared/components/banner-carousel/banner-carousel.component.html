@@ -1,0 +1,55 @@
+@if (isLoading()) {
+  <div class="card bg-base-200 shadow">
+    <div class="card-body items-center py-8">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+      <p class="text-base-content/70 mt-4">Cargando banners...</p>
+    </div>
+  </div>
+} @else if (banners().length > 0) {
+  <div class="carousel w-full h-50">
+    @for (banner of banners(); track banner.id; let index = $index) {
+      <div [id]="getItemId(index)" class="carousel-item w-full relative">
+        <img
+          [src]="banner.pathImagen"
+          [alt]="banner.title + ' - ' + getImagePath(banner.pathImagen)"
+          class="w-full w-[766px] h-50 object-cover"
+          (error)="onImageError($event)" />
+        <!-- Overlay con título y texto -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent flex flex-col justify-end p-6 sm:p-8 md:p-10">
+          <h3 class="text-white text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 drop-shadow-lg">
+            {{ banner.title }}
+            @if (formatBannerDate(banner)) {
+              <span class="text-white/80 text-base sm:text-lg md:text-xl font-normal">
+                ({{ formatBannerDate(banner) }})
+              </span>
+            }
+          </h3>
+          <p class="text-white text-sm sm:text-base md:text-lg max-w-2xl drop-shadow-md line-clamp-3">
+            {{ banner.text }}
+          </p>
+        </div>
+      </div>
+    }
+  </div>
+  @if (banners().length > 1) {
+    <div class="flex w-full justify-center gap-2 py-2">
+      @for (banner of banners(); track banner.id; let index = $index) {
+        <button 
+          type="button" 
+          (click)="scrollToItem(getItemId(index))" 
+          class="btn btn-xs"
+        >
+          {{ index + 1 }}
+        </button>
+      }
+    </div>
+  }
+} @else {
+  <div class="card bg-base-200 shadow">
+    <div class="card-body items-center py-8">
+      <i class="fa-solid fa-image text-4xl text-base-content/30 mb-4"></i>
+      <p class="text-base-content/70">No hay banners disponibles</p>
+    </div>
+  </div>
+}
+
