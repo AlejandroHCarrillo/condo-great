@@ -603,6 +603,175 @@ public class DummySeeder : IDataSeeder
             await _context.Banners.AddRangeAsync(banners.ToArray());
             await _context.SaveChangesAsync();
         }
+
+        // Create comunicados if they don't exist
+        var existingComunicadosCount = await _context.Comunicados.CountAsync();
+
+        if (existingComunicadosCount == 0)
+        {
+            var comunicados = new List<Comunicado>();
+
+            // Propuesta de reglamento revisión
+            comunicados.Add(new Comunicado
+            {
+                Id = Guid.NewGuid(),
+                CommunityId = firstCommunityId,
+                Titulo = "Propuesta de reglamento revisión",
+                Subtitulo = "Cierre temporal por limpieza",
+                Descripcion = @"Estimados condóminos:
+
+Durante el taller de revisión del reglamento no fue posible concluir con todas las preguntas y observaciones planteadas por los vecinos. 
+
+Con el fin de que todos puedan participar activamente en este proceso, la administración compartirá el reglamento con el texto resaltado en aquellos partes que están propuestas para modificación.
+
+Le recordamos que ustedes son quienes construyen y deciden estas modificaciones. Por ello, los invitamos a enviarnos sus dudas, comentarios o sugerencias a través de Whatsapp al número de la administración
+
+La fecha límite para poder recibir este tipo de información será el 12 de Septiembre del presente año.
+
+De esta forma podremos integrar todas las opiniones para la siguiente revisión y asegurar que el reglamento refleje las necesidades y acuerdos de nuestra comunidad. 
+
+¡Gracias por su participación y compromiso!
+
+Este es el link en donde encontrarán la propuesta de reglamento con las señalizaciones específicas. 
+
+https://drive.google.com/file/d/1OG95bOMdZKWme-90_dg3VhTuYs1jMlfd/view?usp=sharing",
+                Fecha = new DateTime(2025, 9, 8),
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            });
+
+            // Mantenimiento de la alberca
+            comunicados.Add(new Comunicado
+            {
+                Id = Guid.NewGuid(),
+                CommunityId = firstCommunityId,
+                Titulo = "Mantenimiento de la alberca",
+                Subtitulo = "Cierre temporal por limpieza",
+                Descripcion = "La alberca estará cerrada el 2025-09-12 para realizar limpieza profunda y revisión del sistema de filtrado.",
+                Fecha = new DateTime(2025, 9, 12),
+                Imagen = "images/anuncios/manenimiento_alberca.png",
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            });
+
+            // Jornada de reciclaje
+            comunicados.Add(new Comunicado
+            {
+                Id = Guid.NewGuid(),
+                CommunityId = firstCommunityId,
+                Titulo = "Jornada de reciclaje",
+                Subtitulo = "Trae tus residuos separados",
+                Descripcion = "Este sábado 2025-09-14 se instalará un punto de acopio en el parque central para reciclaje de papel, plástico y electrónicos.",
+                Fecha = new DateTime(2025, 9, 14),
+                Imagen = "images/anuncios/jornada-reciclaje.png",
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            });
+
+            // Fumigación preventiva
+            comunicados.Add(new Comunicado
+            {
+                Id = Guid.NewGuid(),
+                CommunityId = firstCommunityId,
+                Titulo = "Fumigación preventiva",
+                Subtitulo = "Control de plagas en áreas comunes",
+                Descripcion = "El lunes 2025-09-16 se realizará fumigación en jardines y pasillos. Evita transitar por zonas tratadas durante ese día.",
+                Fecha = new DateTime(2025, 9, 16),
+                Imagen = "images/anuncios/fumigacion.png",
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            });
+
+            // Reunión vecinal mensual
+            comunicados.Add(new Comunicado
+            {
+                Id = Guid.NewGuid(),
+                CommunityId = firstCommunityId,
+                Titulo = "Reunión vecinal mensual",
+                Subtitulo = "Temas de seguridad y mantenimiento",
+                Descripcion = "La reunión se llevará a cabo el 2025-09-20 a las 18:00 hrs en el salón común. Participa y haz escuchar tu voz.",
+                Fecha = new DateTime(2025, 9, 20),
+                Imagen = "images/anuncios/reunion-mensual.png",
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            });
+
+            // Instalación de cámaras
+            comunicados.Add(new Comunicado
+            {
+                Id = Guid.NewGuid(),
+                CommunityId = firstCommunityId,
+                Titulo = "Instalación de cámaras",
+                Subtitulo = "Mejora de seguridad perimetral",
+                Descripcion = "El 2025-09-22 se instalarán nuevas cámaras en los accesos principales. Habrá personal técnico en el área.",
+                Fecha = new DateTime(2025, 9, 22),
+                Imagen = "images/anuncios/instalacion-camaras.png",
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            });
+
+            // Decoración de otoño
+            comunicados.Add(new Comunicado
+            {
+                Id = Guid.NewGuid(),
+                CommunityId = firstCommunityId,
+                Titulo = "Decoración de otoño",
+                Subtitulo = "Convocatoria para voluntarios",
+                Descripcion = "El comité invita a decorar áreas comunes con temática otoñal el 2025-09-25. Puedes donar adornos o ayudar en el montaje.",
+                Fecha = new DateTime(2025, 9, 25),
+                Imagen = "images/anuncios/decoracion-otono.png",
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            });
+
+            // Poda de árboles
+            comunicados.Add(new Comunicado
+            {
+                Id = Guid.NewGuid(),
+                CommunityId = firstCommunityId,
+                Titulo = "Poda de árboles",
+                Subtitulo = "Mantenimiento de áreas verdes",
+                Descripcion = "El 2025-09-28 se realizará poda en los jardines del lado norte. Favor de retirar objetos personales cercanos.",
+                Fecha = new DateTime(2025, 9, 28),
+                Imagen = "images/anuncios/poda-arboles.png",
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            });
+
+            // Taller de compostaje
+            comunicados.Add(new Comunicado
+            {
+                Id = Guid.NewGuid(),
+                CommunityId = firstCommunityId,
+                Titulo = "Taller de compostaje",
+                Subtitulo = "Aprende a reducir residuos orgánicos",
+                Descripcion = "El 2025-10-01 se impartirá un taller gratuito sobre compostaje en el salón común. Cupo limitado, regístrate con anticipación.",
+                Fecha = new DateTime(2025, 10, 1),
+                Imagen = "images/anuncios/taller-compostaje.png",
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            });
+
+            // Reparación del portón
+            comunicados.Add(new Comunicado
+            {
+                Id = Guid.NewGuid(),
+                CommunityId = firstCommunityId,
+                Titulo = "Reparación del portón",
+                Subtitulo = "Acceso restringido temporalmente",
+                Descripcion = "El portón principal estará en mantenimiento el 2025-10-03. Usa el acceso peatonal alternativo durante ese día.",
+                Fecha = new DateTime(2025, 10, 3),
+                Imagen = "images/anuncios/reparacion-porton.png",
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            });
+
+            // Festival comunitario
+            comunicados.Add(new Comunicado
+            {
+                Id = Guid.NewGuid(),
+                CommunityId = firstCommunityId,
+                Titulo = "Festival comunitario",
+                Subtitulo = "Música, comida y juegos",
+                Descripcion = "El 2025-10-06 se celebrará el festival anual en el parque central. ¡Trae a tu familia y disfruta!",
+                Fecha = new DateTime(2025, 10, 6),
+                Imagen = "images/anuncios/festival-comunitario.png",
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            });
+
+            await _context.Comunicados.AddRangeAsync(comunicados.ToArray());
+            await _context.SaveChangesAsync();
+        }
     }
 }
 

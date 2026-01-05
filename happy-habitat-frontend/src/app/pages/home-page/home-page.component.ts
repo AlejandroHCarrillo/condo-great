@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { comunicadosdata } from '../../shared/data/announcement.data';
 import { ComunicadosPostsComponent } from '../../components/comunicados/comunicados-posts.component';
-import { ReservacionesComponent } from "../../components/reservaciones/reservaciones.component";
 import { BannerCarouselComponent, BannerPeriod } from '../../shared/components/banner-carousel/banner-carousel.component';
+import { AvisosListComponent } from '../../components/avisos/avisos-list/avisos-list.component';
 
 @Component({
   selector: 'hh-home-page',
-  imports: [ComunicadosPostsComponent, BannerCarouselComponent],
+  imports: [BannerCarouselComponent, ComunicadosPostsComponent, AvisosListComponent],
   templateUrl: './home-page.component.html',
   styles: ``
 })

@@ -1,15 +1,27 @@
-<!-- <hh-list-posts [posts]="posts()"/> -->
+@if (isLoading()) {
+  <div class="card bg-base-200 shadow">
+    <div class="card-body items-center py-8">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+      <p class="text-base-content/70 mt-4">Cargando comunicados...</p>
+    </div>
+  </div>
+} @else if (comunicados().length > 0) {
 <ul class="list bg-base-100 rounded-box shadow-md px-5">
     <li class="p-4 pb-2 text-2xl opacity-60 tracking-wide">Historial de comunicados</li>
     <hr>
     @for (comunicado of comunicados(); track comunicado.id) {
       <li class="list-row">
         @if (comunicado.imagen) {
-          <div><img class="size-10 rounded-box" [src]="comunicado.imagen" alt=""/></div>
+          <div><img 
+            class="size-10 rounded-box" 
+            [src]="getImagePath(comunicado.imagen)" 
+            [alt]="comunicado.titulo"
+            (error)="onImageError($event)"
+          /></div>
         }
         <div>
           <div>{{comunicado.titulo}}</div>
-          <div class="text-xs uppercase font-semibold opacity-60">{{comunicado.subtitulo}} - <span class="">{{comunicado.fecha | date : 'dd MMM yyyy'}}</span> </div>
+          <div class="text-xs uppercase font-semibold opacity-60">{{comunicado.subtitulo}} - <span class="">{{ getFechaDate(comunicado.fecha) | date : 'dd MMM yyyy'}}</span> </div>
         </div>
         <p class="list-col-wrap text-xs text-justify">
           {{comunicado.descripcion}}
@@ -23,3 +35,11 @@
       </li>
     }
 </ul>
+} @else {
+  <div class="card bg-base-200 shadow">
+    <div class="card-body items-center py-8">
+      <i class="fa-solid fa-newspaper text-4xl text-base-content/30 mb-4"></i>
+      <p class="text-base-content/70">No hay comunicados disponibles</p>
+    </div>
+  </div>
+}
