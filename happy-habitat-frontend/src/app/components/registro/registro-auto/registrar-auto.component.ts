@@ -5,8 +5,8 @@ import { VehiclesService } from '../../../services/vehicles.service';
 import { UsersService } from '../../../services/users.service';
 import { NotificationService } from '../../../services/notification.service';
 import { LoggerService } from '../../../services/logger.service';
-import { CreateVehicleRequest, VehicleDto } from '../../../shared/interfaces/vehicle.interface';
-import { catchError, tap, of } from 'rxjs';
+import { CreateVehicleRequest, UpdateVehicleRequest, VehicleDto } from '../../../shared/interfaces/vehicle.interface';
+import { catchError, tap, of, throwError } from 'rxjs';
 import { GenericListComponent, ColumnConfig } from "../../../shared/components/generic-list/generic-list.component";
 
 @Component({
@@ -25,6 +25,9 @@ export class RegistroAutoComponent implements OnInit {
   isLoadingVehicles = signal(false);
   vehicles = signal<VehicleDto[]>([]);
   showModal = signal(false);
+  showDeleteModal = signal(false);
+  vehicleToDelete: VehicleDto | null = null;
+  editingVehicleId: string | null = null; // ID del vehículo que se está editando
   
   // Año actual para validación del formulario
   currentYear = new Date().getFullYear();
@@ -61,6 +64,7 @@ export class RegistroAutoComponent implements OnInit {
       label: 'Tipo',
       formatter: (value) => value ? value.charAt(0).toUpperCase() + value.slice(1) : '-'
     },
+    /*
     { 
       key: 'createdAt', 
       label: 'Fecha de registro',
@@ -74,6 +78,7 @@ export class RegistroAutoComponent implements OnInit {
         });
       }
     }
+    */
   ];
 
   autoForm = this.fb.group({
@@ -81,7 +86,7 @@ export class RegistroAutoComponent implements OnInit {
     modelo: ['', Validators.required],
     año: [null as number | null, [Validators.required, Validators.min(1980), Validators.max(this.currentYear)]],
     color: ['', Validators.required],
-    placas: ['', [Validators.required, Validators.pattern(/^[A-Z0-9\-]{6,10}$/)]]
+    placas: ['', Validators.required]
   });
 
   ngOnInit(): void {
@@ -165,6 +170,97 @@ export class RegistroAutoComponent implements OnInit {
   }
 
   /**
+   * Maneja la edición de un vehículo
+   */
+  onEditVehicle(vehicle: VehicleDto): void {
+    this.editingVehicleId = vehicle.id;
+    
+    // Cargar los datos del vehículo en el formulario
+    this.autoForm.patchValue({
+      marca: vehicle.brand,
+      modelo: vehicle.model,
+      año: vehicle.year,
+      color: vehicle.color,
+      placas: vehicle.licensePlate
+    });
+    
+    // Abrir el modal
+    this.openNewVehicleModal();
+  }
+
+  /**
+   * Maneja la eliminación de un vehículo
+   */
+  onDeleteVehicle(vehicle: VehicleDto): void {
+    this.vehicleToDelete = vehicle;
+    this.showDeleteModal.set(true);
+    setTimeout(() => {
+      const modal = document.getElementById('deleteVehicleModal') as HTMLDialogElement;
+      if (modal) {
+        modal.showModal();
+      }
+    }, 0);
+  }
+
+  /**
+   * Confirma la eliminación del vehículo
+   */
+  confirmDeleteVehicle(): void {
+    if (!this.vehicleToDelete) {
+      return;
+    }
+
+    const vehicle = this.vehicleToDelete;
+    
+    this.vehiclesService.deleteVehicle(vehicle.id).pipe(
+      tap(() => {
+        // Remover de la lista local inmediatamente
+        this.vehicles.update(currentVehicles => 
+          currentVehicles.filter(v => v.id !== vehicle.id)
+        );
+        
+        this.notificationService.showSuccess(
+          `Vehículo ${vehicle.brand} ${vehicle.model} eliminado exitosamente`,
+          'Éxito'
+        );
+
+        // Elimina el vehículo de la lista local
+        this.vehicles.set(this.vehicles().filter(v => v.id !== vehicle.id));
+
+        // Cerrar el modal de confirmación
+        this.closeDeleteModal();
+      }),
+      catchError((error) => {
+        this.notificationService.showError(
+          error.error?.message || 'Error al eliminar el vehículo. Por favor, intente nuevamente.',
+          'Error'
+        );
+        return throwError(() => error);
+      })
+    ).subscribe({
+      next: () => {
+        // La eliminación fue exitosa, la lista ya fue actualizada en el tap
+        this.logger.debug(`Vehicle ${vehicle.id} deleted successfully`, 'RegistroAutoComponent');
+      },
+      error: (error) => {
+        this.logger.error('Error deleting vehicle', error, 'RegistroAutoComponent');
+      }
+    });
+  }
+
+  /**
+   * Cierra el modal de confirmación de eliminación
+   */
+  closeDeleteModal(): void {
+    const modal = document.getElementById('deleteVehicleModal') as HTMLDialogElement;
+    if (modal) {
+      modal.close();
+    }
+    this.showDeleteModal.set(false);
+    this.vehicleToDelete = null;
+  }
+
+  /**
    * Abre el modal de registro de vehículo
    */
   openNewVehicleModal(): void {
@@ -181,6 +277,7 @@ export class RegistroAutoComponent implements OnInit {
    * Abre el modal para nuevo vehículo (sin datos)
    */
   openNewVehicleModalForCreate(): void {
+    this.editingVehicleId = null;
     this.autoForm.reset({
       marca: '',
       modelo: '',
@@ -200,6 +297,7 @@ export class RegistroAutoComponent implements OnInit {
       modal.close();
     }
     this.showModal.set(false);
+    this.editingVehicleId = null;
     // Resetear el formulario al cerrar
     this.autoForm.reset({
       marca: '',
@@ -246,15 +344,27 @@ export class RegistroAutoComponent implements OnInit {
     
     const residentIdString = residentId.trim();
     
-    // Preparar el request para crear el vehículo
+    // Preparar el request para crear o actualizar el vehículo
     const formValue = this.autoForm.value;
     
     // Obtener el tipo de vehículo: si el usuario ya tiene vehículos, usar el tipo del primero
-    // Si no, mostrar un error indicando que se necesita seleccionar el tipo
+    // Si estamos editando, usar el tipo del vehículo que se está editando
     const existingVehicles = this.vehicles();
     let vehicleTypeId = '';
     
-    if (existingVehicles.length > 0) {
+    if (this.editingVehicleId) {
+      // Si estamos editando, obtener el tipo del vehículo que se está editando
+      const vehicleToEdit = existingVehicles.find(v => v.id === this.editingVehicleId);
+      if (vehicleToEdit) {
+        vehicleTypeId = vehicleToEdit.vehicleTypeId;
+      } else {
+        this.notificationService.showError(
+          'No se pudo encontrar el vehículo a editar.',
+          'Error'
+        );
+        return;
+      }
+    } else if (existingVehicles.length > 0) {
       // Usar el tipo del primer vehículo existente como referencia
       vehicleTypeId = existingVehicles[0].vehicleTypeId;
     } else {
@@ -267,39 +377,68 @@ export class RegistroAutoComponent implements OnInit {
       return;
     }
     
-    const request: CreateVehicleRequest = {
-      residentId: residentIdString,
-      brand: formValue.marca || '',
-      vehicleTypeId: vehicleTypeId,
-      model: formValue.modelo || '',
-      year: formValue.año || 0,
-      color: formValue.color || '',
-      licensePlate: formValue.placas || ''
-    };
+    // Si estamos editando, actualizar; si no, crear
+    const vehicleOperation = this.editingVehicleId
+      ? this.vehiclesService.updateVehicle(this.editingVehicleId, {
+          residentId: residentIdString,
+          brand: formValue.marca || '',
+          vehicleTypeId: vehicleTypeId,
+          model: formValue.modelo || '',
+          year: formValue.año || 0,
+          color: formValue.color || '',
+          licensePlate: formValue.placas || ''
+        } as UpdateVehicleRequest)
+      : this.vehiclesService.createVehicle({
+          residentId: residentIdString,
+          brand: formValue.marca || '',
+          vehicleTypeId: vehicleTypeId,
+          model: formValue.modelo || '',
+          year: formValue.año || 0,
+          color: formValue.color || '',
+          licensePlate: formValue.placas || ''
+        } as CreateVehicleRequest);
 
-    // Crear el vehículo
-    this.vehiclesService.createVehicle(request).pipe(
-      tap((vehicle) => {
-        if (vehicle) {
-          this.notificationService.showSuccess(
-            'Vehículo registrado exitosamente',
-            'Éxito'
-          );
-          
-          // Cerrar el modal
-          this.closeModal();
-          
-          // Recargar la lista de vehículos
-          this.loadVehicles();
-        }
+    vehicleOperation.pipe(
+      tap(() => {
+        const action = this.editingVehicleId ? 'actualizado' : 'registrado';
+        this.notificationService.showSuccess(
+          `Vehículo ${action} exitosamente`,
+          'Éxito'
+        );
+        
+        // Resetear el formulario
+        this.autoForm.reset({
+          marca: '',
+          modelo: '',
+          año: null,
+          color: '',
+          placas: ''
+        });
+        
+        // Cerrar el modal
+        this.closeModal();
+        
+        // Recargar la lista de vehículos
+        this.loadVehicles();
       }),
       catchError((error) => {
+        const action = this.editingVehicleId ? 'actualizar' : 'registrar';
         this.notificationService.showError(
-          error.error?.message || 'Error al registrar el vehículo. Por favor, intente nuevamente.',
+          error.error?.message || `Error al ${action} el vehículo. Por favor, intente nuevamente.`,
           'Error'
         );
-        return of(null);
+        return throwError(() => error);
       })
-    ).subscribe();
+    ).subscribe({
+      next: () => {
+        this.logger.debug(
+          this.editingVehicleId ? `Vehicle ${this.editingVehicleId} updated successfully` : 'Vehicle created successfully',
+          'RegistroAutoComponent'
+        );
+      },
+      error: (error) => {
+        this.logger.error('Error saving vehicle', error, 'RegistroAutoComponent');
+      }
+    });
   }
 }

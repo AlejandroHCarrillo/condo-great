@@ -185,18 +185,56 @@
                 </div>
 
                 <!-- ✅ Botón de envío -->
-                <div class="form-control mt-6 flex justify-start sm:justify-end">
+                <div class="form-control mt-6 flex justify-start sm:justify-end gap-2">
+                    @if (editingVisitId) {
+                        <button 
+                            type="button" 
+                            class="btn btn-ghost w-full sm:w-auto"
+                            (click)="editingVisitId = null; myForm.reset({ name: '', totalpersons: 1, quickSubject: '', cardescription: '', carcolor: '', carplates: '', subject: '', arriveDate: '', departureDate: '' })"
+                        >
+                            Cancelar edición
+                        </button>
+                    }
                     <button 
                         type="submit" 
                         class="btn btn-primary text-white w-full sm:w-auto min-w-32"
-                        [disabled]="myForm.invalid"
+                        [disabled]="myForm.invalid || isSubmitting"
                     >
-                        <i class="fa-solid fa-save mr-2"></i>
-                        Registrar visita
+                        @if (isSubmitting) {
+                            <span class="loading loading-spinner loading-sm"></span>
+                        } @else {
+                            <i class="fa-solid fa-save mr-2"></i>
+                        }
+                        {{ editingVisitId ? 'Actualizar visita' : 'Registrar visita' }}
                     </button>
                 </div>
 
             </form>
         </div>
     </div>
+
+    <!-- Lista de visitas del residente -->
+    @if (isLoadingVisits()) {
+        <div class="card bg-base-200 shadow mt-6">
+            <div class="card-body items-center py-8">
+                <span class="loading loading-spinner loading-lg text-primary"></span>
+                <p class="text-base-content/70 mt-4">Cargando visitas...</p>
+            </div>
+        </div>
+    } @else {
+        <div class="mt-6">
+            <hh-generic-list
+                [items]="visits()"
+                [columns]="visitColumns"
+                [title]="'Mis Visitantes'"
+                [itemsPerPage]="10"
+                [showActions]="true"
+                [canEdit]="isFutureVisit"
+                [canDelete]="isFutureVisit"
+                (rowClick)="onVisitClick($event)"
+                (edit)="onEditVisit($event)"
+                (delete)="onDeleteVisit($event)"
+            ></hh-generic-list>
+        </div>
+    }
 </div>

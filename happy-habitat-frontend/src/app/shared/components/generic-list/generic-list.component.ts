@@ -47,6 +47,12 @@ export class GenericListComponent<T extends Record<string, any>> implements OnCh
   // Muestra botones de acción (editar/eliminar)
   @Input() showActions: boolean = false;
 
+  // Función opcional para determinar si un item puede ser editado
+  @Input() canEdit?: (item: T) => boolean;
+
+  // Función opcional para determinar si un item puede ser eliminado
+  @Input() canDelete?: (item: T) => boolean;
+
   // Señal para la página actual
   currentPage = signal(1);
   
@@ -202,11 +208,27 @@ export class GenericListComponent<T extends Record<string, any>> implements OnCh
   }
 
   /**
+   * Verifica si un item puede ser editado
+   */
+  isEditable(item: T): boolean {
+    return this.canEdit ? this.canEdit(item) : true;
+  }
+
+  /**
+   * Verifica si un item puede ser eliminado
+   */
+  isDeletable(item: T): boolean {
+    return this.canDelete ? this.canDelete(item) : true;
+  }
+
+  /**
    * Maneja el clic en editar
    */
   onEdit(item: T, event: Event): void {
     event.stopPropagation();
-    this.edit.emit(item);
+    if (this.isEditable(item)) {
+      this.edit.emit(item);
+    }
   }
 
   /**
@@ -214,7 +236,9 @@ export class GenericListComponent<T extends Record<string, any>> implements OnCh
    */
   onDelete(item: T, event: Event): void {
     event.stopPropagation();
-    this.delete.emit(item);
+    if (this.isDeletable(item)) {
+      this.delete.emit(item);
+    }
   }
 
   /**

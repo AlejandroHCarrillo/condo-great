@@ -3,22 +3,8 @@
   @apply w-full;
 }
 
-.table th {
-  @apply bg-base-300;
-}
-
 .table tbody tr {
   @apply transition-colors;
-}
-
-.table tbody tr:hover {
-  @apply bg-base-300;
-}
-
-/* Asegurar que las celdas no se desborden */
-.table td {
-  @apply max-w-xs truncate;
-  word-break: break-word;
 }
 
 /* Estilos para el estado vacío */

@@ -25,8 +25,8 @@ export class LoginComponent {
   isLoading = signal<boolean>(false);
 
   loginForm: FormGroup = this.fb.group({
-    username: ['', [Validators.required, Validators.minLength(3)]],
-    password: ['', [Validators.required, Validators.minLength(6)]]
+    username: ['elgrandeahc', [Validators.required, Validators.minLength(3)]],
+    password: ['abc123', [Validators.required, Validators.minLength(6)]]
   });
 
   onSubmit(): void {
