@@ -1,0 +1,27 @@
+/* Estilos adicionales para el componente banner-carousel */
+.carousel {
+  @apply w-full;
+}
+
+.carousel-item {
+  @apply w-full relative;
+}
+
+.carousel-item img {
+  @apply w-full object-cover;
+}
+
+/* Overlay para el contenido del banner */
+.carousel-item .banner-overlay {
+  @apply absolute inset-0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4), transparent);
+}
+
+/* Asegurar que el texto sea legible */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+

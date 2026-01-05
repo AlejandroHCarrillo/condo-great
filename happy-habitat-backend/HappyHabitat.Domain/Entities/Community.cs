@@ -11,7 +11,9 @@ public class Community
     public string Phone { get; set; } = string.Empty;
     public string CreatedAt { get; set; } = string.Empty; // ISO date string
     
-    // Navigation property
+    // Navigation properties
     public ICollection<Resident> Residents { get; set; } = new List<Resident>();
+    public ICollection<Banner> Banners { get; set; } = new List<Banner>();
+    public ICollection<Comunicado> Comunicados { get; set; } = new List<Comunicado>();
 }
 

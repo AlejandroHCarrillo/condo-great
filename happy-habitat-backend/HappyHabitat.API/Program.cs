@@ -66,6 +66,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddScoped<IResidentVisitService, ResidentVisitService>();
+builder.Services.AddScoped<IBannerService, BannerService>();
+builder.Services.AddScoped<IComunicadoService, ComunicadoService>();
 
 // Register seeders
 builder.Services.AddScoped<InitialSeeder>();

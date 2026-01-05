@@ -18,6 +18,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<Pet> Pets { get; set; }
     public DbSet<ResidentVisit> ResidentVisits { get; set; }
     public DbSet<Community> Communities { get; set; }
+    public DbSet<Banner> Banners { get; set; }
+    public DbSet<Comunicado> Comunicados { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -215,6 +217,60 @@ public class ApplicationDbContext : DbContext
                 .HasMaxLength(20);
             entity.Property(e => e.CreatedAt)
                 .IsRequired();
+        });
+
+        // Configure Banner entity
+        modelBuilder.Entity<Banner>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.PathImagen)
+                .IsRequired()
+                .HasMaxLength(500);
+            entity.Property(e => e.Title)
+                .IsRequired()
+                .HasMaxLength(200);
+            entity.Property(e => e.Text)
+                .HasMaxLength(1000);
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true);
+            entity.Property(e => e.StartDate)
+                .HasMaxLength(50);
+            entity.Property(e => e.EndDate)
+                .HasMaxLength(50);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+
+            // Configure relationship with Community
+            entity.HasOne(e => e.Community)
+                .WithMany(c => c.Banners)
+                .HasForeignKey(e => e.CommunityId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Configure Comunicado entity
+        modelBuilder.Entity<Comunicado>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Titulo)
+                .IsRequired()
+                .HasMaxLength(200);
+            entity.Property(e => e.Subtitulo)
+                .HasMaxLength(200);
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(2000);
+            entity.Property(e => e.Fecha)
+                .IsRequired()
+                .HasColumnType("datetime2");
+            entity.Property(e => e.Imagen)
+                .HasMaxLength(500);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+
+            // Configure relationship with Community
+            entity.HasOne(e => e.Community)
+                .WithMany(c => c.Comunicados)
+                .HasForeignKey(e => e.CommunityId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 }

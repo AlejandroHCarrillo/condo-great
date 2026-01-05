@@ -1,9 +1,11 @@
 export interface Comunicado {
-  id?: string;
+  id: string;
+  communityId?: string | null;
+  communityName?: string | null;
   titulo: string;
   subtitulo: string;
   descripcion: string;
-  fecha: Date; // formato ISO: 'YYYY-MM-DD'
-  imagen?: string;
-  comunidad?: string;
+  fecha: string; // Fecha en formato ISO string (serializada desde DateTime del backend)
+  imagen?: string | null;
+  createdAt?: string;
 }
