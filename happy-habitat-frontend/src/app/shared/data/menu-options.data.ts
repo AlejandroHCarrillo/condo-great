@@ -38,8 +38,8 @@ export const menuOptions: menuItem[] = [
   },
   {
     id: UUIDV4(),
-    title: 'Registro',
-    path: "registro",
+    title: 'Residentes',
+    path: "resident",
     icon: "fa-solid fa-address-book"
   },
   {
@@ -85,12 +85,13 @@ export const menuOptions: menuItem[] = [
     path: "Supervisor",
     icon: "fa-solid fa-file-invoice-dollar"
   },
-  {
+/*  {
     id: UUIDV4(),
     title: 'Pagos',
     path: "Supervisor",
     icon: "fa-solid fa-money-bill-1-wave"
   },
+*/    
   {
     id: UUIDV4(),
     title: 'Transparencia',
@@ -103,13 +104,14 @@ export const menuOptions: menuItem[] = [
     path: "Supervisor",
     icon: "fa-solid fa-person-burst"
   },
-
+/*
     {
     id: UUIDV4(),
     title: 'Mis tickets',
     path: "mistickets",
     icon: "fa-solid fa-ticket"
   },
+*/
     {
     id: UUIDV4(),
     title: 'Documentos',

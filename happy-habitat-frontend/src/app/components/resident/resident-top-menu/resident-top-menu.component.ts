@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
-  selector: 'hh-registro-top-menu',
+  selector: 'hh-resident-top-menu',
   imports: [RouterLink, RouterLinkActive],
-  templateUrl: './registro-top-menu.component.html'
+  templateUrl: './resident-top-menu.component.html'
 })
-export class RegistroTopMenuComponent {
+export class ResidentTopMenuComponent {
 
 }

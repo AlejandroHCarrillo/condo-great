@@ -3,8 +3,8 @@ import { RouterOutlet } from '@angular/router';
 import { ResidentTopMenuComponent } from "../../components/resident/resident-top-menu/resident-top-menu.component";
 
 @Component({
-  selector: 'hh-registro-actividades-layout',
+  selector: 'hh-resident-actividades-layout',
   imports: [RouterOutlet, ResidentTopMenuComponent],
-  templateUrl: './registro-actividades-layout.html',
+  templateUrl: './resident-actividades-layout.html',
 })
-export class RegistroActividadesLayoutComponent { }
+export class ResidentActividadesLayoutComponent { }
