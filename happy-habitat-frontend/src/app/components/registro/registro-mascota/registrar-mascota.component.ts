@@ -57,6 +57,7 @@ export class RegistroMascotaComponent implements OnInit {
       label: 'Color',
       formatter: (value) => value ? value.charAt(0).toUpperCase() + value.slice(1) : '-'
     },
+    /*
     { 
       key: 'createdAt', 
       label: 'Fecha de registro',
@@ -70,6 +71,7 @@ export class RegistroMascotaComponent implements OnInit {
         });
       }
     }
+    */
   ];
 
   mascotaForm = this.fb.group({
