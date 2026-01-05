@@ -38,8 +38,8 @@ export const routes: Routes = [
         canActivate: [authGuard]
     },
     {
-        path: 'registro',
-        loadChildren: () => import('./components/registro/registro-routes'),
+        path: 'resident',
+        loadChildren: () => import('./components/resident/resident-routes'),
         canActivate: [authGuard]
     },
     {
