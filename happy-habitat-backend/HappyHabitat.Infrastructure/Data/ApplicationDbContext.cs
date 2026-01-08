@@ -215,6 +215,14 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Phone)
                 .IsRequired()
                 .HasMaxLength(20);
+            entity.Property(e => e.TipoComunidad)
+                .HasMaxLength(50);
+            entity.Property(e => e.Latitud)
+                .HasColumnType("float");
+            entity.Property(e => e.Longitud)
+                .HasColumnType("float");
+            entity.Property(e => e.CantidadViviendas)
+                .HasDefaultValue(0);
             entity.Property(e => e.CreatedAt)
                 .IsRequired();
         });

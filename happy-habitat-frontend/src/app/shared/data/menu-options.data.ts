@@ -41,7 +41,7 @@ export const menuOptions: menuItem[] = [
     id: UUIDV4(),
     title: 'Administración',
     path: "admincompany",
-    icon: "fa-solid fa-building",
+    icon: "fa-solid fa-building-user",
   },
   {
     id: UUIDV4(),

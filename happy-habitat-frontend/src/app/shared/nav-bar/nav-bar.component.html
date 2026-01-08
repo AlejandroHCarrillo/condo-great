@@ -30,13 +30,11 @@
       class="select select-bordered select-sm
              text-xs
              w-24 sm:w-28 md:w-32" 
-      (change)="onSeleccion($event)">
-      <option value="lemonade">Lemonade</option>
-      <option value="dark">Oscuro</option>
-      <option value="winter">Winter</option>
-      <option value="forest">Bosque</option>
-      <option value="autumn">Autumn</option>
-      <option value="lofi">Lofi</option>
+      [ngModel]="selectedTheme()"
+      (ngModelChange)="onSeleccionChange($event)">
+      @for (theme of themes; track theme.value) {
+        <option [value]="theme.value">{{ theme.label }}</option>
+      }
     </select>
   </section>
 </div>

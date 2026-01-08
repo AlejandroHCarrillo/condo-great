@@ -9,6 +9,10 @@ public class Community
     public string Contacto { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Phone { get; set; } = string.Empty;
+    public string TipoComunidad { get; set; } = string.Empty;
+    public double? Latitud { get; set; }
+    public double? Longitud { get; set; }
+    public int CantidadViviendas { get; set; }
     public string CreatedAt { get; set; } = string.Empty; // ISO date string
     
     // Navigation properties
