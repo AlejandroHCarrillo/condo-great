@@ -24,8 +24,18 @@ export function rxResource<TRequest, TResponse>(
   options: RxResourceOptions<TRequest, TResponse>
 ): RxResourceResult<TResponse> {
   const requestSignal = signal(options.request());
-  const isLoadingSignal = signal<boolean>(true);
+  const isLoadingSignal = signal<boolean>(false); // Inicializar en false para no mostrar loading inicialmente
   const errorSignal = signal<Error | null>(null);
+
+  // Effect para actualizar el requestSignal cuando cambia el request
+  effect(() => {
+    const newRequest = options.request();
+    const currentRequest = requestSignal();
+    // Solo actualizar si el request cambió (comparación profunda si es objeto)
+    if (JSON.stringify(newRequest) !== JSON.stringify(currentRequest)) {
+      requestSignal.set(newRequest);
+    }
+  });
 
   // Convertir el signal de request a observable para que se actualice automáticamente
   const requestObservable = toObservable(requestSignal);
@@ -33,6 +43,11 @@ export function rxResource<TRequest, TResponse>(
   // Crear un observable que se actualiza cuando cambia el request
   const resourceObservable = requestObservable.pipe(
     switchMap((currentRequest) => {
+      // Solo cargar si el request no es null/undefined
+      if (currentRequest === null || currentRequest === undefined) {
+        return of(undefined as TResponse);
+      }
+      
       isLoadingSignal.set(true);
       errorSignal.set(null);
 

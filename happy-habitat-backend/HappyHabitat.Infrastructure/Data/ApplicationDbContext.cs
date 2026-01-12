@@ -20,6 +20,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Community> Communities { get; set; }
     public DbSet<Banner> Banners { get; set; }
     public DbSet<Comunicado> Comunicados { get; set; }
+    public DbSet<UserCommunity> UserCommunities { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -279,6 +280,30 @@ public class ApplicationDbContext : DbContext
                 .WithMany(c => c.Comunicados)
                 .HasForeignKey(e => e.CommunityId)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Configure UserCommunity entity
+        modelBuilder.Entity<UserCommunity>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+
+            // Configure relationship with User
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.UserCommunities)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure relationship with Community
+            entity.HasOne(e => e.Community)
+                .WithMany(c => c.UserCommunities)
+                .HasForeignKey(e => e.CommunityId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Create unique index to prevent duplicate associations
+            entity.HasIndex(e => new { e.UserId, e.CommunityId })
+                .IsUnique();
         });
     }
 }

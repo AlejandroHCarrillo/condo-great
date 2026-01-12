@@ -21,9 +21,16 @@ public class UsersController : ControllerBase
     /// Get all users
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
+    public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers([FromQuery] bool includeInactive = false)
     {
-        var users = await _userService.GetAllUsersAsync();
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        Guid? currentUserId = null;
+        if (userIdClaim != null && Guid.TryParse(userIdClaim, out var userId))
+        {
+            currentUserId = userId;
+        }
+
+        var users = await _userService.GetAllUsersAsync(currentUserId, includeInactive);
         return Ok(users);
     }
 
@@ -31,9 +38,9 @@ public class UsersController : ControllerBase
     /// Get user by ID
     /// </summary>
     [HttpGet("{id}")]
-    public async Task<ActionResult<UserDto>> GetUserById(Guid id)
+    public async Task<ActionResult<UserDto>> GetUserById(Guid id, [FromQuery] bool includeInactive = false)
     {
-        var user = await _userService.GetUserByIdAsync(id);
+        var user = await _userService.GetUserByIdAsync(id, includeInactive);
         if (user == null)
             return NotFound();
 
@@ -48,12 +55,23 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var user = await _userService.CreateUserAsync(createUserDto);
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            Guid? currentUserId = null;
+            if (userIdClaim != null && Guid.TryParse(userIdClaim, out var userId))
+            {
+                currentUserId = userId;
+            }
+
+            var user = await _userService.CreateUserAsync(createUserDto, currentUserId);
             return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
         }
         catch (InvalidOperationException ex)
         {
             return BadRequest(ex.Message);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Forbid(ex.Message);
         }
     }
 
@@ -65,7 +83,14 @@ public class UsersController : ControllerBase
     {
         try
         {
-            var user = await _userService.UpdateUserAsync(id, updateUserDto);
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            Guid? currentUserId = null;
+            if (userIdClaim != null && Guid.TryParse(userIdClaim, out var userId))
+            {
+                currentUserId = userId;
+            }
+
+            var user = await _userService.UpdateUserAsync(id, updateUserDto, currentUserId);
             if (user == null)
                 return NotFound();
 
@@ -74,6 +99,10 @@ public class UsersController : ControllerBase
         catch (InvalidOperationException ex)
         {
             return BadRequest(ex.Message);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Forbid(ex.Message);
         }
     }
 

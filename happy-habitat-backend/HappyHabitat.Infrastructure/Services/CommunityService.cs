@@ -15,9 +15,17 @@ public class CommunityService : ICommunityService
         _context = context;
     }
 
-    public async Task<IEnumerable<CommunityDto>> GetAllCommunitiesAsync()
+    public async Task<IEnumerable<CommunityDto>> GetAllCommunitiesAsync(bool includeInactive = false)
     {
-        var communities = await _context.Communities
+        var query = _context.Communities.AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(c => c.IsActive);
+        }
+        
+        var communities = await query
             .OrderBy(c => c.Nombre)
             .ToListAsync();
 
@@ -37,9 +45,18 @@ public class CommunityService : ICommunityService
         });
     }
 
-    public async Task<CommunityDto?> GetCommunityByIdAsync(Guid id)
+    public async Task<CommunityDto?> GetCommunityByIdAsync(Guid id, bool includeInactive = false)
     {
-        var community = await _context.Communities.FindAsync(id);
+        var query = _context.Communities.AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(c => c.IsActive);
+        }
+        
+        var community = await query
+            .FirstOrDefaultAsync(c => c.Id == id);
 
         if (community == null)
             return null;
@@ -150,7 +167,8 @@ public class CommunityService : ICommunityService
         if (community == null)
             return false;
 
-        _context.Communities.Remove(community);
+        // Eliminación lógica: cambiar IsActive a false
+        community.IsActive = false;
         await _context.SaveChangesAsync();
         return true;
     }

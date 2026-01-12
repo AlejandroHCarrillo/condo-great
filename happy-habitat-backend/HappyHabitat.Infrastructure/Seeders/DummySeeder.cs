@@ -170,7 +170,7 @@ public class DummySeeder : IDataSeeder
             await _context.SaveChangesAsync();
         }
 
-        // Create 2 communities if they don't exist
+        // Seed Communities if they don't exist
         // First community ID - will be used to associate elgrandeahc resident and banners
         var firstCommunityId = new Guid("11111111-1111-1111-1111-111111111111");
         
@@ -180,29 +180,326 @@ public class DummySeeder : IDataSeeder
             {
                 new Community
                 {
+                    Id = new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87"),
+                    Nombre = "Residencial El Pueblito",
+                    Descripcion = "Fraccionamiento residencial con amplias áreas verdes",
+                    Direccion = "Av. Paseo del Pueblito 123, El Pueblito, QRO",
+                    Contacto = "admin@elpueblito.mx",
+                    Email = "admin@elpueblito.mx",
+                    Phone = "4421234567",
+                    TipoComunidad = "FRACCIONAMIENTO",
+                    Latitud = 20.5821,
+                    Longitud = -100.3897,
+                    CantidadViviendas = 120,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                },
+                new Community
+                {
+                    Id = new Guid("ff7bc6fb-0f13-4e37-beb4-7d428520c227"),
+                    Nombre = "Colonia Las Palmas",
+                    Descripcion = "Colonia residencial con servicios completos",
+                    Direccion = "Calle Palma Real 45, Querétaro, QRO",
+                    Contacto = "contacto@laspalmas.org",
+                    Email = "contacto@laspalmas.org",
+                    Phone = "4422345678",
+                    TipoComunidad = "COLONIA",
+                    Latitud = 20.5932,
+                    Longitud = -100.3921,
+                    CantidadViviendas = 85,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                },
+                new Community
+                {
+                    Id = new Guid("c4a28c40-a2c7-4190-961c-f3f52ad19c1d"),
+                    Nombre = "Coto San Miguel",
+                    Descripcion = "Coto privado con seguridad 24/7",
+                    Direccion = "Privada San Miguel 8, Corregidora, QRO",
+                    Contacto = "info@cotosanmiguel.com",
+                    Email = "info@cotosanmiguel.com",
+                    Phone = "4423456789",
+                    TipoComunidad = "COTO",
+                    Latitud = 20.5798,
+                    Longitud = -100.3865,
+                    CantidadViviendas = 60,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                },
+                new Community
+                {
+                    Id = new Guid("aa2f0511-bedd-413c-8681-34f3eee11ac9"),
+                    Nombre = "Villa del Sol",
+                    Descripcion = "Fraccionamiento premium con clubhouse",
+                    Direccion = "Av. del Sol 200, Querétaro, QRO",
+                    Contacto = "villa@delsol.mx",
+                    Email = "villa@delsol.mx",
+                    Phone = "4424567890",
+                    TipoComunidad = "FRACCIONAMIENTO",
+                    Latitud = 20.6001,
+                    Longitud = -100.395,
+                    CantidadViviendas = 150,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                },
+                new Community
+                {
+                    Id = new Guid("9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"),
+                    Nombre = "Capital Sur - Coto Berlin",
+                    Descripcion = "Coto residencial con amplias áreas comunes",
+                    Direccion = "El Marqués, QRO",
+                    Contacto = "capitalsur-cotoberlin@comunidad.org",
+                    Email = "capitalsur-cotoberlin@comunidad.org",
+                    Phone = "4425678901",
+                    TipoComunidad = "COTO",
+                    Latitud = 20.6105,
+                    Longitud = -100.3802,
+                    CantidadViviendas = 240,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                },
+                new Community
+                {
                     Id = firstCommunityId,
-                    Nombre = "Coto Berlin",
-                    Descripcion = "Capital sur - Coto Berlin",
-                    Direccion = "Lago de Xochimilco #700 ",
-                    Contacto = "Coto Berlin",
-                    Email = "elgrande@lospinos.com",
-                    Phone = "+1-555-0101",
+                    Nombre = "Residencial Los Pinos",
+                    Descripcion = "Fraccionamiento con alberca y áreas deportivas",
+                    Direccion = "Blvd. Los Pinos 500, Querétaro, QRO",
+                    Contacto = "info@lospinos.mx",
+                    Email = "info@lospinos.mx",
+                    Phone = "4426789012",
+                    TipoComunidad = "FRACCIONAMIENTO",
+                    Latitud = 20.5950,
+                    Longitud = -100.4000,
+                    CantidadViviendas = 180,
                     CreatedAt = DateTime.UtcNow.ToString("O")
                 },
                 new Community
                 {
                     Id = new Guid("22222222-2222-2222-2222-222222222222"),
-                    Nombre = "Comunidad El Jardín",
-                    Descripcion = "Comunidad moderna con amenities y espacios comunes",
-                    Direccion = "Avenida Central 456, Sector Sur",
-                    Contacto = "Administración El Jardín",
-                    Email = "admin@eljardin.com",
-                    Phone = "+1-555-0102",
+                    Nombre = "Coto Las Fuentes",
+                    Descripcion = "Coto privado con jardines y fuentes",
+                    Direccion = "Av. Las Fuentes 300, Querétaro, QRO",
+                    Contacto = "contacto@lasfuentes.com",
+                    Email = "contacto@lasfuentes.com",
+                    Phone = "4427890123",
+                    TipoComunidad = "COTO",
+                    Latitud = 20.5850,
+                    Longitud = -100.3750,
+                    CantidadViviendas = 95,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                },
+                new Community
+                {
+                    Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                    Nombre = "Colonia Jardines del Valle",
+                    Descripcion = "Colonia residencial con parques y áreas verdes",
+                    Direccion = "Calle Valle Verde 150, Querétaro, QRO",
+                    Contacto = "jardines@valle.org",
+                    Email = "jardines@valle.org",
+                    Phone = "4428901234",
+                    TipoComunidad = "COLONIA",
+                    Latitud = 20.6050,
+                    Longitud = -100.3900,
+                    CantidadViviendas = 110,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                },
+                new Community
+                {
+                    Id = new Guid("44444444-4444-4444-4444-444444444444"),
+                    Nombre = "Mexico",
+                    Descripcion = "Coto privado con seguridad y áreas comunes",
+                    Direccion = "Av. México 250, Querétaro, QRO",
+                    Contacto = "contacto@mexico.com",
+                    Email = "contacto@mexico.com",
+                    Phone = "4429012345",
+                    TipoComunidad = "COTO",
+                    Latitud = 20.5900,
+                    Longitud = -100.3850,
+                    CantidadViviendas = 75,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                },
+                new Community
+                {
+                    Id = new Guid("55555555-5555-5555-5555-555555555555"),
+                    Nombre = "Monaco",
+                    Descripcion = "Coto exclusivo con servicios premium",
+                    Direccion = "Blvd. Monaco 400, Querétaro, QRO",
+                    Contacto = "info@monaco.com",
+                    Email = "info@monaco.com",
+                    Phone = "4420123456",
+                    TipoComunidad = "COTO",
+                    Latitud = 20.5750,
+                    Longitud = -100.3950,
+                    CantidadViviendas = 50,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                },
+                new Community
+                {
+                    Id = new Guid("66666666-6666-6666-6666-666666666666"),
+                    Nombre = "Bruselas",
+                    Descripcion = "Coto residencial con jardines y áreas recreativas",
+                    Direccion = "Calle Bruselas 180, Querétaro, QRO",
+                    Contacto = "bruselas@comunidad.com",
+                    Email = "bruselas@comunidad.com",
+                    Phone = "4421234567",
+                    TipoComunidad = "COTO",
+                    Latitud = 20.6000,
+                    Longitud = -100.3750,
+                    CantidadViviendas = 90,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                },
+                new Community
+                {
+                    Id = new Guid("77777777-7777-7777-7777-777777777777"),
+                    Nombre = "Jardines de Morelos",
+                    Descripcion = "Fraccionamiento con amplias áreas verdes y alberca",
+                    Direccion = "Av. Morelos 350, Querétaro, QRO",
+                    Contacto = "jardines@morelos.mx",
+                    Email = "jardines@morelos.mx",
+                    Phone = "4422345678",
+                    TipoComunidad = "FRACCIONAMIENTO",
+                    Latitud = 20.5850,
+                    Longitud = -100.4000,
+                    CantidadViviendas = 200,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                },
+                new Community
+                {
+                    Id = new Guid("88888888-8888-8888-8888-888888888888"),
+                    Nombre = "Fuentes de valle",
+                    Descripcion = "Fraccionamiento con fuentes y áreas deportivas",
+                    Direccion = "Blvd. Fuentes del Valle 500, Querétaro, QRO",
+                    Contacto = "fuentes@valle.mx",
+                    Email = "fuentes@valle.mx",
+                    Phone = "4423456789",
+                    TipoComunidad = "FRACCIONAMIENTO",
+                    Latitud = 20.5950,
+                    Longitud = -100.3850,
+                    CantidadViviendas = 175,
                     CreatedAt = DateTime.UtcNow.ToString("O")
                 }
             };
 
             await _context.Communities.AddRangeAsync(communities);
+            await _context.SaveChangesAsync();
+        }
+
+        // Seed 3 Company Administrators with unique communities
+        // Company Administrator 1 - 3 communities
+        var admin1Id = new Guid("BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB");
+        var admin1 = await _context.Users.FirstOrDefaultAsync(u => u.Id == admin1Id || u.Username == "admincom01");
+        if (admin1 == null)
+        {
+            admin1 = new User
+            {
+                Id = admin1Id,
+                RoleId = adminCompanyRoleId,
+                FirstName = "María",
+                LastName = "González",
+                Username = "admincom01",
+                Email = "maria.gonzalez@admincom1.com",
+                Password = _passwordHasher.HashPassword("admin123"),
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            };
+            await _context.Users.AddAsync(admin1);
+            await _context.SaveChangesAsync();
+
+            // Associate with 3 communities
+            var admin1Communities = new[]
+            {
+                new UserCommunity
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = admin1Id,
+                    CommunityId = new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87"), // Residencial El Pueblito
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                },
+                new UserCommunity
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = admin1Id,
+                    CommunityId = new Guid("ff7bc6fb-0f13-4e37-beb4-7d428520c227"), // Colonia Las Palmas
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                },
+                new UserCommunity
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = admin1Id,
+                    CommunityId = new Guid("c4a28c40-a2c7-4190-961c-f3f52ad19c1d"), // Coto San Miguel
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                }
+            };
+            await _context.UserCommunities.AddRangeAsync(admin1Communities);
+            await _context.SaveChangesAsync();
+        }
+
+        // Company Administrator 2 - 2 communities
+        var admin2Id = new Guid("CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC");
+        var admin2 = await _context.Users.FirstOrDefaultAsync(u => u.Id == admin2Id || u.Username == "admincom02");
+        if (admin2 == null)
+        {
+            admin2 = new User
+            {
+                Id = admin2Id,
+                RoleId = adminCompanyRoleId,
+                FirstName = "Carlos",
+                LastName = "Rodríguez",
+                Username = "admincom02",
+                Email = "carlos.rodriguez@admincom2.com",
+                Password = _passwordHasher.HashPassword("admin123"),
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            };
+            await _context.Users.AddAsync(admin2);
+            await _context.SaveChangesAsync();
+
+            // Associate with 2 communities
+            var admin2Communities = new[]
+            {
+                new UserCommunity
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = admin2Id,
+                    CommunityId = new Guid("aa2f0511-bedd-413c-8681-34f3eee11ac9"), // Villa del Sol
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                },
+                new UserCommunity
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = admin2Id,
+                    CommunityId = new Guid("9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"), // Capital Sur - Coto Berlin
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                }
+            };
+            await _context.UserCommunities.AddRangeAsync(admin2Communities);
+            await _context.SaveChangesAsync();
+        }
+
+        // Company Administrator 3 - 1 community
+        var admin3Id = new Guid("DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDDD");
+        var admin3 = await _context.Users.FirstOrDefaultAsync(u => u.Id == admin3Id || u.Username == "admincom03");
+        if (admin3 == null)
+        {
+            admin3 = new User
+            {
+                Id = admin3Id,
+                RoleId = adminCompanyRoleId,
+                FirstName = "Ana",
+                LastName = "Martínez",
+                Username = "admincom03",
+                Email = "ana.martinez@admincom3.com",
+                Password = _passwordHasher.HashPassword("admin123"),
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            };
+            await _context.Users.AddAsync(admin3);
+            await _context.SaveChangesAsync();
+
+            // Associate with 1 community
+            var admin3Community = new UserCommunity
+            {
+                Id = Guid.NewGuid(),
+                UserId = admin3Id,
+                CommunityId = new Guid("11111111-1111-1111-1111-111111111111"), // Residencial Los Pinos
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            };
+            await _context.UserCommunities.AddAsync(admin3Community);
             await _context.SaveChangesAsync();
         }
 

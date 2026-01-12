@@ -9,6 +9,7 @@ public class Comunicado
     public string Descripcion { get; set; } = string.Empty;
     public DateTime Fecha { get; set; } // Fecha del comunicado
     public string? Imagen { get; set; }
+    public bool IsActive { get; set; } = true;
     public string CreatedAt { get; set; } = string.Empty; // ISO date string
     
     // Navigation property

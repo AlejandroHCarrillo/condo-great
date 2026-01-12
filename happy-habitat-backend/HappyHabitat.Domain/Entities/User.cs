@@ -15,5 +15,6 @@ public class User
     // Navigation properties
     public Role Role { get; set; } = null!;
     public Resident? Resident { get; set; }
+    public ICollection<UserCommunity> UserCommunities { get; set; } = new List<UserCommunity>();
 }
 

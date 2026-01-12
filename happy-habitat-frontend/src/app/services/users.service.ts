@@ -1,11 +1,74 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError, tap, map, filter, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { LoggerService } from './logger.service';
 import { ErrorService } from './error.service';
 import { SessionService } from './session.service';
 import { UserInfo } from '../interfaces/user-info.interface';
+import { RolesEnum } from '../enums/roles.enum';
+
+export interface UserDto {
+  id: string;
+  roleId: string;
+  roleCode: RolesEnum;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  isActive: boolean;
+  createdAt: string;
+  residentInfo?: ResidentInfoDto;
+  userCommunityIds?: string[];
+}
+
+export interface ResidentInfoDto {
+  id?: string;
+  fullName: string;
+  email?: string;
+  phone?: string;
+  number?: string;
+  address: string;
+  communityId?: string;
+  communityIds: string[];
+}
+
+export interface CreateUserRequest {
+  roleId: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  password: string;
+  isActive?: boolean;
+  residentInfo?: {
+    fullName: string;
+    email?: string;
+    phone?: string;
+    number?: string;
+    address: string;
+  };
+  communityIds: string[];
+  userCommunityIds?: string[];
+}
+
+export interface UpdateUserRequest {
+  roleId: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  isActive?: boolean;
+  residentInfo?: {
+    fullName: string;
+    email?: string;
+    phone?: string;
+    number?: string;
+    address: string;
+  };
+  communityIds: string[];
+  userCommunityIds?: string[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -102,6 +165,92 @@ export class UsersService {
       hasResidentInfo: !!currentUser.residentInfo
     });
     return of(null);
+  }
+
+  /**
+   * Obtiene todos los usuarios
+   */
+  getAllUsers(includeInactive: boolean = false): Observable<UserDto[]> {
+    this.logger.debug('Fetching all users', 'UsersService', { includeInactive });
+    
+    let params = new HttpParams();
+    if (includeInactive) {
+      params = params.set('includeInactive', 'true');
+    }
+    
+    return this.http.get<UserDto[]>(this.API_URL, { params }).pipe(
+      catchError((error) => {
+        this.logger.error('Error fetching users', error, 'UsersService');
+        this.errorService.handleError(error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Obtiene un usuario por ID
+   */
+  getUserById(id: string): Observable<UserDto> {
+    this.logger.debug(`Fetching user with id: ${id}`, 'UsersService');
+    
+    return this.http.get<UserDto>(`${this.API_URL}/${id}`).pipe(
+      catchError((error) => {
+        this.logger.error(`Error fetching user ${id}`, error, 'UsersService');
+        this.errorService.handleError(error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Crea un nuevo usuario
+   */
+  createUser(request: CreateUserRequest): Observable<UserDto> {
+    this.logger.info('Creating new user', 'UsersService', { 
+      username: request.username,
+      roleId: request.roleId
+    });
+    
+    return this.http.post<UserDto>(this.API_URL, request).pipe(
+      catchError((error) => {
+        this.logger.error('Error creating user', error, 'UsersService', { request });
+        this.errorService.handleError(error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Actualiza un usuario existente
+   */
+  updateUser(id: string, request: UpdateUserRequest): Observable<UserDto> {
+    this.logger.info(`Updating user ${id}`, 'UsersService', { 
+      username: request.username,
+      roleId: request.roleId
+    });
+    
+    return this.http.put<UserDto>(`${this.API_URL}/${id}`, request).pipe(
+      catchError((error) => {
+        this.logger.error(`Error updating user ${id}`, error, 'UsersService', { request });
+        this.errorService.handleError(error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Elimina un usuario
+   */
+  deleteUser(id: string): Observable<void> {
+    this.logger.info(`Deleting user ${id}`, 'UsersService');
+    
+    return this.http.delete<void>(`${this.API_URL}/${id}`).pipe(
+      catchError((error) => {
+        this.logger.error(`Error deleting user ${id}`, error, 'UsersService');
+        this.errorService.handleError(error);
+        return throwError(() => error);
+      })
+    );
   }
 }
 

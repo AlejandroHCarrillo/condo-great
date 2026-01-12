@@ -13,11 +13,13 @@ public class Community
     public double? Latitud { get; set; }
     public double? Longitud { get; set; }
     public int CantidadViviendas { get; set; }
+    public bool IsActive { get; set; } = true;
     public string CreatedAt { get; set; } = string.Empty; // ISO date string
     
     // Navigation properties
     public ICollection<Resident> Residents { get; set; } = new List<Resident>();
     public ICollection<Banner> Banners { get; set; } = new List<Banner>();
     public ICollection<Comunicado> Comunicados { get; set; } = new List<Comunicado>();
+    public ICollection<UserCommunity> UserCommunities { get; set; } = new List<UserCommunity>();
 }
 

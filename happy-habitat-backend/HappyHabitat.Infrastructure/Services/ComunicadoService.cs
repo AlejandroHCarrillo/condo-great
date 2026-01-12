@@ -15,9 +15,17 @@ public class ComunicadoService : IComunicadoService
         _context = context;
     }
 
-    public async Task<IEnumerable<ComunicadoDto>> GetAllComunicadosAsync()
+    public async Task<IEnumerable<ComunicadoDto>> GetAllComunicadosAsync(bool includeInactive = false)
     {
-        var comunicados = await _context.Comunicados
+        var query = _context.Comunicados.AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(c => c.IsActive);
+        }
+        
+        var comunicados = await query
             .Include(c => c.Community)
             .OrderByDescending(c => c.Fecha)
             .ToListAsync();
@@ -36,9 +44,17 @@ public class ComunicadoService : IComunicadoService
         });
     }
 
-    public async Task<IEnumerable<ComunicadoDto>> GetComunicadosPaginatedAsync(int page = 1, int pageSize = 20)
+    public async Task<IEnumerable<ComunicadoDto>> GetComunicadosPaginatedAsync(int page = 1, int pageSize = 20, bool includeInactive = false)
     {
-        var comunicados = await _context.Comunicados
+        var query = _context.Comunicados.AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(c => c.IsActive);
+        }
+        
+        var comunicados = await query
             .Include(c => c.Community)
             .OrderByDescending(c => c.Fecha)
             .Skip((page - 1) * pageSize)
@@ -59,9 +75,17 @@ public class ComunicadoService : IComunicadoService
         });
     }
 
-    public async Task<IEnumerable<ComunicadoDto>> GetComunicadosByCommunityIdAsync(Guid? communityId)
+    public async Task<IEnumerable<ComunicadoDto>> GetComunicadosByCommunityIdAsync(Guid? communityId, bool includeInactive = false)
     {
-        var query = _context.Comunicados
+        var query = _context.Comunicados.AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(c => c.IsActive);
+        }
+        
+        query = query
             .Include(c => c.Community)
             .AsQueryable();
 
@@ -92,9 +116,17 @@ public class ComunicadoService : IComunicadoService
         });
     }
 
-    public async Task<ComunicadoDto?> GetComunicadoByIdAsync(Guid id)
+    public async Task<ComunicadoDto?> GetComunicadoByIdAsync(Guid id, bool includeInactive = false)
     {
-        var comunicado = await _context.Comunicados
+        var query = _context.Comunicados.AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(c => c.IsActive);
+        }
+        
+        var comunicado = await query
             .Include(c => c.Community)
             .FirstOrDefaultAsync(c => c.Id == id);
 
@@ -206,7 +238,8 @@ public class ComunicadoService : IComunicadoService
         if (comunicado == null)
             return false;
 
-        _context.Comunicados.Remove(comunicado);
+        // Eliminación lógica: cambiar IsActive a false
+        comunicado.IsActive = false;
         await _context.SaveChangesAsync();
         return true;
     }

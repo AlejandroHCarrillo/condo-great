@@ -65,8 +65,8 @@ public class InitialSeeder : IDataSeeder
             {
                 Id = initialUserId,
                 RoleId = systemAdminRoleId,
-                FirstName = "System",
-                LastName = "Administrator",
+                FirstName = "Alejandro",
+                LastName = "Hernandez",
                 Username = "elgrandeahc",
                 Email = "elgrandeahc@happyhabitat.com",
                 Password = _passwordHasher.HashPassword("abc123"),
@@ -80,8 +80,8 @@ public class InitialSeeder : IDataSeeder
         else
         {
             // Update existing user to ensure correct username, role, password and required fields
-            existingUser.FirstName = string.IsNullOrEmpty(existingUser.FirstName) ? "System" : existingUser.FirstName;
-            existingUser.LastName = string.IsNullOrEmpty(existingUser.LastName) ? "Administrator" : existingUser.LastName;
+            existingUser.FirstName = string.IsNullOrEmpty(existingUser.FirstName) ? "Alejandro" : existingUser.FirstName;
+            existingUser.LastName = string.IsNullOrEmpty(existingUser.LastName) ? "Hernandez Carrillo" : existingUser.LastName;
             existingUser.Email = string.IsNullOrEmpty(existingUser.Email) ? "elgrandeahc@happyhabitat.com" : existingUser.Email;
             existingUser.Username = "elgrandeahc";
             // Only update password if it's not already hashed (check if it starts with $2a$ or $2b$ which are BCrypt prefixes)

@@ -10,6 +10,7 @@ public class Vehicle
     public int Year { get; set; }
     public string Color { get; set; } = string.Empty;
     public string LicensePlate { get; set; } = string.Empty;
+    public bool IsActive { get; set; } = true;
     public string CreatedAt { get; set; } = string.Empty;
     
     // Navigation properties
