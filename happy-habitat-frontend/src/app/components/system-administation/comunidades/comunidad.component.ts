@@ -1,4 +1,4 @@
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import type { Comunidad } from '../../../interfaces/comunidad.interface';
 import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -16,12 +16,13 @@ import { catchError, of, switchMap } from 'rxjs';
 @Component({
   selector: 'hh-comunidad',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, GenericListComponent, TruncatePipe],
+  imports: [CommonModule, ReactiveFormsModule, GenericListComponent, TruncatePipe, RouterModule],
   templateUrl: './comunidad.component.html',
   styles: ``
 })
 export class ComunidadComponent {
   private fb = inject(FormBuilder);
+  private router = inject(Router);
   private communitiesService = inject(CommunitiesService);
   private logger = inject(LoggerService);
   private notificationService = inject(NotificationService);
@@ -284,7 +285,7 @@ export class ComunidadComponent {
           contacto: dto.contacto,
           email: dto.email,
           phone: dto.phone,
-          tipoComunidad: dto.tipoComunidad || '',
+          tipoComunidad: this.normalizeTipoComunidad(dto.tipoComunidad),
           latitud: dto.latitud ?? null,
           longitud: dto.longitud ?? null,
           cantidadViviendas: dto.cantidadViviendas || 0
@@ -324,6 +325,41 @@ export class ComunidadComponent {
   // Tipos de comunidad para el select
   tiposComunidad = Object.values(tipoComunidadEnum);
 
+  /**
+   * Normaliza el valor de tipoComunidad del backend al valor del enum
+   */
+  private normalizeTipoComunidad(tipoComunidad: string | null | undefined): string {
+    if (!tipoComunidad) {
+      return '';
+    }
+
+    const tipoLower = tipoComunidad.toLowerCase().trim();
+    
+    // Mapear valores del backend a valores del enum
+    if (tipoLower.includes('coto')) {
+      return tipoComunidadEnum.COTO;
+    } else if (tipoLower.includes('fraccionamiento')) {
+      return tipoComunidadEnum.FRACCIONAMIENTO;
+    } else if (tipoLower.includes('colonia')) {
+      return tipoComunidadEnum.COLONIA;
+    } else if (tipoLower.includes('edificio')) {
+      return tipoComunidadEnum.EDIFICIO;
+    } else if (tipoLower.includes('condominio')) {
+      return tipoComunidadEnum.CONDOMINIO;
+    } else if (tipoLower.includes('comunidad')) {
+      return tipoComunidadEnum.COMUNIDAD;
+    }
+
+    // Si el valor coincide exactamente con algún valor del enum, usarlo
+    const enumValues = Object.values(tipoComunidadEnum);
+    if (enumValues.includes(tipoComunidad as tipoComunidadEnum)) {
+      return tipoComunidad;
+    }
+
+    // Si no coincide, retornar vacío
+    return '';
+  }
+
   // Configuración de columnas para la lista genérica
   communityColumns: ColumnConfig[] = [
     { 
@@ -351,6 +387,15 @@ export class ComunidadComponent {
         if (value.length <= 25) return value;
         return value.substring(0, 25) + '...';
       }
+    },
+    { 
+      key: 'contratos', 
+      label: 'Contratos',
+      formatter: (value, item: Comunidad) => {
+        if (!item.id) return '-';
+        return `<a href="/sysadmin/comunidades/contratos/${item.id}" class="link link-primary">Ver Contratos</a>`;
+      },
+      isHtml: true
     },
     /*
     { 

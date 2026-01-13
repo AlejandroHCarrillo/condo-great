@@ -21,5 +21,6 @@ public class Community
     public ICollection<Banner> Banners { get; set; } = new List<Banner>();
     public ICollection<Comunicado> Comunicados { get; set; } = new List<Comunicado>();
     public ICollection<UserCommunity> UserCommunities { get; set; } = new List<UserCommunity>();
+    public ICollection<Contrato> Contratos { get; set; } = new List<Contrato>();
 }
 

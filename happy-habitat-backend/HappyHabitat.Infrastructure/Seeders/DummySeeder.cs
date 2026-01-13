@@ -1069,6 +1069,138 @@ https://drive.google.com/file/d/1OG95bOMdZKWme-90_dg3VhTuYs1jMlfd/view?usp=shari
             await _context.Comunicados.AddRangeAsync(comunicados.ToArray());
             await _context.SaveChangesAsync();
         }
+
+        // Seed Contratos for Bruselas and Coto Berlin communities
+        var bruselasCommunityId = new Guid("66666666-6666-6666-6666-666666666666");
+        var cotoBerlinCommunityId = new Guid("9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c");
+
+        // Check if contratos already exist for these communities
+        var existingContratosBruselas = await _context.Contratos
+            .AnyAsync(c => c.CommunityId == bruselasCommunityId);
+        var existingContratosCotoBerlin = await _context.Contratos
+            .AnyAsync(c => c.CommunityId == cotoBerlinCommunityId);
+
+        if (!existingContratosBruselas)
+        {
+            var today = DateTime.UtcNow;
+            var contratosBruselas = new List<Contrato>
+            {
+                new Contrato
+                {
+                    Id = Guid.NewGuid(),
+                    CommunityId = bruselasCommunityId,
+                    TipoContrato = "estandar",
+                    FolioContrato = "CT-BRU-2024-001",
+                    RepresentanteComunidad = "María González Pérez",
+                    CostoTotal = 125000.00m,
+                    PeriodicidadPago = "mensual",
+                    MetodoPago = "transferencia",
+                    FechaFirma = today.AddMonths(-6).ToString("O"),
+                    FechaInicio = today.AddMonths(-6).ToString("O"),
+                    FechaFin = today.AddMonths(6).ToString("O"),
+                    NumeroCasas = 90,
+                    EstadoContrato = "activo",
+                    AsesorVentas = "Carlos Rodríguez",
+                    Notas = "Contrato estándar para servicios de administración y mantenimiento",
+                    IsActive = true,
+                    CreatedAt = today.AddMonths(-6).ToString("O")
+                },
+                new Contrato
+                {
+                    Id = Guid.NewGuid(),
+                    CommunityId = bruselasCommunityId,
+                    TipoContrato = "promocion",
+                    FolioContrato = "CT-BRU-2024-002",
+                    RepresentanteComunidad = "María González Pérez",
+                    CostoTotal = 45000.00m,
+                    PeriodicidadPago = "trimestral",
+                    MetodoPago = "tarjeta",
+                    FechaFirma = today.AddMonths(-3).ToString("O"),
+                    FechaInicio = today.AddMonths(-3).ToString("O"),
+                    FechaFin = today.AddMonths(9).ToString("O"),
+                    NumeroCasas = 90,
+                    EstadoContrato = "activo",
+                    AsesorVentas = "Ana Martínez",
+                    Notas = "Contrato promocional para servicios de seguridad",
+                    IsActive = true,
+                    CreatedAt = today.AddMonths(-3).ToString("O")
+                }
+            };
+
+            await _context.Contratos.AddRangeAsync(contratosBruselas);
+            await _context.SaveChangesAsync();
+        }
+
+        if (!existingContratosCotoBerlin)
+        {
+            var today = DateTime.UtcNow;
+            var contratosCotoBerlin = new List<Contrato>
+            {
+                new Contrato
+                {
+                    Id = Guid.NewGuid(),
+                    CommunityId = cotoBerlinCommunityId,
+                    TipoContrato = "estandar",
+                    FolioContrato = "CT-CB-2024-001",
+                    RepresentanteComunidad = "Juan Pérez Hernández",
+                    CostoTotal = 350000.00m,
+                    PeriodicidadPago = "mensual",
+                    MetodoPago = "transferencia",
+                    FechaFirma = today.AddMonths(-12).ToString("O"),
+                    FechaInicio = today.AddMonths(-12).ToString("O"),
+                    FechaFin = today.AddMonths(12).ToString("O"),
+                    NumeroCasas = 240,
+                    EstadoContrato = "activo",
+                    AsesorVentas = "Carlos Rodríguez",
+                    Notas = "Contrato estándar anual para servicios completos de administración",
+                    IsActive = true,
+                    CreatedAt = today.AddMonths(-12).ToString("O")
+                },
+                new Contrato
+                {
+                    Id = Guid.NewGuid(),
+                    CommunityId = cotoBerlinCommunityId,
+                    TipoContrato = "estandar",
+                    FolioContrato = "CT-CB-2024-002",
+                    RepresentanteComunidad = "Juan Pérez Hernández",
+                    CostoTotal = 85000.00m,
+                    PeriodicidadPago = "trimestral",
+                    MetodoPago = "transferencia",
+                    FechaFirma = today.AddMonths(-8).ToString("O"),
+                    FechaInicio = today.AddMonths(-8).ToString("O"),
+                    FechaFin = today.AddMonths(4).ToString("O"),
+                    NumeroCasas = 240,
+                    EstadoContrato = "activo",
+                    AsesorVentas = "María López",
+                    Notas = "Contrato para servicios de mantenimiento de áreas comunes",
+                    IsActive = true,
+                    CreatedAt = today.AddMonths(-8).ToString("O")
+                },
+                new Contrato
+                {
+                    Id = Guid.NewGuid(),
+                    CommunityId = cotoBerlinCommunityId,
+                    TipoContrato = "prueba",
+                    FolioContrato = "CT-CB-2024-003",
+                    RepresentanteComunidad = "Juan Pérez Hernández",
+                    CostoTotal = 25000.00m,
+                    PeriodicidadPago = "mensual",
+                    MetodoPago = "efectivo",
+                    FechaFirma = today.AddMonths(-1).ToString("O"),
+                    FechaInicio = today.AddMonths(-1).ToString("O"),
+                    FechaFin = today.AddMonths(2).ToString("O"),
+                    NumeroCasas = 50,
+                    EstadoContrato = "activo",
+                    AsesorVentas = "Ana Martínez",
+                    Notas = "Contrato de prueba para nuevo servicio de limpieza",
+                    IsActive = true,
+                    CreatedAt = today.AddMonths(-1).ToString("O")
+                }
+            };
+
+            await _context.Contratos.AddRangeAsync(contratosCotoBerlin);
+            await _context.SaveChangesAsync();
+        }
     }
 }
 

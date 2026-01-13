@@ -1,0 +1,520 @@
+<div class="w-full max-w-4xl p-4 sm:p-6 md:p-8">
+    <!-- Título y Botón Nuevo en la misma línea -->
+    <div class="flex flex-row items-center justify-between mb-4 sm:mb-6">
+        <div class="flex flex-col">
+            <h2 class="text-xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-file-contract text-primary"></i>
+                <span>Gestión de Contratos</span>
+            </h2>
+            @if (comunidadNombre()) {
+                <p class="text-sm text-base-content/70 mt-1">
+                    Comunidad: <strong>{{ comunidadNombre() }}</strong>
+                </p>
+            }
+        </div>
+        <div class="flex gap-2">
+            @if (comunidadId()) {
+                <button 
+                    class="btn btn-ghost"
+                    (click)="router.navigate(['/sysadmin/comunidades'])"
+                >
+                    <i class="fa-solid fa-arrow-left mr-2"></i>
+                    Volver a Comunidades
+                </button>
+            }
+            <button 
+                class="btn btn-primary text-white"
+                (click)="openNewContratoModalForCreate()"
+            >
+                <i class="fa-solid fa-plus mr-2"></i>
+                Nuevo
+            </button>
+        </div>
+    </div>
+
+    <!-- Lista de contratos -->
+    @if (isLoading()) {
+        <div class="card bg-base-200 shadow mb-6">
+            <div class="card-body items-center py-8">
+                <span class="loading loading-spinner loading-lg text-primary"></span>
+                <p class="text-base-content/70 mt-4">Cargando contratos...</p>
+            </div>
+        </div>
+    } @else {
+        <div class="mb-6">
+            <!-- Lista genérica de contratos -->
+            <hh-generic-list
+                [items]="contratos()"
+                [columns]="contratoColumns"
+                [title]="'Contratos'"
+                [itemsPerPage]="10"
+                [showActions]="true"
+                [canDelete]="canDeleteContrato"
+                (rowClick)="onContratoClick($event)"
+                (edit)="onEditContrato($event)"
+                (delete)="onDeleteContrato($event)"
+            ></hh-generic-list>
+        </div>
+    }
+
+    <!-- Modal para registro/edición de contrato -->
+    <dialog 
+        id="newContratoModal"
+        class="modal modal-bottom sm:modal-middle"
+    >
+        <div class="modal-box max-w-3xl flex flex-col max-h-[90vh] p-0">
+            <!-- Header del modal -->
+            <div class="flex items-center justify-between p-6 border-b border-base-300">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-file-contract text-primary"></i>
+                    <span>{{ editingContratoId ? 'Editar Contrato' : 'Registrar Nuevo Contrato' }}</span>
+                </h3>
+                <form method="dialog">
+                    <button 
+                        type="button"
+                        class="btn btn-sm btn-circle btn-ghost"
+                        (click)="closeModal()"
+                    >
+                        ✕
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Contenido del formulario con scroll -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <form [formGroup]="contratoForm" (ngSubmit)="saveContrato()" class="flex flex-col gap-4">
+                    <!-- Comunidad -->
+                    <div class="form-control">
+                        <label class="label font-semibold" for="communityId">
+                            <span class="label-text">Comunidad</span>
+                        </label>
+                        <select 
+                            id="communityId"
+                            formControlName="communityId" 
+                            class="select select-bordered w-full"
+                            [class.input-error]="contratoForm.get('communityId')?.invalid && contratoForm.get('communityId')?.touched"
+                            [disabled]="!!editingContratoId || !!comunidadId()"
+                        >
+                            <option value="">Seleccione una comunidad</option>
+                            @for (comunidad of comunidades(); track comunidad.id) {
+                                <option [value]="comunidad.id">{{ comunidad.nombre }}</option>
+                            }
+                        </select>
+                        @if (contratoForm.get('communityId')?.invalid && contratoForm.get('communityId')?.touched) {
+                            <label class="label">
+                                <span class="label-text-alt text-error">La comunidad es requerida</span>
+                            </label>
+                        }
+                        @if (comunidadId()) {
+                            <label class="label">
+                                <span class="label-text-alt text-info">La comunidad está fijada por la ruta actual</span>
+                            </label>
+                        }
+                    </div>
+
+                    <!-- Tipo de Contrato y Folio -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-control">
+                            <label class="label font-semibold" for="tipoContrato">
+                                <span class="label-text">Tipo de Contrato</span>
+                            </label>
+                            <select 
+                                id="tipoContrato"
+                                formControlName="tipoContrato" 
+                                class="select select-bordered w-full"
+                                [class.input-error]="contratoForm.get('tipoContrato')?.invalid && contratoForm.get('tipoContrato')?.touched"
+                            >
+                                <option value="">Seleccione un tipo</option>
+                                @for (tipo of tiposContrato; track tipo) {
+                                    <option [value]="tipo">{{ tipo | titlecase }}</option>
+                                }
+                            </select>
+                            @if (contratoForm.get('tipoContrato')?.invalid && contratoForm.get('tipoContrato')?.touched) {
+                                <label class="label">
+                                    <span class="label-text-alt text-error">El tipo de contrato es requerido</span>
+                                </label>
+                            }
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label font-semibold" for="folioContrato">
+                                <span class="label-text">Folio Contrato</span>
+                            </label>
+                            <input 
+                                id="folioContrato"
+                                formControlName="folioContrato" 
+                                type="text" 
+                                placeholder="Ej: CT-2024-001"
+                                class="input input-bordered w-full"
+                                [class.input-error]="contratoForm.get('folioContrato')?.invalid && contratoForm.get('folioContrato')?.touched"
+                            />
+                            @if (contratoForm.get('folioContrato')?.invalid && contratoForm.get('folioContrato')?.touched) {
+                                <label class="label">
+                                    <span class="label-text-alt text-error">El folio es requerido (mínimo 3 caracteres)</span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Representante y Asesor -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-control">
+                            <label class="label font-semibold" for="representanteComunidad">
+                                <span class="label-text">Representante Comunidad</span>
+                            </label>
+                            <input 
+                                id="representanteComunidad"
+                                formControlName="representanteComunidad" 
+                                type="text" 
+                                placeholder="Ej: Juan Pérez"
+                                class="input input-bordered w-full"
+                                [class.input-error]="contratoForm.get('representanteComunidad')?.invalid && contratoForm.get('representanteComunidad')?.touched"
+                            />
+                            @if (contratoForm.get('representanteComunidad')?.invalid && contratoForm.get('representanteComunidad')?.touched) {
+                                <label class="label">
+                                    <span class="label-text-alt text-error">El representante es requerido</span>
+                                </label>
+                            }
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label font-semibold" for="asesorVentas">
+                                <span class="label-text">Asesor de Ventas</span>
+                            </label>
+                            <input 
+                                id="asesorVentas"
+                                formControlName="asesorVentas" 
+                                type="text" 
+                                placeholder="Ej: María González"
+                                class="input input-bordered w-full"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Costo Total y Número de Casas -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-control">
+                            <label class="label font-semibold" for="costoTotal">
+                                <span class="label-text">Costo Total</span>
+                            </label>
+                            <input 
+                                id="costoTotal"
+                                formControlName="costoTotal" 
+                                type="number" 
+                                step="0.01"
+                                min="0"
+                                placeholder="Ej: 50000.00"
+                                class="input input-bordered w-full"
+                                [class.input-error]="contratoForm.get('costoTotal')?.invalid && contratoForm.get('costoTotal')?.touched"
+                            />
+                            @if (contratoForm.get('costoTotal')?.invalid && contratoForm.get('costoTotal')?.touched) {
+                                <label class="label">
+                                    <span class="label-text-alt text-error">El costo total es requerido (mínimo 0)</span>
+                                </label>
+                            }
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label font-semibold" for="numeroCasas">
+                                <span class="label-text">Número de Casas</span>
+                            </label>
+                            <input 
+                                id="numeroCasas"
+                                formControlName="numeroCasas" 
+                                type="number" 
+                                min="0"
+                                placeholder="Ej: 50"
+                                class="input input-bordered w-full"
+                                [class.input-error]="contratoForm.get('numeroCasas')?.invalid && contratoForm.get('numeroCasas')?.touched"
+                            />
+                            @if (contratoForm.get('numeroCasas')?.invalid && contratoForm.get('numeroCasas')?.touched) {
+                                <label class="label">
+                                    <span class="label-text-alt text-error">El número de casas es requerido (mínimo 0)</span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Periodicidad y Método de Pago -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-control">
+                            <label class="label font-semibold" for="periodicidadPago">
+                                <span class="label-text">Periodicidad de Pago</span>
+                            </label>
+                            <select 
+                                id="periodicidadPago"
+                                formControlName="periodicidadPago" 
+                                class="select select-bordered w-full"
+                                [class.input-error]="contratoForm.get('periodicidadPago')?.invalid && contratoForm.get('periodicidadPago')?.touched"
+                            >
+                                <option value="">Seleccione una periodicidad</option>
+                                @for (periodicidad of periodicidadesPago; track periodicidad) {
+                                    <option [value]="periodicidad">{{ periodicidad | titlecase }}</option>
+                                }
+                            </select>
+                            @if (contratoForm.get('periodicidadPago')?.invalid && contratoForm.get('periodicidadPago')?.touched) {
+                                <label class="label">
+                                    <span class="label-text-alt text-error">La periodicidad es requerida</span>
+                                </label>
+                            }
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label font-semibold" for="metodoPago">
+                                <span class="label-text">Método de Pago</span>
+                            </label>
+                            <select 
+                                id="metodoPago"
+                                formControlName="metodoPago" 
+                                class="select select-bordered w-full"
+                                [class.input-error]="contratoForm.get('metodoPago')?.invalid && contratoForm.get('metodoPago')?.touched"
+                            >
+                                <option value="">Seleccione un método</option>
+                                @for (metodo of metodosPago; track metodo) {
+                                    <option [value]="metodo">{{ metodo | titlecase }}</option>
+                                }
+                            </select>
+                            @if (contratoForm.get('metodoPago')?.invalid && contratoForm.get('metodoPago')?.touched) {
+                                <label class="label">
+                                    <span class="label-text-alt text-error">El método de pago es requerido</span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Estado del Contrato -->
+                    <div class="form-control">
+                        <label class="label font-semibold" for="estadoContrato">
+                            <span class="label-text">Estado del Contrato</span>
+                        </label>
+                        <select 
+                            id="estadoContrato"
+                            formControlName="estadoContrato" 
+                            class="select select-bordered w-full"
+                            [class.input-error]="contratoForm.get('estadoContrato')?.invalid && contratoForm.get('estadoContrato')?.touched"
+                        >
+                            <option value="">Seleccione un estado</option>
+                            @for (estado of estadosContrato; track estado) {
+                                <option [value]="estado">{{ estado | titlecase }}</option>
+                            }
+                        </select>
+                        @if (contratoForm.get('estadoContrato')?.invalid && contratoForm.get('estadoContrato')?.touched) {
+                            <label class="label">
+                                <span class="label-text-alt text-error">El estado es requerido</span>
+                            </label>
+                        }
+                    </div>
+
+                    <!-- Fechas -->
+                    <fieldset class="border border-base-300 p-4 rounded-md">
+                        <legend class="text-sm font-semibold mb-2">Fechas del Contrato</legend>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="form-control">
+                                <label class="label font-semibold" for="fechaFirma">
+                                    <span class="label-text">Fecha de Firma</span>
+                                </label>
+                                <input 
+                                    id="fechaFirma"
+                                    formControlName="fechaFirma" 
+                                    type="date" 
+                                    class="input input-bordered w-full"
+                                    [class.input-error]="contratoForm.get('fechaFirma')?.invalid && contratoForm.get('fechaFirma')?.touched"
+                                />
+                                @if (contratoForm.get('fechaFirma')?.invalid && contratoForm.get('fechaFirma')?.touched) {
+                                    <label class="label">
+                                        <span class="label-text-alt text-error">La fecha de firma es requerida</span>
+                                    </label>
+                                }
+                            </div>
+                            <div class="form-control">
+                                <label class="label font-semibold" for="fechaInicio">
+                                    <span class="label-text">Fecha de Inicio</span>
+                                </label>
+                                <input 
+                                    id="fechaInicio"
+                                    formControlName="fechaInicio" 
+                                    type="date" 
+                                    class="input input-bordered w-full"
+                                    [class.input-error]="contratoForm.get('fechaInicio')?.invalid && contratoForm.get('fechaInicio')?.touched"
+                                />
+                                @if (contratoForm.get('fechaInicio')?.invalid && contratoForm.get('fechaInicio')?.touched) {
+                                    <label class="label">
+                                        <span class="label-text-alt text-error">La fecha de inicio es requerida</span>
+                                    </label>
+                                }
+                            </div>
+                            <div class="form-control">
+                                <label class="label font-semibold" for="fechaFin">
+                                    <span class="label-text">Fecha de Fin (opcional)</span>
+                                </label>
+                                <input 
+                                    id="fechaFin"
+                                    formControlName="fechaFin" 
+                                    type="date" 
+                                    class="input input-bordered w-full"
+                                />
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Notas y Documentos -->
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="form-control">
+                            <label class="label font-semibold" for="notas">
+                                <span class="label-text">Notas</span>
+                            </label>
+                            <textarea 
+                                id="notas"
+                                formControlName="notas" 
+                                placeholder="Notas adicionales sobre el contrato"
+                                class="textarea textarea-bordered w-full"
+                                rows="3"
+                            ></textarea>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label font-semibold" for="documentosAdjuntos">
+                                <span class="label-text">Documentos Adjuntos</span>
+                            </label>
+                            <input 
+                                id="documentosAdjuntos"
+                                formControlName="documentosAdjuntos" 
+                                type="text" 
+                                placeholder="Ruta o referencia a documentos adjuntos"
+                                class="input input-bordered w-full"
+                            />
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer del modal con botones -->
+            <div class="flex flex-col sm:flex-row justify-end gap-2 p-6 border-t border-base-300">
+                <button 
+                    type="button" 
+                    class="btn btn-ghost"
+                    (click)="closeModal()"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    type="button" 
+                    class="btn btn-primary text-white"
+                    [disabled]="contratoForm.invalid"
+                    (click)="saveContrato()"
+                >
+                    <i class="fa-solid fa-save mr-2"></i>
+                    {{ editingContratoId ? 'Actualizar' : 'Guardar' }}
+                </button>
+            </div>
+        </div>
+        
+        <!-- Backdrop para cerrar el modal -->
+        <form method="dialog" class="modal-backdrop">
+            <button (click)="closeModal()">Cerrar</button>
+        </form>
+    </dialog>
+
+    <!-- Modal de información de contrato (al hacer clic en una fila) -->
+    <dialog id="infoContratoModal" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box">
+            @if (selectedContrato) {
+                <h3 class="text-lg font-bold py-2">Contrato: {{ selectedContrato.folioContrato }}</h3>
+                <hr>
+                <p class="py-2">
+                    <strong>Comunidad:</strong> {{ selectedContrato.nombreComunidad || 'N/A' }}
+                </p>
+                <p class="py-2">
+                    <strong>Tipo:</strong> {{ selectedContrato.tipoContrato | titlecase }}
+                </p>
+                <p class="py-2">
+                    <strong>Estado:</strong> {{ selectedContrato.estadoContrato | titlecase }}
+                </p>
+                <p class="py-2">
+                    <strong>Representante:</strong> {{ selectedContrato.representanteComunidad }}
+                </p>
+                <p class="py-2">
+                    <strong>Costo Total:</strong> ${{ selectedContrato.costoTotal.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                </p>
+                <p class="py-2">
+                    <strong>Periodicidad:</strong> {{ selectedContrato.periodicidadPago | titlecase }}
+                </p>
+                <p class="py-2">
+                    <strong>Método de Pago:</strong> {{ selectedContrato.metodoPago | titlecase }}
+                </p>
+                <p class="py-2">
+                    <strong>Número de Casas:</strong> {{ selectedContrato.numeroCasas }}
+                </p>
+                <p class="py-2">
+                    <strong>Fecha de Firma:</strong> {{ selectedContrato.fechaFirma | date:'short' }}
+                </p>
+                <p class="py-2">
+                    <strong>Fecha de Inicio:</strong> {{ selectedContrato.fechaInicio | date:'short' }}
+                </p>
+                @if (selectedContrato.fechaFin) {
+                    <p class="py-2">
+                        <strong>Fecha de Fin:</strong> {{ selectedContrato.fechaFin | date:'short' }}
+                    </p>
+                }
+                @if (selectedContrato.asesorVentas) {
+                    <p class="py-2">
+                        <strong>Asesor de Ventas:</strong> {{ selectedContrato.asesorVentas }}
+                    </p>
+                }
+                @if (selectedContrato.notas) {
+                    <p class="py-2">
+                        <strong>Notas:</strong> {{ selectedContrato.notas }}
+                    </p>
+                }
+            }
+            <div class="modal-action">
+                <form method="dialog">
+                    <button class="btn" (click)="closeInfoModal()">Cerrar</button>
+                </form>
+            </div>
+        </div>
+        
+        <form method="dialog" class="modal-backdrop">
+            <button (click)="closeInfoModal()">Cerrar</button>
+        </form>
+    </dialog>
+
+    <!-- Modal de confirmación de eliminación -->
+    <dialog id="deleteContratoModal" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-error"></i>
+                <span>Confirmar Eliminación</span>
+            </h3>
+            
+            @if (contratoToDelete) {
+                <p class="py-4">
+                    ¿Está seguro de que desea eliminar el contrato <strong>{{ contratoToDelete.folioContrato }}</strong>?
+                </p>
+                <p class="text-sm text-base-content/70 mb-4">
+                    Esta acción no se puede deshacer.
+                </p>
+            }
+            
+            <div class="modal-action">
+                <button 
+                    class="btn btn-ghost"
+                    (click)="closeDeleteModal()"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    class="btn btn-error text-white"
+                    (click)="confirmDeleteContrato()"
+                >
+                    <i class="fa-solid fa-trash mr-2"></i>
+                    Eliminar
+                </button>
+            </div>
+        </div>
+        
+        <form method="dialog" class="modal-backdrop">
+            <button (click)="closeDeleteModal()">Cerrar</button>
+        </form>
+    </dialog>
+</div>
