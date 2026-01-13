@@ -30,6 +30,7 @@ public class Contrato
     public Community Community { get; set; } = null!;
     public User? UpdatedByUser { get; set; }
     public ICollection<PaymentHistory> PaymentHistories { get; set; } = new List<PaymentHistory>();
+    public ICollection<CargosComunidad> CargosComunidad { get; set; } = new List<CargosComunidad>();
 }
 
 

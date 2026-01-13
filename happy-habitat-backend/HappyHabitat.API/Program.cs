@@ -71,6 +71,7 @@ builder.Services.AddScoped<IComunicadoService, ComunicadoService>();
 builder.Services.AddScoped<ICommunityService, CommunityService>();
 builder.Services.AddScoped<IContratoService, ContratoService>();
 builder.Services.AddScoped<IPaymentHistoryService, PaymentHistoryService>();
+builder.Services.AddScoped<IChargesService, ChargesService>();
 
 // Register seeders
 builder.Services.AddScoped<InitialSeeder>();

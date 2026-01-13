@@ -500,6 +500,15 @@ export class ContratoComponent {
           return value;
         }
       }
+    },
+    {
+      key: 'estadoCuenta',
+      label: 'Estado de Cuenta',
+      formatter: (value, item: Contrato) => {
+        if (!item.id) return '-';
+        return `<a href="/sysadmin/comunidades/statement/contrato/${item.id}" class="link link-primary">Ver Estado de Cuenta</a>`;
+      },
+      isHtml: true
     }
   ];
 

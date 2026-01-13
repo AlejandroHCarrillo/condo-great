@@ -1,0 +1,85 @@
+<div class="container mx-auto p-4">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice text-primary"></i>
+                Estado de Cuenta
+            </h1>
+            @if (comunidadNombre()) {
+                <p class="text-sm text-base-content/70 mt-1">
+                    Comunidad: <strong>{{ comunidadNombre() }}</strong>
+                    @if (contratoFolio()) {
+                        | Contrato: <strong>{{ contratoFolio() }}</strong>
+                    }
+                </p>
+            }
+        </div>
+        <div class="flex gap-2">
+            <button 
+                class="btn btn-sm btn-primary" 
+                (click)="imprimirEstadoCuenta()"
+            >
+                <i class="fa-solid fa-print mr-2"></i>
+                Imprimir
+            </button>
+            <button 
+                class="btn btn-sm btn-ghost" 
+                (click)="router.navigate(['/sysadmin/comunidades'])"
+            >
+                <i class="fa-solid fa-arrow-left mr-2"></i>
+                Volver
+            </button>
+        </div>
+    </div>
+
+    <!-- Resumen de totales -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="card bg-base-200 shadow">
+            <div class="card-body">
+                <h3 class="card-title text-sm">Total Cargos</h3>
+                <p class="text-2xl font-bold text-error">
+                    ${{ calcularTotalCargos().toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                </p>
+            </div>
+        </div>
+        <div class="card bg-base-200 shadow">
+            <div class="card-body">
+                <h3 class="card-title text-sm">Total Pagos</h3>
+                <p class="text-2xl font-bold text-success">
+                    ${{ calcularTotalPagos().toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                </p>
+            </div>
+        </div>
+        <div class="card bg-base-200 shadow">
+            <div class="card-body">
+                <h3 class="card-title text-sm">Saldo Total</h3>
+                <p class="text-2xl font-bold" [class.text-error]="calcularSaldoTotal() > 0" [class.text-success]="calcularSaldoTotal() <= 0">
+                    ${{ calcularSaldoTotal().toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de cargos y pagos -->
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <h2 class="card-title mb-4">Movimientos</h2>
+            @if (statementResource.isLoading()) {
+                <div class="flex justify-center items-center py-8">
+                    <span class="loading loading-spinner loading-lg"></span>
+                </div>
+            } @else if (statementResource.error()) {
+                <div class="alert alert-error">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Error al cargar el estado de cuenta. Por favor, intenta nuevamente.</span>
+                </div>
+            } @else {
+                <hh-generic-list
+                    [items]="statementItems()"
+                    [columns]="statementColumns"
+                    [showActions]="false"
+                />
+            }
+        </div>
+    </div>
+</div>

@@ -5,6 +5,7 @@ import { ComunidadComponent } from './comunidades/comunidad.component';
 import { ContratoComponent } from './contratos/contrato.component';
 import { UserListComponent } from '../users/user-list.component';
 import { BannersListComponent } from './banners/banners-list.component';
+import { StatementComponent } from './statement/statement.component';
 
 export const registroRoutes: Routes = [
     {
@@ -14,6 +15,14 @@ export const registroRoutes: Routes = [
         {
             path: 'comunidades/contratos/:comunidadId',
             component: ContratoComponent
+        },
+        {
+            path: 'comunidades/statement/:comunidadId',
+            component: StatementComponent
+        },
+        {
+            path: 'comunidades/statement/contrato/:contratoId',
+            component: StatementComponent
         },
         {
             path: 'comunidades',
