@@ -30,9 +30,17 @@ public class BannerService : IBannerService
         return null;
     }
 
-    public async Task<IEnumerable<BannerDto>> GetAllBannersAsync()
+    public async Task<IEnumerable<BannerDto>> GetAllBannersAsync(bool includeInactive = false)
     {
-        var banners = await _context.Banners
+        var query = _context.Banners.AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(b => b.IsActive);
+        }
+        
+        var banners = await query
             .Include(b => b.Community)
             .ToListAsync();
 
@@ -99,9 +107,17 @@ public class BannerService : IBannerService
         });
     }
 
-    public async Task<IEnumerable<BannerDto>> GetBannersByCommunityIdAsync(Guid? communityId)
+    public async Task<IEnumerable<BannerDto>> GetBannersByCommunityIdAsync(Guid? communityId, bool includeInactive = false)
     {
-        var query = _context.Banners
+        var query = _context.Banners.AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(b => b.IsActive);
+        }
+        
+        query = query
             .Include(b => b.Community)
             .AsQueryable();
 
@@ -136,9 +152,17 @@ public class BannerService : IBannerService
         });
     }
 
-    public async Task<BannerDto?> GetBannerByIdAsync(Guid id)
+    public async Task<BannerDto?> GetBannerByIdAsync(Guid id, bool includeInactive = false)
     {
-        var banner = await _context.Banners
+        var query = _context.Banners.AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(b => b.IsActive);
+        }
+        
+        var banner = await query
             .Include(b => b.Community)
             .FirstOrDefaultAsync(b => b.Id == id);
 
@@ -255,7 +279,8 @@ public class BannerService : IBannerService
         if (banner == null)
             return false;
 
-        _context.Banners.Remove(banner);
+        // Eliminación lógica: cambiar IsActive a false
+        banner.IsActive = false;
         await _context.SaveChangesAsync();
         return true;
     }

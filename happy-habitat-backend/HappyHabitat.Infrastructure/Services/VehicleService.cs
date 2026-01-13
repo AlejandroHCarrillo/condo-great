@@ -15,9 +15,17 @@ public class VehicleService : IVehicleService
         _context = context;
     }
 
-    public async Task<IEnumerable<VehicleDto>> GetAllVehiclesAsync()
+    public async Task<IEnumerable<VehicleDto>> GetAllVehiclesAsync(bool includeInactive = false)
     {
-        var vehicles = await _context.Vehicles
+        var query = _context.Vehicles.AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(v => v.IsActive);
+        }
+        
+        var vehicles = await query
             .Include(v => v.Resident)
             .Include(v => v.VehicleType)
             .ToListAsync();
@@ -38,9 +46,17 @@ public class VehicleService : IVehicleService
         });
     }
 
-    public async Task<VehicleDto?> GetVehicleByIdAsync(Guid id)
+    public async Task<VehicleDto?> GetVehicleByIdAsync(Guid id, bool includeInactive = false)
     {
-        var vehicle = await _context.Vehicles
+        var query = _context.Vehicles.AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(v => v.IsActive);
+        }
+        
+        var vehicle = await query
             .Include(v => v.Resident)
             .Include(v => v.VehicleType)
             .FirstOrDefaultAsync(v => v.Id == id);
@@ -64,12 +80,21 @@ public class VehicleService : IVehicleService
         };
     }
 
-    public async Task<IEnumerable<VehicleDto>> GetVehiclesByResidentIdAsync(Guid residentId)
+    public async Task<IEnumerable<VehicleDto>> GetVehiclesByResidentIdAsync(Guid residentId, bool includeInactive = false)
     {
-        var vehicles = await _context.Vehicles
+        var query = _context.Vehicles
+            .Where(v => v.ResidentId == residentId)
+            .AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(v => v.IsActive);
+        }
+        
+        var vehicles = await query
             .Include(v => v.Resident)
             .Include(v => v.VehicleType)
-            .Where(v => v.ResidentId == residentId)
             .ToListAsync();
 
         return vehicles.Select(v => new VehicleDto
@@ -184,7 +209,8 @@ public class VehicleService : IVehicleService
         if (vehicle == null)
             return false;
 
-        _context.Vehicles.Remove(vehicle);
+        // Eliminación lógica: cambiar IsActive a false
+        vehicle.IsActive = false;
         await _context.SaveChangesAsync();
         return true;
     }

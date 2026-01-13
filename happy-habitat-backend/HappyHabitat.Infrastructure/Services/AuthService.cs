@@ -83,7 +83,7 @@ public class AuthService : IAuthService
                 }
             }
 
-            response.ResidentInfo = new ResidentInfoDto
+            response.ResidentInfo = new LoginResidentInfoDto
             {
                 Id = user.Resident.Id.ToString(),
                 Fullname = user.Resident.FullName,

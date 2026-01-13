@@ -11,6 +11,7 @@ public class ResidentVisit
     public string Subject { get; set; } = string.Empty;
     public string ArrivalDate { get; set; } = string.Empty; // ISO date string
     public string? DepartureDate { get; set; } // ISO date string
+    public bool IsActive { get; set; } = true;
     public string CreatedAt { get; set; } = string.Empty;
     
     // Navigation property

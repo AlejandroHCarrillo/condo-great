@@ -2,11 +2,10 @@ import { Component } from '@angular/core';
 import { comunicadosdata } from '../../shared/data/announcement.data';
 import { ComunicadosPostsComponent } from '../../components/comunicados/comunicados-posts.component';
 import { BannerCarouselComponent, BannerPeriod } from '../../shared/components/banner-carousel/banner-carousel.component';
-import { AvisosListComponent } from '../../components/avisos/avisos-list/avisos-list.component';
 
 @Component({
   selector: 'hh-home-page',
-  imports: [BannerCarouselComponent, ComunicadosPostsComponent, AvisosListComponent],
+  imports: [BannerCarouselComponent, ComunicadosPostsComponent],
   templateUrl: './home-page.component.html',
   styles: ``
 })

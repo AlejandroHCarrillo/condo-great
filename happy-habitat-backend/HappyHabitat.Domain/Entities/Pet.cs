@@ -9,6 +9,7 @@ public class Pet
     public string Breed { get; set; } = string.Empty;
     public int Age { get; set; }
     public string Color { get; set; } = string.Empty;
+    public bool IsActive { get; set; } = true;
     public string CreatedAt { get; set; } = string.Empty;
     
     // Navigation property

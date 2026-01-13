@@ -1,12 +1,14 @@
-import { Component, Input, Output, EventEmitter, computed, signal, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, computed, signal, OnChanges, SimpleChanges, AfterViewInit, ElementRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 export interface ColumnConfig {
   key: string;
   label: string;
   sortable?: boolean;
   formatter?: (value: any, item: any) => string;
+  isHtml?: boolean; // Si es true, el formatter puede devolver HTML
 }
 
 @Component({
@@ -16,7 +18,7 @@ export interface ColumnConfig {
   templateUrl: './generic-list.component.html',
   styleUrl: './generic-list.component.css'
 })
-export class GenericListComponent<T extends Record<string, any>> implements OnChanges {
+export class GenericListComponent<T extends Record<string, any>> implements OnChanges, AfterViewInit {
   // Lista de elementos a mostrar
   @Input() items: T[] = [];
   
@@ -71,7 +73,8 @@ export class GenericListComponent<T extends Record<string, any>> implements OnCh
       return Object.keys(firstItem).map(key => ({
         key,
         label: this.formatLabel(key),
-        sortable: false
+        sortable: false,
+        isHtml: false
       }));
     }
     
@@ -104,9 +107,31 @@ export class GenericListComponent<T extends Record<string, any>> implements OnCh
   // Opciones de elementos por página
   itemsPerPageOptions = [5, 10, 20, 50, 100];
 
+  private router = inject(Router);
+
   constructor() {
     // Inicializar itemsPerPageSignal con el valor del input
     this.itemsPerPageSignal.set(this.itemsPerPage);
+  }
+
+  ngAfterViewInit(): void {
+    // Interceptar clicks en enlaces dentro de las celdas para usar Router
+    setTimeout(() => {
+      const table = document.querySelector('table');
+      if (table) {
+        table.addEventListener('click', (event) => {
+          const target = event.target as HTMLElement;
+          const link = target.closest('a[href^="/"]');
+          if (link && link.getAttribute('href')?.startsWith('/')) {
+            event.preventDefault();
+            const href = link.getAttribute('href');
+            if (href) {
+              this.router.navigateByUrl(href);
+            }
+          }
+        });
+      }
+    }, 0);
   }
 
   ngOnChanges(changes: SimpleChanges): void {

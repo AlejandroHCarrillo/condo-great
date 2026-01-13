@@ -26,5 +26,30 @@ public class CreateUserDto
     public string Password { get; set; } = string.Empty;
 
     public bool IsActive { get; set; } = true;
+    
+    // Resident information
+    public ResidentCreateDto? ResidentInfo { get; set; }
+    
+    // Community IDs (for roles that need communities - RESIDENT, COMITEE_MEMBER, VIGILANCE)
+    public List<Guid> CommunityIds { get; set; } = new List<Guid>();
+    
+    // User Community IDs (for any user role)
+    public List<Guid> UserCommunityIds { get; set; } = new List<Guid>();
+}
+
+public class ResidentCreateDto
+{
+    [Required]
+    public string FullName { get; set; } = string.Empty;
+    
+    [EmailAddress]
+    public string? Email { get; set; }
+    
+    public string? Phone { get; set; }
+    
+    public string? Number { get; set; }
+    
+    [Required]
+    public string Address { get; set; } = string.Empty;
 }
 

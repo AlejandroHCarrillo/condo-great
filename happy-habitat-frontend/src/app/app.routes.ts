@@ -38,14 +38,24 @@ export const routes: Routes = [
         canActivate: [authGuard]
     },
     {
-        path: 'registro',
-        loadChildren: () => import('./components/registro/registro-routes'),
+        path: 'resident',
+        loadChildren: () => import('./components/resident/resident-routes'),
         canActivate: [authGuard]
     },
     {
         path: 'sysadmin',
         loadChildren: () => import('./components/system-administation/system-admin-routes'),
         canActivate: [roleGuard([RolesEnum.SYSTEM_ADMIN, RolesEnum.ADMIN_COMPANY])]
+    },
+    {
+        path: 'admincompany',
+        loadChildren: () => import('./components/admincompany/admincompany-routes'),
+        canActivate: [authGuard] // TODO: Cambiar a roleGuard([RolesEnum.ADMIN_COMPANY]) cuando los roles estén configurados
+    },
+    {
+        path: 'vigilancia',
+        loadChildren: () => import('./components/vigilancia/vigilancia-routes'),
+        canActivate: [authGuard] // TODO: Cambiar a roleGuard([RolesEnum.VIGILANCE]) cuando los roles estén configurados
     },
     {
         path: 'amenidades',

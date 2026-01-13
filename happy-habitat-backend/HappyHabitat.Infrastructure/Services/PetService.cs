@@ -15,9 +15,17 @@ public class PetService : IPetService
         _context = context;
     }
 
-    public async Task<IEnumerable<PetDto>> GetAllPetsAsync()
+    public async Task<IEnumerable<PetDto>> GetAllPetsAsync(bool includeInactive = false)
     {
-        var pets = await _context.Pets
+        var query = _context.Pets.AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(p => p.IsActive);
+        }
+        
+        var pets = await query
             .Include(p => p.Resident)
             .ToListAsync();
 
@@ -35,9 +43,17 @@ public class PetService : IPetService
         });
     }
 
-    public async Task<PetDto?> GetPetByIdAsync(Guid id)
+    public async Task<PetDto?> GetPetByIdAsync(Guid id, bool includeInactive = false)
     {
-        var pet = await _context.Pets
+        var query = _context.Pets.AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(p => p.IsActive);
+        }
+        
+        var pet = await query
             .Include(p => p.Resident)
             .FirstOrDefaultAsync(p => p.Id == id);
 
@@ -58,11 +74,20 @@ public class PetService : IPetService
         };
     }
 
-    public async Task<IEnumerable<PetDto>> GetPetsByResidentIdAsync(Guid residentId)
+    public async Task<IEnumerable<PetDto>> GetPetsByResidentIdAsync(Guid residentId, bool includeInactive = false)
     {
-        var pets = await _context.Pets
-            .Include(p => p.Resident)
+        var query = _context.Pets
             .Where(p => p.ResidentId == residentId)
+            .AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(p => p.IsActive);
+        }
+        
+        var pets = await query
+            .Include(p => p.Resident)
             .ToListAsync();
 
         return pets.Select(p => new PetDto
@@ -158,7 +183,8 @@ public class PetService : IPetService
         if (pet == null)
             return false;
 
-        _context.Pets.Remove(pet);
+        // Eliminación lógica: cambiar IsActive a false
+        pet.IsActive = false;
         await _context.SaveChangesAsync();
         return true;
     }

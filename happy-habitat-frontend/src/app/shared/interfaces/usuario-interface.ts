@@ -6,5 +6,8 @@ export interface Usuario {
   role: RolesEnum;
   username: string;
   password: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
   ResidentInfo?: Residente;
 }

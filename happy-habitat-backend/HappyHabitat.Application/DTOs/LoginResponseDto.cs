@@ -8,10 +8,10 @@ public class LoginResponseDto
     public string Email { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
     public string ExpiresAt { get; set; } = string.Empty; // ISO date string
-    public ResidentInfoDto? ResidentInfo { get; set; }
+    public LoginResidentInfoDto? ResidentInfo { get; set; }
 }
 
-public class ResidentInfoDto
+public class LoginResidentInfoDto
 {
     public string? Id { get; set; }
     public string Fullname { get; set; } = string.Empty;

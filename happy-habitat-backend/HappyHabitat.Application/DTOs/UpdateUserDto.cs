@@ -22,5 +22,28 @@ public class UpdateUserDto
     public string Email { get; set; } = string.Empty;
 
     public bool IsActive { get; set; }
+    
+    // Resident information
+    public ResidentUpdateDto? ResidentInfo { get; set; }
+    
+    // Community IDs (for roles that need communities - RESIDENT, COMITEE_MEMBER, VIGILANCE)
+    public List<Guid> CommunityIds { get; set; } = new List<Guid>();
+    
+    // User Community IDs (for any user role)
+    public List<Guid> UserCommunityIds { get; set; } = new List<Guid>();
+}
+
+public class ResidentUpdateDto
+{
+    public string FullName { get; set; } = string.Empty;
+    
+    [EmailAddress]
+    public string? Email { get; set; }
+    
+    public string? Phone { get; set; }
+    
+    public string? Number { get; set; }
+    
+    public string Address { get; set; } = string.Empty;
 }
 

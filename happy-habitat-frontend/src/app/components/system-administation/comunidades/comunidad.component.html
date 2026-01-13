@@ -1,58 +1,359 @@
-<div class="max-w-xl mx-auto p-4 bg-base-200 rounded-box shadow-md">
-  <h2 class="text-2xl font-bold mb-4 flex flex-row justify-between">
-    <span class="flex justify-around text-2xl">
-      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 20 20"><path fill="currentColor" d="M3.25 2C2.56 2 2 2.56 2 3.25v10.5c0 .69.56 1.25 1.25 1.25H7.5v-1.741c0-.683.3-1.332.82-1.776l3.47-2.959A2.24 2.24 0 0 1 13 8v-.75C13 6.56 12.44 6 11.75 6h-1.5a.25.25 0 0 1-.25-.25v-2.5C10 2.56 9.44 2 8.75 2zm1.5 3.5a.75.75 0 1 1 0-1.5a.75.75 0 0 1 0 1.5M5.5 7A.75.75 0 1 1 4 7a.75.75 0 0 1 1.5 0m-.75 3a.75.75 0 1 1 0-1.5a.75.75 0 0 1 0 1.5M8 4.75a.75.75 0 1 1-1.5 0a.75.75 0 0 1 1.5 0m-.75 3a.75.75 0 1 1 0-1.5a.75.75 0 0 1 0 1.5M8 9.25a.75.75 0 1 1-1.5 0a.75.75 0 0 1 1.5 0m6.061.034a1.25 1.25 0 0 0-1.622 0l-3.47 2.96a1.33 1.33 0 0 0-.469 1.014v4.616c0 .622.504 1.125 1.125 1.125h1.75c.621 0 1.125-.503 1.125-1.125v-1.749c0-.069.056-.125.125-.125h1.25c.069 0 .125.056.125.125v1.75c0 .62.504 1.124 1.125 1.124h1.75c.621 0 1.125-.503 1.125-1.125v-4.616c0-.39-.171-.761-.468-1.014zm-.973.761a.25.25 0 0 1 .324 0l3.47 2.96a.33.33 0 0 1 .118.253v4.616c0 .07-.056.125-.125.125h-1.75a.125.125 0 0 1-.125-.125v-1.749c0-.621-.504-1.125-1.125-1.125h-1.25c-.621 0-1.125.504-1.125 1.125v1.75a.125.125 0 0 1-.125.124h-1.75a.125.125 0 0 1-.125-.125v-4.616c0-.097.043-.19.117-.253z"/></svg>
-      <span>Alta de comunidades</span>
-    </span>
-    <span>
-        <button class="btn bg-gray-300 float-end" (click)="goBack();">Regresar</button>
-    </span>
-  </h2>
+<div class="w-full max-w-4xl p-4 sm:p-6 md:p-8">
+    <!-- Título y Botón Nuevo en la misma línea -->
+    <div class="flex flex-row items-center justify-between mb-4 sm:mb-6">
+        <h2 class="text-xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2">
+            <i class="fa-solid fa-building text-primary"></i>
+            <span>Gestión de Comunidades</span>
+        </h2>
+        <button 
+            class="btn btn-primary text-white"
+            (click)="openNewCommunityModalForCreate()"
+        >
+            <i class="fa-solid fa-plus mr-2"></i>
+            Nuevo
+        </button>
+    </div>
 
-    <form [formGroup]="myForm" (ngSubmit)="submit()" class="flex flex-col gap-4">
+    <!-- Lista de comunidades -->
+    @if (isLoading()) {
+        <div class="card bg-base-200 shadow mb-6">
+            <div class="card-body items-center py-8">
+                <span class="loading loading-spinner loading-lg text-primary"></span>
+                <p class="text-base-content/70 mt-4">Cargando comunidades...</p>
+            </div>
+        </div>
+    } @else {
+        <div class="mb-6">
+            <!-- Lista genérica de comunidades -->
+            <hh-generic-list
+                [items]="comunidades()"
+                [columns]="communityColumns"
+                [title]="'Comunidades'"
+                [itemsPerPage]="10"
+                [showActions]="true"
+                (rowClick)="onCommunityClick($event)"
+                (edit)="onEditCommunity($event)"
+                (delete)="onDeleteCommunity($event)"
+            ></hh-generic-list>
+        </div>
+    }
+
+    <!-- Modal para registro/edición de comunidad -->
+    <dialog 
+        id="newCommunityModal"
+        class="modal modal-bottom sm:modal-middle"
+    >
+        <div class="modal-box max-w-2xl flex flex-col max-h-[90vh] p-0">
+            <!-- Header del modal -->
+            <div class="flex items-center justify-between p-6 border-b border-base-300">
+                <h3 class="font-bold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-building text-primary"></i>
+                    <span>{{ editingCommunityId ? 'Editar Comunidad' : 'Registrar Nueva Comunidad' }}</span>
+                </h3>
+                <form method="dialog">
+                    <button 
+                        type="button"
+                        class="btn btn-sm btn-circle btn-ghost"
+                        (click)="closeModal()"
+                    >
+                        ✕
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Contenido del formulario con scroll -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <form [formGroup]="communityForm" (ngSubmit)="saveCommunity()" class="flex flex-col gap-4">
+                    <div class="form-control">
+                        <label class="label font-semibold" for="tipoComunidad">
+                            <span class="label-text">Tipo de Comunidad</span>
+                        </label>
+                        <select 
+                            id="tipoComunidad"
+                            formControlName="tipoComunidad" 
+                            class="select select-bordered w-full"
+                            [class.input-error]="communityForm.get('tipoComunidad')?.invalid && communityForm.get('tipoComunidad')?.touched"
+                        >
+                            <option value="">Seleccione un tipo</option>
+                            @for (tipo of tiposComunidad; track tipo) {
+                                <option [value]="tipo">{{ tipo }}</option>
+                            }
+                        </select>
+                        @if (communityForm.get('tipoComunidad')?.invalid && communityForm.get('tipoComunidad')?.touched) {
+                            <label class="label">
+                                <span class="label-text-alt text-error">El tipo de comunidad es requerido</span>
+                            </label>
+                        }
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label font-semibold" for="nombre">
+                            <span class="label-text">Nombre</span>
+                        </label>
+                        <input 
+                            id="nombre"
+                            formControlName="nombre" 
+                            type="text" 
+                            placeholder="Ej: Residencial El Pueblito"
+                            class="input input-bordered w-full"
+                            [class.input-error]="communityForm.get('nombre')?.invalid && communityForm.get('nombre')?.touched"
+                        />
+                        @if (communityForm.get('nombre')?.invalid && communityForm.get('nombre')?.touched) {
+                            <label class="label">
+                                <span class="label-text-alt text-error">El nombre es requerido (mínimo 3 caracteres)</span>
+                            </label>
+                        }
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label font-semibold" for="descripcion">
+                            <span class="label-text">Descripción</span>
+                        </label>
+                        <textarea 
+                            id="descripcion"
+                            formControlName="descripcion" 
+                            placeholder="Descripción de la comunidad"
+                            class="textarea textarea-bordered w-full"
+                            rows="3"
+                            [class.input-error]="communityForm.get('descripcion')?.invalid && communityForm.get('descripcion')?.touched"
+                        ></textarea>
+                        @if (communityForm.get('descripcion')?.invalid && communityForm.get('descripcion')?.touched) {
+                            <label class="label">
+                                <span class="label-text-alt text-error">La descripción es requerida</span>
+                            </label>
+                        }
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label font-semibold" for="direccion">
+                            <span class="label-text">Dirección</span>
+                        </label>
+                        <input 
+                            id="direccion"
+                            formControlName="direccion" 
+                            type="text" 
+                            placeholder="Ej: Av. Paseo del Pueblito 123, El Pueblito, QRO"
+                            class="input input-bordered w-full"
+                            [class.input-error]="communityForm.get('direccion')?.invalid && communityForm.get('direccion')?.touched"
+                        />
+                        @if (communityForm.get('direccion')?.invalid && communityForm.get('direccion')?.touched) {
+                            <label class="label">
+                                <span class="label-text-alt text-error">La dirección es requerida</span>
+                            </label>
+                        }
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label font-semibold" for="contacto">
+                            <span class="label-text">Contacto</span>
+                        </label>
+                        <input 
+                            id="contacto"
+                            formControlName="contacto" 
+                            type="text" 
+                            placeholder="Ej: Administración El Jardín"
+                            class="input input-bordered w-full"
+                            [class.input-error]="communityForm.get('contacto')?.invalid && communityForm.get('contacto')?.touched"
+                        />
+                        @if (communityForm.get('contacto')?.invalid && communityForm.get('contacto')?.touched) {
+                            <label class="label">
+                                <span class="label-text-alt text-error">El contacto es requerido</span>
+                            </label>
+                        }
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label font-semibold" for="email">
+                            <span class="label-text">Email</span>
+                        </label>
+                        <input 
+                            id="email"
+                            formControlName="email" 
+                            type="email" 
+                            placeholder="Ej: admin@comunidad.com"
+                            class="input input-bordered w-full"
+                            [class.input-error]="communityForm.get('email')?.invalid && communityForm.get('email')?.touched"
+                        />
+                        @if (communityForm.get('email')?.invalid && communityForm.get('email')?.touched) {
+                            <label class="label">
+                                <span class="label-text-alt text-error">El email es requerido y debe ser válido</span>
+                            </label>
+                        }
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label font-semibold" for="phone">
+                            <span class="label-text">Teléfono</span>
+                        </label>
+                        <input 
+                            id="phone"
+                            formControlName="phone" 
+                            type="tel" 
+                            placeholder="Ej: +1-555-0101"
+                            class="input input-bordered w-full"
+                            [class.input-error]="communityForm.get('phone')?.invalid && communityForm.get('phone')?.touched"
+                        />
+                        @if (communityForm.get('phone')?.invalid && communityForm.get('phone')?.touched) {
+                            <label class="label">
+                                <span class="label-text-alt text-error">El teléfono es requerido</span>
+                            </label>
+                        }
+                    </div>
+
+                    <div class="form-control">
+                        <label class="label font-semibold" for="cantidadViviendas">
+                            <span class="label-text">Cantidad de Viviendas</span>
+                        </label>
+                        <input 
+                            id="cantidadViviendas"
+                            formControlName="cantidadViviendas" 
+                            type="number" 
+                            min="0"
+                            placeholder="Ej: 120"
+                            class="input input-bordered w-full"
+                            [class.input-error]="communityForm.get('cantidadViviendas')?.invalid && communityForm.get('cantidadViviendas')?.touched"
+                        />
+                        @if (communityForm.get('cantidadViviendas')?.invalid && communityForm.get('cantidadViviendas')?.touched) {
+                            <label class="label">
+                                <span class="label-text-alt text-error">La cantidad de viviendas es requerida (mínimo 0)</span>
+                            </label>
+                        }
+                    </div>
+
+                    <fieldset class="border border-base-300 p-4 rounded-md">
+                        <legend class="text-sm font-semibold mb-2">Coordenadas (opcional)</legend>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="form-control">
+                                <label class="label font-semibold" for="latitud">
+                                    <span class="label-text">Latitud</span>
+                                </label>
+                                <input 
+                                    id="latitud"
+                                    formControlName="latitud" 
+                                    type="number" 
+                                    step="any"
+                                    placeholder="Ej: 20.5821"
+                                    class="input input-bordered w-full"
+                                />
+                            </div>
+                            <div class="form-control">
+                                <label class="label font-semibold" for="longitud">
+                                    <span class="label-text">Longitud</span>
+                                </label>
+                                <input 
+                                    id="longitud"
+                                    formControlName="longitud" 
+                                    type="number" 
+                                    step="any"
+                                    placeholder="Ej: -100.3897"
+                                    class="input input-bordered w-full"
+                                />
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+
+            <!-- Footer del modal con botones -->
+            <div class="flex flex-col sm:flex-row justify-end gap-2 p-6 border-t border-base-300">
+                <button 
+                    type="button" 
+                    class="btn btn-ghost"
+                    (click)="closeModal()"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    type="button" 
+                    class="btn btn-primary text-white"
+                    [disabled]="communityForm.invalid"
+                    (click)="saveCommunity()"
+                >
+                    <i class="fa-solid fa-save mr-2"></i>
+                    {{ editingCommunityId ? 'Actualizar' : 'Guardar' }}
+                </button>
+            </div>
+        </div>
         
-        <div>
-            <label class="label">Tipo de comunidad</label>
-            <select formControlName="tipoUnidadHabitacional" class="select select-bordered w-full">
-            <option *ngFor="let tipo of tipos" [value]="tipo">{{ tipo }}</option>
-            </select>
-        </div>
+        <!-- Backdrop para cerrar el modal -->
+        <form method="dialog" class="modal-backdrop">
+            <button (click)="closeModal()">Cerrar</button>
+        </form>
+    </dialog>
 
-        <div>
-            <label class="label">Nombre</label>
-            <input formControlName="nombre" type="text" class="input input-bordered w-full" />
-        </div>
-
-        <div>
-            <label class="label">Ubicación</label>
-            <input formControlName="ubicacion" type="text" class="input input-bordered w-full" />
-        </div>
-
-        <fieldset formGroupName="latlng" class="border border-base-300 p-4 rounded-md">
-            <legend class="text-sm font-semibold mb-2">Coordenadas (opcional)</legend>
-
-            <div class="grid grid-cols-2 gap-4">
-            <div>
-                <label class="label">Latitud</label>
-                <input formControlName="lat" type="number" class="input input-bordered w-full" />
+    <!-- Modal de información de comunidad (al hacer clic en una fila) -->
+    <dialog id="infoCommunityModal" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box">
+            @if (selectedCommunity) {
+                <h3 class="text-lg font-bold py-2">{{ selectedCommunity.nombre }}</h3>
+                <hr>
+                <p class="py-4">
+                    <strong>Tipo:</strong> {{ selectedCommunity.tipoUnidadHabitacional }}
+                </p>
+                <p class="py-4">
+                    <strong>Viviendas:</strong> {{ selectedCommunity.cantidadviviendas }}
+                </p>
+                <p class="py-4">
+                    <strong>Ubicación:</strong> {{ selectedCommunity.ubicacion | truncate:25 }}
+                </p>
+                <p class="py-4">
+                    <strong>Contacto:</strong> {{ selectedCommunity.contacto }}
+                </p>
+                @if (selectedCommunity.latlng) {
+                    <p class="py-4">
+                        <strong>Lat:</strong> {{ selectedCommunity.latlng.lat }} 
+                        <strong>Long:</strong> {{ selectedCommunity.latlng.lng }}
+                    </p>
+                }
+            }
+            <div class="modal-action">
+                <form method="dialog">
+                    <button class="btn" (click)="closeInfoModal()">Cerrar</button>
+                </form>
             </div>
-            <div>
-                <label class="label">Longitud</label>
-                <input formControlName="lng" type="number" class="input input-bordered w-full" />
-            </div>
-            </div>
-        </fieldset>
-
-        <div>
-            <label class="label">Cantidad de viviendas</label>
-            <input formControlName="cantidadviviendas" type="number" class="input input-bordered w-full" />
         </div>
+        
+        <form method="dialog" class="modal-backdrop">
+            <button (click)="closeInfoModal()">Cerrar</button>
+        </form>
+    </dialog>
 
-        <div>
-            <label class="label">Contacto</label>
-            <input formControlName="contacto" type="text" class="input input-bordered w-full" />
+    <!-- Modal de confirmación de eliminación -->
+    <dialog id="deleteCommunityModal" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-error"></i>
+                <span>Confirmar Eliminación</span>
+            </h3>
+            
+            @if (communityToDelete) {
+                <p class="py-4">
+                    ¿Está seguro de que desea eliminar la comunidad <strong>{{ communityToDelete.nombre }}</strong>?
+                </p>
+                <p class="text-sm text-base-content/70 mb-4">
+                    Esta acción no se puede deshacer.
+                </p>
+            }
+            
+            <div class="modal-action">
+                <button 
+                    class="btn btn-ghost"
+                    (click)="closeDeleteModal()"
+                >
+                    Cancelar
+                </button>
+                <button 
+                    class="btn btn-error text-white"
+                    (click)="confirmDeleteCommunity()"
+                >
+                    <i class="fa-solid fa-trash mr-2"></i>
+                    Eliminar
+                </button>
+            </div>
         </div>
-
-        <button type="submit" class="btn btn-primary w-full text-white">Registrar unidad</button>
-    </form>
+        
+        <form method="dialog" class="modal-backdrop">
+            <button (click)="closeDeleteModal()">Cerrar</button>
+        </form>
+    </dialog>
 </div>

@@ -15,9 +15,17 @@ public class ResidentVisitService : IResidentVisitService
         _context = context;
     }
 
-    public async Task<IEnumerable<ResidentVisitDto>> GetAllVisitsAsync()
+    public async Task<IEnumerable<ResidentVisitDto>> GetAllVisitsAsync(bool includeInactive = false)
     {
-        var visits = await _context.ResidentVisits
+        var query = _context.ResidentVisits.AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(v => v.IsActive);
+        }
+        
+        var visits = await query
             .Include(v => v.Resident)
             .ToListAsync();
 
@@ -37,9 +45,17 @@ public class ResidentVisitService : IResidentVisitService
         });
     }
 
-    public async Task<ResidentVisitDto?> GetVisitByIdAsync(Guid id)
+    public async Task<ResidentVisitDto?> GetVisitByIdAsync(Guid id, bool includeInactive = false)
     {
-        var visit = await _context.ResidentVisits
+        var query = _context.ResidentVisits.AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(v => v.IsActive);
+        }
+        
+        var visit = await query
             .Include(v => v.Resident)
             .FirstOrDefaultAsync(v => v.Id == id);
 
@@ -62,11 +78,20 @@ public class ResidentVisitService : IResidentVisitService
         };
     }
 
-    public async Task<IEnumerable<ResidentVisitDto>> GetVisitsByResidentIdAsync(Guid residentId)
+    public async Task<IEnumerable<ResidentVisitDto>> GetVisitsByResidentIdAsync(Guid residentId, bool includeInactive = false)
     {
-        var visits = await _context.ResidentVisits
-            .Include(v => v.Resident)
+        var query = _context.ResidentVisits
             .Where(v => v.ResidentId == residentId)
+            .AsQueryable();
+        
+        // Filtrar por IsActive solo si includeInactive es false
+        if (!includeInactive)
+        {
+            query = query.Where(v => v.IsActive);
+        }
+        
+        var visits = await query
+            .Include(v => v.Resident)
             .ToListAsync();
 
         return visits.Select(v => new ResidentVisitDto
@@ -172,7 +197,8 @@ public class ResidentVisitService : IResidentVisitService
         if (visit == null)
             return false;
 
-        _context.ResidentVisits.Remove(visit);
+        // Eliminación lógica: cambiar IsActive a false
+        visit.IsActive = false;
         await _context.SaveChangesAsync();
         return true;
     }

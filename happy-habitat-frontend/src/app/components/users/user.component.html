@@ -9,7 +9,7 @@
     <h2 class="text-2xl font-bold mb-4 flex flex-row justify-between">
     <span class="flex justify-around text-2xl">
       <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 640 512"><path fill="currentColor" d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0S96 57.3 96 128s57.3 128 128 128m89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h274.9c-2.4-6.8-3.4-14-2.6-21.3l6.8-60.9l1.2-11.1l7.9-7.9l77.3-77.3c-24.5-27.7-60-45.5-99.9-45.5m45.3 145.3l-6.8 61c-1.1 10.2 7.5 18.8 17.6 17.6l60.9-6.8l137.9-137.9l-71.7-71.7zM633 268.9L595.1 231c-9.3-9.3-24.5-9.3-33.8 0l-37.8 37.8l-4.1 4.1l71.8 71.7l41.8-41.8c9.3-9.4 9.3-24.5 0-33.9"/></svg> &nbsp;
-      <span>Alta de usuarios</span>
+      <span>{{ isEditMode() ? 'Editar Usuario' : 'Alta de usuarios' }}</span>
     </span>
     <span>
         <button class="btn bg-gray-300 float-end" (click)="goBack();">Regresar</button>
@@ -23,7 +23,7 @@
         <div>
           <label class="label">Rol</label>
           <select formControlName="role" class="select select-bordered w-full">
-              @for (rol of roles; track $index) {
+              @for (rol of availableRoles(); track $index) {
                   <option [value]="rol.value">{{ rol.text }}</option>
               }    
           </select>
@@ -35,11 +35,20 @@
         </div>
 
         <div>
-          <label class="label">Nombre completo</label>
-          <input formControlName="fullname" type="text" class="input input-bordered w-full" />
+          <label class="label">Nombre</label>
+          <input formControlName="firstName" type="text" class="input input-bordered w-full" />
           <show-form-error-template
-                  [isValid]="formUtils.isValidField(myForm, 'fullname')"
-                  [errorMessage]="formUtils.getFieldError(myForm, 'fullname')"
+                  [isValid]="formUtils.isValidField(myForm, 'firstName')"
+                  [errorMessage]="formUtils.getFieldError(myForm, 'firstName')"
+          />
+        </div>
+
+        <div>
+          <label class="label">Apellido</label>
+          <input formControlName="lastName" type="text" class="input input-bordered w-full" />
+          <show-form-error-template
+                  [isValid]="formUtils.isValidField(myForm, 'lastName')"
+                  [errorMessage]="formUtils.getFieldError(myForm, 'lastName')"
           />
         </div>
 
@@ -62,6 +71,15 @@
         </div>
 
         <div>
+          <label class="label">Teléfono</label>
+          <input formControlName="phone" type="tel" class="input input-bordered w-full" />
+          <show-form-error-template
+                  [isValid]="formUtils.isValidField(myForm, 'phone')"
+                  [errorMessage]="formUtils.getFieldError(myForm, 'phone')"
+          />
+        </div>
+
+        <div>
           <label class="label">Dirección</label>
           <input formControlName="address" type="text" class="input input-bordered w-full" />
           <show-form-error-template
@@ -69,7 +87,45 @@
                   [errorMessage]="formUtils.getFieldError(myForm, 'address')"
           />
         </div>
-        <button type="submit" class="btn btn-primary w-full text-white mt-5">Guardar</button>
+
+        @if (!isEditMode()) {
+          <div>
+            <label class="label">Contraseña</label>
+            <input formControlName="password" type="password" class="input input-bordered w-full" />
+            <show-form-error-template
+                    [isValid]="formUtils.isValidField(myForm, 'password')"
+                    [errorMessage]="formUtils.getFieldError(myForm, 'password')"
+            />
+          </div>
+        }
+        
+        <div class="flex gap-2 mt-5">
+          <button 
+            type="submit" 
+            class="btn btn-primary flex-1 text-white"
+            [disabled]="isLoading()"
+          >
+            @if (isLoading()) {
+              <span class="loading loading-spinner loading-sm"></span>
+            }
+            Guardar
+          </button>
+          @if (isEditMode()) {
+            <button 
+              type="button" 
+              class="btn btn-error text-white"
+              [disabled]="isLoading()"
+              (click)="onDelete()"
+            >
+              @if (isLoading()) {
+                <span class="loading loading-spinner loading-sm"></span>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M7.616 20q-.672 0-1.144-.472T6 18.385V6H5V5h4v-.77h6V5h4v1h-1v12.385q0 .69-.462 1.153T16.384 20zM17 6H7v12.385q0 .269.173.442t.443.173h8.769q.23 0 .423-.192t.192-.424zM9.808 17h1V8h-1zm3.384 0h1V8h-1zM7 6v13z"/></svg>
+              }
+              Eliminar
+            </button>
+          }
+        </div>
       </div>
 
       <div class="col w-[50%]">
@@ -83,7 +139,7 @@
                       placeholder="Seleccione una unidad habitacional"
                       [formControl]  = "newComunidad"
                 >
-                    @for (selectoption of comunidadesCombo; track $index) {
+                    @for (selectoption of comunidadesCombo(); track $index) {
                         <option [value]="selectoption.value">{{ selectoption.text }}</option>
                     }    
                 </select>
@@ -94,7 +150,13 @@
                         >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M19 12.998h-6v6h-2v-6H5v-2h6v-6h2v6h6z"/></svg>
                 </button>
-              </div>            
+              </div>
+              @if (isAdminCompany() && !isEditMode()) {
+                <div class="text-sm text-base-content/70 mt-2">
+                  <i class="fa-solid fa-info-circle mr-1"></i>
+                  Los usuarios ADMIN_COMPANY pueden administrar múltiples comunidades. Selecciona las comunidades que este administrador podrá gestionar.
+                </div>
+              }            
             </div>
             <!-- Mandamos el error directo por que no lo tenemos en las utils 
                 como sacar los errores de un campo externo 
@@ -129,7 +191,7 @@
                 <!-- Con este validador verificamos los errores del campo -->
                 <show-form-error-template
                         [isValid]="formUtils.isValidField(myForm, 'comunidades')"
-                        [errorMessage]="formUtils.getFieldError(myForm, 'comunidades')?.replace('caracteres', 'comunidades')"
+                        [errorMessage]="formUtils.getFieldError(myForm, 'comunidades')?.replace('caracteres', 'comunidades')?.replace('minlength', isAdminCompany() ? 'Debe tener al menos 1 comunidad' : 'Debe tener al menos 2 comunidades')"
                 />
 
             <!-- <span class="form-text text-danger">Error general</span> -->

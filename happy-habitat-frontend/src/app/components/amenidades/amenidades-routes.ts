@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { RegistroActividadesLayoutComponent } from '../../layouts/registro/registro-actividades-layout';
 import { AmenidadesLayoutComponent } from '../../layouts/amenidades/amenidades-layout';
 import { AmenidadesListComponent } from './amenidades-list.component';
 import { AmenidadesGridComponent } from './amenidades-grid.component';
