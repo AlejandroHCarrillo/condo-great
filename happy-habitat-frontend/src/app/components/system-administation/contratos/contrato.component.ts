@@ -252,6 +252,36 @@ export class ContratoComponent {
         this.comunidadNombre.set('');
       }
     });
+
+    // Listener para cargar número de casas cuando cambia la comunidad
+    this.contratoForm.get('communityId')?.valueChanges.subscribe((communityId) => {
+      if (communityId && !this.editingContratoId) {
+        // Solo cargar si no se está editando un contrato existente
+        this.communitiesService.getCommunityById(communityId).subscribe({
+          next: (comunidad) => {
+            this.contratoForm.get('numeroCasas')?.setValue(comunidad.cantidadViviendas || 0, { emitEvent: false });
+          },
+          error: (error) => {
+            this.logger.error('Error loading community data', error, 'ContratoComponent');
+          }
+        });
+      }
+    });
+
+    // Listener para calcular monto parcial cuando cambian costoTotal o numeroPagosParciales
+    this.contratoForm.get('costoTotal')?.valueChanges.subscribe(() => {
+      this.calcularMontoParcial();
+    });
+
+    this.contratoForm.get('numeroPagosParciales')?.valueChanges.subscribe(() => {
+      this.calcularMontoParcial();
+    });
+
+    // Listener para validar fechaFin cuando cambia fechaInicio
+    this.contratoForm.get('fechaInicio')?.valueChanges.subscribe(() => {
+      this.contratoForm.get('fechaFin')?.updateValueAndValidity();
+    });
+
     // Flags para evitar ejecuciones múltiples de los effects
     let createProcessed = false;
     let updateProcessed = false;
@@ -364,6 +394,9 @@ export class ContratoComponent {
           folioContrato: dto.folioContrato,
           representanteComunidad: dto.representanteComunidad,
           costoTotal: dto.costoTotal,
+          montoPagoParcial: dto.montoPagoParcial || 0,
+          numeroPagosParciales: dto.numeroPagosParciales || 1,
+          diaPago: dto.diaPago || 1,
           periodicidadPago: this.normalizePeriodicidadPago(dto.periodicidadPago),
           metodoPago: this.normalizeMetodoPago(dto.metodoPago),
           fechaFirma: formatDateForInput(dto.fechaFirma),
@@ -382,6 +415,14 @@ export class ContratoComponent {
         } else {
           this.contratoForm.get('communityId')?.enable();
         }
+        
+        // Deshabilitar fechaFirma y fechaInicio (solo lectura)
+        this.contratoForm.get('fechaFirma')?.disable();
+        this.contratoForm.get('fechaInicio')?.disable();
+        
+        // Habilitar fechaFin para que pueda ser modificada
+        this.contratoForm.get('fechaFin')?.enable();
+        
         this.openNewContratoModal();
         setTimeout(() => {
           this.editContratoIdSignal.set(null);
@@ -469,17 +510,91 @@ export class ContratoComponent {
     folioContrato: ['', [Validators.required, Validators.minLength(3)]],
     representanteComunidad: ['', Validators.required],
     costoTotal: [0, [Validators.required, Validators.min(0)]],
+    montoPagoParcial: [0, [Validators.required, Validators.min(0)]],
+    numeroPagosParciales: [1, [Validators.required, Validators.min(1)]],
+    diaPago: [1, [Validators.required, Validators.min(1), Validators.max(28)]],
     periodicidadPago: ['', Validators.required],
     metodoPago: ['', Validators.required],
     fechaFirma: ['', Validators.required],
     fechaInicio: ['', Validators.required],
-    fechaFin: [null as string | null],
+    fechaFin: [null as string | null, [this.fechaFinValidator.bind(this)]],
     numeroCasas: [0, [Validators.required, Validators.min(0)]],
     estadoContrato: ['', Validators.required],
     asesorVentas: [''],
     notas: [''],
     documentosAdjuntos: ['']
   });
+
+  /**
+   * Calcula automáticamente el monto parcial dividiendo el costo total entre el número de pagos parciales
+   * Solo se ejecuta cuando se está creando un nuevo contrato (no al editar)
+   */
+  calcularMontoParcial(): void {
+    // No calcular si se está editando un contrato existente
+    if (this.editingContratoId) {
+      return;
+    }
+    
+    const costoTotal = this.contratoForm.get('costoTotal')?.value || 0;
+    const numeroPagos = this.contratoForm.get('numeroPagosParciales')?.value || 1;
+    
+    if (costoTotal > 0 && numeroPagos > 0) {
+      const montoParcial = costoTotal / numeroPagos;
+      this.contratoForm.get('montoPagoParcial')?.setValue(Number(montoParcial.toFixed(2)), { emitEvent: false });
+    }
+  }
+
+  /**
+   * Validador personalizado para fechaFin: debe ser posterior a fechaInicio
+   */
+  fechaFinValidator(control: any): { [key: string]: any } | null {
+    if (!control.value) {
+      return null; // fechaFin es opcional
+    }
+
+    const fechaInicio = this.contratoForm?.get('fechaInicio')?.value;
+    if (!fechaInicio) {
+      return null; // Si no hay fechaInicio, no podemos validar
+    }
+
+    try {
+      const fechaInicioDate = new Date(fechaInicio);
+      const fechaFinDate = new Date(control.value);
+
+      if (fechaFinDate <= fechaInicioDate) {
+        return { fechaFinInvalida: true };
+      }
+    } catch {
+      return null; // Si hay error al parsear fechas, dejamos que otros validadores lo manejen
+    }
+
+    return null;
+  }
+
+  /**
+   * Obtiene la fecha del día 1 del mes actual en formato ISO
+   */
+  private getFirstDayOfCurrentMonth(): string {
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    return firstDay.toISOString().split('T')[0]; // Formato YYYY-MM-DD para input type="date"
+  }
+
+  /**
+   * Obtiene la fecha de 1 año después de la fecha de inicio
+   */
+  private getOneYearAfter(fechaInicio: string): string {
+    if (!fechaInicio) {
+      return '';
+    }
+    try {
+      const fecha = new Date(fechaInicio);
+      fecha.setFullYear(fecha.getFullYear() + 1);
+      return fecha.toISOString().split('T')[0]; // Formato YYYY-MM-DD para input type="date"
+    } catch {
+      return '';
+    }
+  }
 
   /**
    * Normaliza el valor de tipoContrato del backend al valor del enum
@@ -638,6 +753,148 @@ export class ContratoComponent {
   }
 
   /**
+   * Imprime la información del contrato
+   */
+  imprimirContrato(): void {
+    if (!this.selectedContrato) {
+      return;
+    }
+
+    const contenido = document.getElementById('contratoContent');
+    if (!contenido) {
+      this.notificationService.showError('No se pudo obtener el contenido para imprimir', 'Error');
+      return;
+    }
+
+    // Crear una ventana nueva para imprimir
+    const ventanaImpresion = window.open('', '_blank');
+    if (!ventanaImpresion) {
+      this.notificationService.showError('No se pudo abrir la ventana de impresión. Por favor, permite ventanas emergentes.', 'Error');
+      return;
+    }
+
+    // Obtener el HTML del contenido
+    const htmlContenido = contenido.innerHTML;
+    
+    // Crear el HTML completo para imprimir
+    const htmlCompleto = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Contrato ${this.selectedContrato.folioContrato}</title>
+          <style>
+            @media print {
+              @page {
+                margin: 1cm;
+              }
+              body {
+                font-family: Arial, sans-serif;
+                font-size: 12pt;
+                line-height: 1.6;
+                color: #000;
+              }
+              h3 {
+                font-size: 18pt;
+                margin-bottom: 10px;
+                color: #000;
+              }
+              h4 {
+                font-size: 14pt;
+                margin-top: 15px;
+                margin-bottom: 10px;
+                color: #000;
+              }
+              hr {
+                border: none;
+                border-top: 1px solid #000;
+                margin: 10px 0;
+              }
+              .grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                margin: 10px 0;
+              }
+              .grid-cols-3 {
+                grid-template-columns: repeat(3, 1fr);
+              }
+              strong {
+                font-weight: bold;
+              }
+              .py-2 {
+                padding: 8px 0;
+              }
+              .mt-2 {
+                margin-top: 8px;
+              }
+              .mb-2 {
+                margin-bottom: 8px;
+              }
+            }
+            body {
+              font-family: Arial, sans-serif;
+              font-size: 12pt;
+              line-height: 1.6;
+              padding: 20px;
+            }
+            h3 {
+              font-size: 18pt;
+              margin-bottom: 10px;
+            }
+            h4 {
+              font-size: 14pt;
+              margin-top: 15px;
+              margin-bottom: 10px;
+            }
+            hr {
+              border: none;
+              border-top: 1px solid #ccc;
+              margin: 10px 0;
+            }
+            .grid {
+              display: grid;
+              grid-template-columns: repeat(2, 1fr);
+              gap: 10px;
+              margin: 10px 0;
+            }
+            .grid-cols-3 {
+              grid-template-columns: repeat(3, 1fr);
+            }
+            strong {
+              font-weight: bold;
+            }
+            .py-2 {
+              padding: 8px 0;
+            }
+            .mt-2 {
+              margin-top: 8px;
+            }
+            .mb-2 {
+              margin-bottom: 8px;
+            }
+          </style>
+        </head>
+        <body>
+          <h3>Contrato: ${this.selectedContrato.folioContrato}</h3>
+          <hr />
+          ${htmlContenido}
+        </body>
+      </html>
+    `;
+
+    ventanaImpresion.document.write(htmlCompleto);
+    ventanaImpresion.document.close();
+    
+    // Esperar a que se cargue el contenido y luego imprimir
+    ventanaImpresion.onload = () => {
+      setTimeout(() => {
+        ventanaImpresion.print();
+        ventanaImpresion.close();
+      }, 250);
+    };
+  }
+
+  /**
    * Abre el modal de registro de contrato
    */
   openNewContratoModal(): void {
@@ -657,29 +914,51 @@ export class ContratoComponent {
     this.editingContratoId = null;
     // Si hay un comunidadId en la ruta, pre-llenar el campo
     const defaultCommunityId = this.comunidadId() || '';
+    const fechaPrimerDia = this.getFirstDayOfCurrentMonth();
+    const fechaUnAnoDespues = this.getOneYearAfter(fechaPrimerDia);
+    
     this.contratoForm.reset({
       communityId: defaultCommunityId,
       tipoContrato: '',
       folioContrato: '',
       representanteComunidad: '',
       costoTotal: 0,
+      montoPagoParcial: 0,
+      numeroPagosParciales: 1,
+      diaPago: 1,
       periodicidadPago: '',
       metodoPago: '',
-      fechaFirma: '',
-      fechaInicio: '',
-      fechaFin: null,
+      fechaFirma: fechaPrimerDia,
+      fechaInicio: fechaPrimerDia,
+      fechaFin: fechaUnAnoDespues,
       numeroCasas: 0,
-      estadoContrato: '',
+      estadoContrato: estadoContratoEnum.ACTIVO, // Estado por defecto: activo
       asesorVentas: '',
       notas: '',
       documentosAdjuntos: ''
     });
-    // Si hay un comunidadId, deshabilitar el selector de comunidad
+    
+    // Si hay un comunidadId, deshabilitar el selector de comunidad y cargar número de casas
     if (this.comunidadId()) {
       this.contratoForm.get('communityId')?.disable();
+      // Cargar número de casas de la comunidad
+      this.communitiesService.getCommunityById(this.comunidadId()!).subscribe({
+        next: (comunidad) => {
+          this.contratoForm.get('numeroCasas')?.setValue(comunidad.cantidadViviendas || 0, { emitEvent: false });
+        },
+        error: (error) => {
+          this.logger.error('Error loading community data', error, 'ContratoComponent');
+        }
+      });
     } else {
       this.contratoForm.get('communityId')?.enable();
     }
+    
+    // Habilitar todas las fechas para que puedan ser modificadas al crear
+    this.contratoForm.get('fechaFirma')?.enable();
+    this.contratoForm.get('fechaInicio')?.enable();
+    this.contratoForm.get('fechaFin')?.enable();
+    
     this.openNewContratoModal();
   }
 
@@ -699,6 +978,9 @@ export class ContratoComponent {
       folioContrato: '',
       representanteComunidad: '',
       costoTotal: 0,
+      montoPagoParcial: 0,
+      numeroPagosParciales: 1,
+      diaPago: 1,
       periodicidadPago: '',
       metodoPago: '',
       fechaFirma: '',
@@ -710,6 +992,11 @@ export class ContratoComponent {
       notas: '',
       documentosAdjuntos: ''
     });
+    
+    // Habilitar todos los campos al cerrar
+    this.contratoForm.get('fechaFirma')?.enable();
+    this.contratoForm.get('fechaInicio')?.enable();
+    this.contratoForm.get('fechaFin')?.enable();
   }
 
   /**
@@ -776,6 +1063,9 @@ export class ContratoComponent {
       folioContrato: formValue.folioContrato || '',
       representanteComunidad: formValue.representanteComunidad || '',
       costoTotal: formValue.costoTotal || 0,
+      montoPagoParcial: formValue.montoPagoParcial || 0,
+      numeroPagosParciales: formValue.numeroPagosParciales || 1,
+      diaPago: formValue.diaPago || 1,
       periodicidadPago: formValue.periodicidadPago || '',
       metodoPago: formValue.metodoPago || '',
       fechaFirma: formatDateToISO(formValue.fechaFirma),

@@ -85,6 +85,9 @@ public class ContratoService : IContratoService
             FolioContrato = createContratoDto.FolioContrato,
             RepresentanteComunidad = createContratoDto.RepresentanteComunidad,
             CostoTotal = createContratoDto.CostoTotal,
+            MontoPagoParcial = createContratoDto.MontoPagoParcial,
+            NumeroPagosParciales = createContratoDto.NumeroPagosParciales,
+            DiaPago = createContratoDto.DiaPago,
             PeriodicidadPago = createContratoDto.PeriodicidadPago,
             MetodoPago = createContratoDto.MetodoPago,
             FechaFirma = createContratoDto.FechaFirma,
@@ -117,6 +120,9 @@ public class ContratoService : IContratoService
         contrato.FolioContrato = updateContratoDto.FolioContrato;
         contrato.RepresentanteComunidad = updateContratoDto.RepresentanteComunidad;
         contrato.CostoTotal = updateContratoDto.CostoTotal;
+        contrato.MontoPagoParcial = updateContratoDto.MontoPagoParcial;
+        contrato.NumeroPagosParciales = updateContratoDto.NumeroPagosParciales;
+        contrato.DiaPago = updateContratoDto.DiaPago;
         contrato.PeriodicidadPago = updateContratoDto.PeriodicidadPago;
         contrato.MetodoPago = updateContratoDto.MetodoPago;
         contrato.FechaFirma = updateContratoDto.FechaFirma;
@@ -171,6 +177,9 @@ public class ContratoService : IContratoService
             FolioContrato = contrato.FolioContrato,
             RepresentanteComunidad = contrato.RepresentanteComunidad,
             CostoTotal = contrato.CostoTotal,
+            MontoPagoParcial = contrato.MontoPagoParcial,
+            NumeroPagosParciales = contrato.NumeroPagosParciales,
+            DiaPago = contrato.DiaPago,
             PeriodicidadPago = contrato.PeriodicidadPago,
             MetodoPago = contrato.MetodoPago,
             FechaFirma = contrato.FechaFirma,

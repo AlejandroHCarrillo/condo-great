@@ -8,6 +8,9 @@ public class ContratoDto
     public string FolioContrato { get; set; } = string.Empty;
     public string RepresentanteComunidad { get; set; } = string.Empty;
     public decimal CostoTotal { get; set; }
+    public decimal MontoPagoParcial { get; set; } // Monto que se debe pagar cada periodo
+    public int NumeroPagosParciales { get; set; } // Número de pagos parciales
+    public int DiaPago { get; set; } // Día del mes (1-28) en que se debe cubrir el pago
     public string PeriodicidadPago { get; set; } = string.Empty; // mensual, trimestral, anual
     public string MetodoPago { get; set; } = string.Empty; // transferencia, tarjeta, efectivo, etc.
     public string FechaFirma { get; set; } = string.Empty; // ISO date string
@@ -31,6 +34,9 @@ public class CreateContratoDto
     public string FolioContrato { get; set; } = string.Empty;
     public string RepresentanteComunidad { get; set; } = string.Empty;
     public decimal CostoTotal { get; set; }
+    public decimal MontoPagoParcial { get; set; } // Monto que se debe pagar cada periodo
+    public int NumeroPagosParciales { get; set; } // Número de pagos parciales
+    public int DiaPago { get; set; } // Día del mes (1-28) en que se debe cubrir el pago
     public string PeriodicidadPago { get; set; } = string.Empty; // mensual, trimestral, anual
     public string MetodoPago { get; set; } = string.Empty; // transferencia, tarjeta, efectivo, etc.
     public string FechaFirma { get; set; } = string.Empty; // ISO date string
@@ -49,6 +55,9 @@ public class UpdateContratoDto
     public string FolioContrato { get; set; } = string.Empty;
     public string RepresentanteComunidad { get; set; } = string.Empty;
     public decimal CostoTotal { get; set; }
+    public decimal MontoPagoParcial { get; set; } // Monto que se debe pagar cada periodo
+    public int NumeroPagosParciales { get; set; } // Número de pagos parciales
+    public int DiaPago { get; set; } // Día del mes (1-28) en que se debe cubrir el pago
     public string PeriodicidadPago { get; set; } = string.Empty; // mensual, trimestral, anual
     public string MetodoPago { get; set; } = string.Empty; // transferencia, tarjeta, efectivo, etc.
     public string FechaFirma { get; set; } = string.Empty; // ISO date string

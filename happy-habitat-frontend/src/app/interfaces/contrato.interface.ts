@@ -5,6 +5,9 @@ export interface Contrato {
   folioContrato: string;
   representanteComunidad: string;
   costoTotal: number;
+  montoPagoParcial: number;
+  numeroPagosParciales: number;
+  diaPago: number;
   periodicidadPago: string;
   metodoPago: string;
   fechaFirma: string;

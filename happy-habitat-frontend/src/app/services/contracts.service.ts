@@ -12,6 +12,9 @@ export interface ContratoDto {
   folioContrato: string; // Mapeado desde FolioContrato del backend
   representanteComunidad: string; // Mapeado desde RepresentanteComunidad del backend
   costoTotal: number; // Mapeado desde CostoTotal del backend
+  montoPagoParcial: number; // Mapeado desde MontoPagoParcial del backend
+  numeroPagosParciales: number; // Mapeado desde NumeroPagosParciales del backend
+  diaPago: number; // Mapeado desde DiaPago del backend
   periodicidadPago: string; // Mapeado desde PeriodicidadPago del backend
   metodoPago: string; // Mapeado desde MetodoPago del backend
   fechaFirma: string; // Mapeado desde FechaFirma del backend
@@ -34,6 +37,9 @@ export interface CreateContratoRequest {
   folioContrato: string;
   representanteComunidad: string;
   costoTotal: number;
+  montoPagoParcial: number;
+  numeroPagosParciales: number;
+  diaPago: number;
   periodicidadPago: string;
   metodoPago: string;
   fechaFirma: string;
@@ -51,6 +57,9 @@ export interface UpdateContratoRequest {
   folioContrato: string;
   representanteComunidad: string;
   costoTotal: number;
+  montoPagoParcial: number;
+  numeroPagosParciales: number;
+  diaPago: number;
   periodicidadPago: string;
   metodoPago: string;
   fechaFirma: string;

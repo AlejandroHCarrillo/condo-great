@@ -324,6 +324,13 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.CostoTotal)
                 .IsRequired()
                 .HasColumnType("decimal(18,2)");
+            entity.Property(e => e.MontoPagoParcial)
+                .IsRequired()
+                .HasColumnType("decimal(18,2)");
+            entity.Property(e => e.NumeroPagosParciales)
+                .IsRequired();
+            entity.Property(e => e.DiaPago)
+                .IsRequired();
             entity.Property(e => e.PeriodicidadPago)
                 .IsRequired()
                 .HasMaxLength(50); // mensual, trimestral, anual
