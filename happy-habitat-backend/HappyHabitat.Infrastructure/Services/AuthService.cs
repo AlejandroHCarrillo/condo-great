@@ -23,8 +23,12 @@ public class AuthService : IAuthService
     {
         var user = await _context.Users
             .Include(u => u.Role)
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
             .Include(u => u.Resident)
                 .ThenInclude(r => r.Community)
+            .Include(u => u.UserCommunities)
+                .ThenInclude(uc => uc.Community)
             .FirstOrDefaultAsync(u => u.Username == loginDto.Username && u.IsActive);
 
         // Debug logging (remove in production)
@@ -44,7 +48,17 @@ public class AuthService : IAuthService
         if (!_passwordHasher.VerifyPassword(user.Password, loginDto.Password))
             return null;
 
-        var token = _jwtService.GenerateToken(user, user.Role);
+        // Get roles from UserRoles, fallback to Role for backward compatibility
+        var roles = user.UserRoles.Any() 
+            ? user.UserRoles.Select(ur => ur.Role).ToList()
+            : (user.Role != null ? new List<Role> { user.Role } : new List<Role>());
+
+        if (!roles.Any())
+            throw new InvalidOperationException("User has no roles assigned");
+
+        // Use first role for JWT token (backward compatibility)
+        var primaryRole = roles.First();
+        var token = _jwtService.GenerateToken(user, primaryRole);
         var expiresAt = DateTime.UtcNow.AddMinutes(60);
 
         var response = new LoginResponseDto
@@ -53,18 +67,64 @@ public class AuthService : IAuthService
             UserId = user.Id.ToString(),
             Username = user.Username,
             Email = user.Email,
-            Role = user.Role.Code,
+            Role = primaryRole.Code, // Backward compatibility
+            Roles = roles.Select(r => r.Code).ToList(),
+            RoleDetails = roles.Select(r => new RoleDto
+            {
+                Id = r.Id,
+                Code = r.Code,
+                Description = r.Description
+            }).ToList(),
             ExpiresAt = expiresAt.ToString("O")
         };
 
         // Add resident info if exists
         if (user.Resident != null)
         {
-            // Load community if resident has one
+            // Load communities from UserCommunities
+            var comunidadesList = new List<string>();
             CommunityDto? communityDto = null;
-            string[]? comunidades = null;
             
-            if (user.Resident.CommunityId.HasValue)
+            // Get communities from UserCommunities
+            var comunidadesCompletasList = new List<CommunityDto>();
+            if (user.UserCommunities.Any())
+            {
+                foreach (var uc in user.UserCommunities)
+                {
+                    comunidadesList.Add(uc.CommunityId.ToString());
+                    // Add full community information
+                    if (uc.Community != null)
+                    {
+                        comunidadesCompletasList.Add(new CommunityDto
+                        {
+                            Id = uc.Community.Id.ToString(),
+                            Nombre = uc.Community.Nombre,
+                            Descripcion = uc.Community.Descripcion,
+                            Direccion = uc.Community.Direccion,
+                            Contacto = uc.Community.Contacto,
+                            Email = uc.Community.Email,
+                            Phone = uc.Community.Phone
+                        });
+                    }
+                }
+                // Use first community for backward compatibility
+                var firstCommunity = user.UserCommunities.First().Community;
+                if (firstCommunity != null)
+                {
+                    communityDto = new CommunityDto
+                    {
+                        Id = firstCommunity.Id.ToString(),
+                        Nombre = firstCommunity.Nombre,
+                        Descripcion = firstCommunity.Descripcion,
+                        Direccion = firstCommunity.Direccion,
+                        Contacto = firstCommunity.Contacto,
+                        Email = firstCommunity.Email,
+                        Phone = firstCommunity.Phone
+                    };
+                }
+            }
+            // Fallback to Resident.CommunityId for backward compatibility
+            else if (user.Resident.CommunityId.HasValue)
             {
                 var community = await _context.Communities.FindAsync(user.Resident.CommunityId.Value);
                 if (community != null)
@@ -79,9 +139,13 @@ public class AuthService : IAuthService
                         Email = community.Email,
                         Phone = community.Phone
                     };
-                    comunidades = new[] { community.Id.ToString() };
+                    comunidadesList.Add(community.Id.ToString());
+                    comunidadesCompletasList.Add(communityDto);
                 }
             }
+            
+            string[]? comunidades = comunidadesList.Any() ? comunidadesList.ToArray() : null;
+            List<CommunityDto>? comunidadesCompletas = comunidadesCompletasList.Any() ? comunidadesCompletasList : null;
 
             response.ResidentInfo = new LoginResidentInfoDto
             {
@@ -91,8 +155,55 @@ public class AuthService : IAuthService
                 Phone = user.Resident.Phone,
                 Number = user.Resident.Number,
                 Address = user.Resident.Address,
-                Comunidades = comunidades,
-                Comunidad = communityDto
+                Comunidades = comunidades, // Backward compatibility
+                Comunidad = communityDto, // Backward compatibility
+                ComunidadesCompletas = comunidadesCompletas // All communities with full information
+            };
+        }
+        // Handle users with communities but no resident info (e.g., ADMIN_COMPANY)
+        else if (user.UserCommunities.Any())
+        {
+            var comunidadesList = new List<string>();
+            var comunidadesCompletasList = new List<CommunityDto>();
+            CommunityDto? communityDto = null;
+
+            foreach (var uc in user.UserCommunities)
+            {
+                comunidadesList.Add(uc.CommunityId.ToString());
+                // Add full community information
+                if (uc.Community != null)
+                {
+                    var communityInfo = new CommunityDto
+                    {
+                        Id = uc.Community.Id.ToString(),
+                        Nombre = uc.Community.Nombre,
+                        Descripcion = uc.Community.Descripcion,
+                        Direccion = uc.Community.Direccion,
+                        Contacto = uc.Community.Contacto,
+                        Email = uc.Community.Email,
+                        Phone = uc.Community.Phone
+                    };
+                    comunidadesCompletasList.Add(communityInfo);
+                    
+                    // Use first community for backward compatibility
+                    if (communityDto == null)
+                    {
+                        communityDto = communityInfo;
+                    }
+                }
+            }
+
+            string[]? comunidades = comunidadesList.Any() ? comunidadesList.ToArray() : null;
+            List<CommunityDto>? comunidadesCompletas = comunidadesCompletasList.Any() ? comunidadesCompletasList : null;
+
+            response.ResidentInfo = new LoginResidentInfoDto
+            {
+                Fullname = $"{user.FirstName} {user.LastName}".Trim(),
+                Email = user.Email,
+                Address = string.Empty,
+                Comunidades = comunidades, // Backward compatibility
+                Comunidad = communityDto, // Backward compatibility
+                ComunidadesCompletas = comunidadesCompletas // All communities with full information
             };
         }
 

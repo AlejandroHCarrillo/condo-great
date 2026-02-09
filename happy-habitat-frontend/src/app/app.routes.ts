@@ -1,17 +1,12 @@
-import { ProveedoresListComponent } from './components/proveedores-residentes/components/proveedores-list/proveedores-list.component';
 import { Routes } from '@angular/router';
-import { HomePageComponent } from './pages/home-page/home-page.component';
-import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.component';
 import { NotFoundPageComponent } from './pages/not-found-page/not-found-page.component';
-import { ProveedoresServiciosComponent } from './components/proveedores-residentes/components/proveedores-servicios.component';
-import { AvisosListComponent } from './components/avisos/avisos-list/avisos-list.component';
-import { ComunicadosListComponent } from './components/comunicados/comunicados-list.component';
-import { PostsListComponent } from './shared/post/posts-list.component';
-import { DocumentsPageComponent } from './pages/documents-page/documents-page.component';
-import { ComunicadosPostsComponent } from './components/comunicados/comunicados-posts.component';
 import { authGuard } from './guards/auth.guard';
 import { roleGuard } from './guards/role.guard';
 import { RolesEnum } from './enums/roles.enum';
+import { ComunicadosListComponent } from './components/comunicados/comunicados-list.component';
+import { ProveedoresServiciosComponent } from './components/proveedores-residentes/components/proveedores-servicios.component';
+import { PostsListComponent } from './shared/post/posts-list.component';
+import { DocumentsPageComponent } from './pages/documents-page/documents-page.component';
 
 export const routes: Routes = [
     // Rutas públicas de autenticación con layout propio (sin header/menu/footer)
@@ -26,15 +21,15 @@ export const routes: Routes = [
         redirectTo: '/home',
         pathMatch: 'full'
     },
-    // Rutas protegidas
+    // Rutas protegidas con lazy loading
     {
         path: 'home',
-        component: HomePageComponent,
+        loadComponent: () => import('./pages/home-page/home-page.component').then(m => m.HomePageComponent),
         canActivate: [authGuard]
     },
     {
         path: 'dashboard',
-        component: DashboardPageComponent,
+        loadComponent: () => import('./pages/dashboard-page/dashboard-page.component').then(m => m.DashboardPageComponent),
         canActivate: [authGuard]
     },
     {

@@ -137,7 +137,7 @@ export class UserListComponent {
    * Determina qué roles de usuarios puede ver el rol actual
    */
   private getVisibleRolesForCurrentUser(): RolesEnum[] {
-    const currentRole = this.currentUser()?.role;
+    const currentRole = this.currentUser()?.selectedRole;
     
     if (!currentRole) {
       return []; // Si no hay usuario conectado, no mostrar nada
@@ -162,7 +162,7 @@ export class UserListComponent {
    * Determina qué roles puede crear el rol actual
    */
   getCreatableRoles(): RolesEnum[] {
-    const currentRole = this.currentUser()?.role;
+    const currentRole = this.currentUser()?.selectedRole;
     
     if (!currentRole) {
       return [];
@@ -195,7 +195,7 @@ export class UserListComponent {
    * Solo SYSTEM_ADMIN y ADMIN_COMPANY pueden verlo
    */
   canViewInactiveUsersSwitch(): boolean {
-    const currentRole = this.currentUser()?.role;
+    const currentRole = this.currentUser()?.selectedRole;
     console.log('canViewInactiveUsersSwitch - currentRole:', currentRole);
     return currentRole === RolesEnum.SYSTEM_ADMIN || currentRole === RolesEnum.ADMIN_COMPANY;
   }

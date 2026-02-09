@@ -4,8 +4,12 @@ namespace HappyHabitat.Application.DTOs;
 
 public class UpdateUserDto
 {
-    [Required]
-    public Guid RoleId { get; set; }
+    // Backward compatibility - if provided, will be added to RoleIds
+    public Guid? RoleId { get; set; }
+    
+    // Multiple roles support - at least one role is required
+    [Required(ErrorMessage = "At least one role is required")]
+    public List<Guid> RoleIds { get; set; } = new List<Guid>();
 
     [Required]
     public string FirstName { get; set; } = string.Empty;

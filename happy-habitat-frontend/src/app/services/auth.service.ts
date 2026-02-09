@@ -39,6 +39,9 @@ export class AuthService {
   isAuthenticated = signal<boolean>(false);
   currentUser = signal<UserInfo | null>(null);
   isLoading = signal<boolean>(false);
+  
+  // Signal para almacenar la respuesta de login con múltiples roles (antes de seleccionar rol)
+  pendingLoginResponse = signal<{ loginResponse: LoginResponse; authResponse: AuthResponse } | null>(null);
 
   constructor() {
     // Verificar si hay sesión guardada al inicializar
@@ -64,11 +67,36 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.API_URL}/login`, credentials).pipe(
       // Transformar LoginResponse a AuthResponse
       switchMap((loginResponse) => {
-        const authResponse = mapLoginResponseToAuthResponse(loginResponse);
+        // Debug: ver qué está recibiendo del backend
+        console.log('LoginResponse recibido:', {
+          roles: loginResponse.roles,
+          rolesLength: loginResponse.roles?.length,
+          roleDetails: loginResponse.roleDetails,
+          role: loginResponse.role
+        });
         
-        // Intentar obtener información completa del usuario
-        // Nota: Por ahora usamos la información básica del LoginResponse
-        // En el futuro podríamos hacer una llamada adicional a /api/users/{id}
+        // Verificar si el usuario tiene múltiples roles
+        const hasMultipleRoles = loginResponse.roles && loginResponse.roles.length > 1;
+        console.log('hasMultipleRoles: ', hasMultipleRoles);
+        
+        if (hasMultipleRoles) {
+          // Si tiene múltiples roles, guardar la respuesta y no completar el login aún
+          const authResponse = mapLoginResponseToAuthResponse(loginResponse);
+          this.pendingLoginResponse.set({ loginResponse, authResponse });
+          this.isLoading.set(false);
+          
+          // Devolver un error especial que el componente puede detectar
+          // Usamos un error con código especial para indicar que se necesita selección de rol
+          return throwError(() => ({ 
+            needsRoleSelection: true, 
+            roles: loginResponse.roles || [],
+            roleDetails: loginResponse.roleDetails || [],
+            loginResponse 
+          }));
+        }
+        
+        // Si solo tiene un rol, proceder normalmente
+        const authResponse = mapLoginResponseToAuthResponse(loginResponse);
         return of(authResponse);
       }),
       tap((response) => {
@@ -81,10 +109,15 @@ export class AuthService {
 
         this.logger.info('Login successful', 'AuthService', { 
           username: response.user.username,
-          role: response.user.role 
+          role: response.user.selectedRole 
         });
       }),
       catchError((error) => {
+        // Si es el error especial de selección de rol, no tratarlo como error real
+        if (error?.needsRoleSelection) {
+          return throwError(() => error);
+        }
+        
         this.isLoading.set(false);
         // El error interceptor ya manejará el error y mostrará la notificación
         // Solo loggeamos aquí para contexto adicional
@@ -136,6 +169,11 @@ export class AuthService {
     };
     
     // Crear usuario mock basado en el username
+    // Para elgrandeahc, simular múltiples roles (SYSTEM_ADMIN y ADMIN_COMPANY)
+    const userRoles: RolesEnum[] = username.toLowerCase() === 'elgrandeahc' 
+      ? [RolesEnum.SYSTEM_ADMIN, RolesEnum.ADMIN_COMPANY]
+      : [role];
+    
     const mockUser: UserInfo = {
       id: `mock-user-${Date.now()}`,
       fullname: isAdmin 
@@ -143,7 +181,8 @@ export class AuthService {
         : `${username.charAt(0).toUpperCase() + username.slice(1)} Usuario`,
       username: username,
       email: `${username}@happyhabitat.com`,
-      role: role,
+      selectedRole: role, // Rol principal/seleccionado
+      userRoles: userRoles, // Todos los roles
       residentInfo: {
         id: `mock-resident-${Date.now()}`,
         fullname: isAdmin 
@@ -242,7 +281,8 @@ export class AuthService {
       fullname: `${data.firstName} ${data.lastName}`.trim(),
       username: data.username,
       email: data.email,
-      role: RolesEnum.RESIDENT,
+      selectedRole: RolesEnum.RESIDENT, // Rol principal/seleccionado
+      userRoles: [RolesEnum.RESIDENT], // Todos los roles
       residentInfo: {
         id: `mock-resident-${Date.now()}`,
         fullname: `${data.firstName} ${data.lastName}`.trim(),
@@ -262,6 +302,68 @@ export class AuthService {
   }
 
   /**
+   * Completa el login con un rol seleccionado (cuando el usuario tiene múltiples roles)
+   */
+  completeLoginWithRole(selectedRoleCode: string): Observable<AuthResponse> {
+    const pending = this.pendingLoginResponse();
+    if (!pending) {
+      return throwError(() => new Error('No hay una sesión pendiente de login'));
+    }
+
+    const { loginResponse, authResponse } = pending;
+    
+    // Actualizar el rol en la respuesta usando el rol seleccionado
+    const updatedAuthResponse = this.updateAuthResponseWithSelectedRole(authResponse, selectedRoleCode);
+    
+    // Completar el login
+    this.handleAuthSuccess(updatedAuthResponse);
+    this.currentUser.set(updatedAuthResponse.user);
+    this.pendingLoginResponse.set(null);
+    
+    this.logger.info('Login completed with selected role', 'AuthService', { 
+      username: updatedAuthResponse.user.username,
+      role: selectedRoleCode 
+    });
+    
+    return of(updatedAuthResponse);
+  }
+
+  /**
+   * Actualiza AuthResponse con el rol seleccionado
+   */
+  private updateAuthResponseWithSelectedRole(authResponse: AuthResponse, selectedRoleCode: string): AuthResponse {
+    // Mantener todos los roles originales
+    const allRoles = authResponse.user.userRoles || [authResponse.user.selectedRole];
+    
+    const updatedUser: UserInfo = {
+      ...authResponse.user,
+      selectedRole: this.mapRoleCodeToEnum(selectedRoleCode), // Rol seleccionado
+      userRoles: allRoles // Mantener todos los roles
+    };
+    
+    return {
+      ...authResponse,
+      user: updatedUser
+    };
+  }
+
+  /**
+   * Mapea el código de rol del backend al enum del frontend
+   */
+  private mapRoleCodeToEnum(roleCode: string): RolesEnum {
+    const roleMap: Record<string, RolesEnum> = {
+      'SYSTEM_ADMIN': RolesEnum.SYSTEM_ADMIN,
+      'ADMIN_COMPANY': RolesEnum.ADMIN_COMPANY,
+      'COMITEE_MEMBER': RolesEnum.COMITEE_MEMBER,
+      'RESIDENT': RolesEnum.RESIDENT,
+      'RENTER': RolesEnum.TENANT,
+      'VIGILANCE': RolesEnum.VIGILANCE
+    };
+    
+    return roleMap[roleCode] || RolesEnum.RESIDENT;
+  }
+
+  /**
    * Cierra sesión
    */
   logout(): void {
@@ -271,6 +373,7 @@ export class AuthService {
     this.sessionService.clearSession();
     this.isAuthenticated.set(false);
     this.currentUser.set(null);
+    this.pendingLoginResponse.set(null);
     // Limpiar usuario en UsersService
     this.usersService.clearCurrentUser();
     this.router.navigate(['/auth/login']);
@@ -357,7 +460,7 @@ export class AuthService {
    */
   hasRole(role: string): boolean {
     const user = this.currentUser();
-    return user?.role === role;
+    return user?.selectedRole === role;
   }
 
   /**
@@ -365,7 +468,7 @@ export class AuthService {
    */
   hasAnyRole(roles: string[]): boolean {
     const user = this.currentUser();
-    return user ? roles.includes(user.role) : false;
+    return user ? roles.includes(user.selectedRole) : false;
   }
 
   /**

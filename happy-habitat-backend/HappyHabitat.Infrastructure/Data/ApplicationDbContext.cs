@@ -12,6 +12,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Role> Roles { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<Resident> Residents { get; set; }
     public DbSet<VehicleType> VehicleTypes { get; set; }
     public DbSet<Vehicle> Vehicles { get; set; }
@@ -67,11 +68,36 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true);
 
-            // Configure relationship with Role
+            // Configure relationship with Role (backward compatibility - optional)
             entity.HasOne(e => e.Role)
                 .WithMany(r => r.Users)
                 .HasForeignKey(e => e.RoleId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired(false);
+        });
+
+        // Configure UserRole entity (many-to-many relationship)
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+
+            // Configure relationship with User
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.UserRoles)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure relationship with Role
+            entity.HasOne(e => e.Role)
+                .WithMany(r => r.UserRoles)
+                .HasForeignKey(e => e.RoleId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Create unique index to prevent duplicate role assignments
+            entity.HasIndex(e => new { e.UserId, e.RoleId })
+                .IsUnique();
         });
 
         // Configure Resident entity

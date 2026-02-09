@@ -503,10 +503,161 @@ public class DummySeeder : IDataSeeder
             await _context.SaveChangesAsync();
         }
 
-        // Create resident for elgrandeahc user with vehicles, pets, and visits
+        // Add ADMIN_COMPANY role to elgrandeahc user and associate with 3 communities
         var elgrandeahcUserId = new Guid("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA");
-        var elgrandeahcUser = await _context.Users.FindAsync(elgrandeahcUserId);
+        var elgrandeahcUser = await _context.Users
+            .Include(u => u.UserRoles)
+            .Include(u => u.UserCommunities)
+            .FirstOrDefaultAsync(u => u.Id == elgrandeahcUserId || u.Username == "elgrandeahc");
 
+        if (elgrandeahcUser != null)
+        {
+            // Get SYSTEM_ADMIN role ID
+            var systemAdminRoleId = new Guid("11111111-1111-1111-1111-111111111111");
+            
+            // Add SYSTEM_ADMIN role to UserRoles if not already assigned
+            var hasSystemAdminRole = await _context.UserRoles
+                .AnyAsync(ur => ur.UserId == elgrandeahcUserId && ur.RoleId == systemAdminRoleId);
+
+            if (!hasSystemAdminRole)
+            {
+                var systemAdminUserRole = new UserRole
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = elgrandeahcUserId,
+                    RoleId = systemAdminRoleId,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                };
+                await _context.UserRoles.AddAsync(systemAdminUserRole);
+                await _context.SaveChangesAsync();
+            }
+
+            // Add ADMIN_COMPANY role if not already assigned
+            var hasAdminCompanyRole = await _context.UserRoles
+                .AnyAsync(ur => ur.UserId == elgrandeahcUserId && ur.RoleId == adminCompanyRoleId);
+
+            if (!hasAdminCompanyRole)
+            {
+                var adminCompanyUserRole = new UserRole
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = elgrandeahcUserId,
+                    RoleId = adminCompanyRoleId,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                };
+                await _context.UserRoles.AddAsync(adminCompanyUserRole);
+                await _context.SaveChangesAsync();
+            }
+
+            // Associate with 3 communities (selecting first 3 communities that exist)
+            var communitiesToAssociate = new[]
+            {
+                new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87"), // Residencial El Pueblito
+                new Guid("ff7bc6fb-0f13-4e37-beb4-7d428520c227"), // Colonia Las Palmas
+                new Guid("c4a28c40-a2c7-4190-961c-f3f52ad19c1d")  // Coto San Miguel
+            };
+
+            foreach (var communityId in communitiesToAssociate)
+            {
+                var communityExists = await _context.Communities.AnyAsync(c => c.Id == communityId);
+                if (!communityExists) continue;
+
+                var existingUserCommunity = await _context.UserCommunities
+                    .AnyAsync(uc => uc.UserId == elgrandeahcUserId && uc.CommunityId == communityId);
+
+                if (!existingUserCommunity)
+                {
+                    var userCommunity = new UserCommunity
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = elgrandeahcUserId,
+                        CommunityId = communityId,
+                        CreatedAt = DateTime.UtcNow.ToString("O")
+                    };
+                    await _context.UserCommunities.AddAsync(userCommunity);
+                }
+            }
+            await _context.SaveChangesAsync();
+
+            // Ensure these 3 communities have residents
+            foreach (var communityId in communitiesToAssociate)
+            {
+                var community = await _context.Communities.FindAsync(communityId);
+                if (community == null) continue;
+
+                // Check if community has residents
+                var hasResidents = await _context.Residents
+                    .AnyAsync(r => r.CommunityId == communityId);
+
+                if (!hasResidents)
+                {
+                    // Create a resident user for each community
+                    var localResidentRoleId = new Guid("44444444-4444-4444-4444-444444444444");
+                    
+                    // Sanitize community name for username and email
+                    var sanitizedName = community.Nombre
+                        .Replace(" ", "_")
+                        .Replace("-", "_")
+                        .Replace(".", "")
+                        .Replace(",", "")
+                        .ToLower();
+                    var username = $"residente_{sanitizedName.Substring(0, Math.Min(15, sanitizedName.Length))}";
+                    var emailName = community.Nombre
+                        .Replace(" ", ".")
+                        .Replace("-", ".")
+                        .Replace(",", "")
+                        .ToLower();
+                    var email = $"residente.{emailName.Substring(0, Math.Min(25, emailName.Length))}@example.com";
+                    var lastName = community.Nombre
+                        .Replace(" ", "")
+                        .Replace("-", "")
+                        .Substring(0, Math.Min(20, community.Nombre.Length));
+                    
+                    var residentUser = new User
+                    {
+                        Id = Guid.NewGuid(),
+                        RoleId = localResidentRoleId,
+                        FirstName = "Residente",
+                        LastName = lastName,
+                        Username = username,
+                        Email = email,
+                        Password = _passwordHasher.HashPassword("password123"),
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow.ToString("O")
+                    };
+                    await _context.Users.AddAsync(residentUser);
+                    await _context.SaveChangesAsync();
+
+                    // Add UserRole for the resident
+                    var residentUserRole = new UserRole
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = residentUser.Id,
+                        RoleId = localResidentRoleId,
+                        CreatedAt = DateTime.UtcNow.ToString("O")
+                    };
+                    await _context.UserRoles.AddAsync(residentUserRole);
+
+                    // Create resident
+                    var resident = new Resident
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = residentUser.Id,
+                        CommunityId = communityId,
+                        FullName = $"{residentUser.FirstName} {residentUser.LastName}",
+                        Email = residentUser.Email,
+                        Phone = "4421234567",
+                        Number = "A-101",
+                        Address = community.Direccion,
+                        CreatedAt = DateTime.UtcNow.ToString("O")
+                    };
+                    await _context.Residents.AddAsync(resident);
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
+
+        // Create resident for elgrandeahc user with vehicles, pets, and visits
         if (elgrandeahcUser != null)
         {
             // Check if resident already exists for this user

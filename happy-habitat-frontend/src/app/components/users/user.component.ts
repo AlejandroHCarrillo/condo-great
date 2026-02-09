@@ -38,7 +38,7 @@ export class UserComponent implements OnInit {
 
   // Roles disponibles filtrados según el usuario actual
   availableRoles = computed(() => {
-    const currentRole = this.currentUser()?.role;
+    const currentRole = this.currentUser()?.selectedRole;
     
     if (!currentRole) {
       return [];
@@ -93,7 +93,7 @@ export class UserComponent implements OnInit {
 
   // Verificar si el usuario actual es ADMIN_COMPANY
   isAdminCompany = computed(() => {
-    return this.currentUser()?.role === RolesEnum.ADMIN_COMPANY;
+    return this.currentUser()?.selectedRole === RolesEnum.ADMIN_COMPANY;
   });
 
   // ID del usuario a editar (si existe en la ruta)

@@ -71,6 +71,42 @@ export function mapLoginResponseToAuthResponse(loginResponse: LoginResponse): Au
     };
   }
 
+  // Mapear todos los roles si están disponibles
+  const allRoles: RolesEnum[] = [];
+  if (loginResponse.roles && loginResponse.roles.length > 0) {
+    allRoles.push(...loginResponse.roles.map(roleCode => mapRoleToEnum(roleCode)));
+  } else if (loginResponse.role) {
+    // Si no hay array de roles, usar el rol único
+    allRoles.push(mapRoleToEnum(loginResponse.role));
+  }
+
+  // Mapear todas las comunidades si están disponibles
+  const allCommunities: Comunidad[] = [];
+  if (loginResponse.residentInfo?.comunidadesCompletas && loginResponse.residentInfo.comunidadesCompletas.length > 0) {
+    // Mapear todas las comunidades completas del backend
+    allCommunities.push(...loginResponse.residentInfo.comunidadesCompletas.map(comunidadDto => ({
+      id: comunidadDto.id,
+      tipoUnidadHabitacional: tipoComunidadEnum.COMUNIDAD, // Default, puede ajustarse según necesidad
+      nombre: comunidadDto.nombre,
+      ubicacion: comunidadDto.direccion,
+      cantidadviviendas: 0, // No disponible en el backend, usar 0 como default
+      contacto: comunidadDto.contacto
+    })));
+  } else if (loginResponse.residentInfo?.comunidades && loginResponse.residentInfo.comunidades.length > 0) {
+    // Fallback: si solo hay IDs, crear objetos Comunidad básicos
+    allCommunities.push(...loginResponse.residentInfo.comunidades.map(comunidadId => ({
+      id: comunidadId,
+      tipoUnidadHabitacional: tipoComunidadEnum.COMUNIDAD,
+      nombre: '', // No disponible solo con ID
+      ubicacion: '',
+      cantidadviviendas: 0,
+      contacto: ''
+    })));
+  } else if (comunidad) {
+    // Si solo hay una comunidad mapeada, agregarla
+    allCommunities.push(comunidad);
+  }
+
   // Crear UserInfo desde LoginResponse con toda la información
   const user: UserInfo = {
     id: loginResponse.userId,
@@ -78,7 +114,9 @@ export function mapLoginResponseToAuthResponse(loginResponse: LoginResponse): Au
     username: loginResponse.username,
     email: loginResponse.email,
     addres: loginResponse.residentInfo?.address,
-    role: mapRoleToEnum(loginResponse.role),
+    selectedRole: mapRoleToEnum(loginResponse.role), // Rol principal/seleccionado
+    userRoles: allRoles.length > 0 ? allRoles : undefined, // Todos los roles
+    communities: allCommunities.length > 0 ? allCommunities : undefined, // Todas las comunidades
     residentInfo: residentInfo
   };
 
@@ -99,7 +137,7 @@ export function mapUserDtoToUserInfo(userDto: UserDto): UserInfo {
     fullname: `${userDto.firstName} ${userDto.lastName}`.trim(),
     username: userDto.username,
     email: userDto.email,
-    role: mapRoleToEnum(userDto.roleName),
+    selectedRole: mapRoleToEnum(userDto.roleName),
     // unidadhabitacional se completará cuando se obtenga la información de la comunidad
   };
 }

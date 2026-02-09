@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { UserInfo } from '../../../interfaces/user-info.interface';
+import { RolesEnum } from '../../../enums/roles.enum';
 
 @Component({
   selector: 'hh-user-info',
@@ -28,14 +29,14 @@ export class UserInfoComponent {
     this.authService.logout();
   }
 
-  getRoleDisplayName(role: string): string {
-    const roleNames: { [key: string]: string } = {
-      'SYSTEM_ADMIN': 'Administrador del Sistema',
-      'ADMIN_COMPANY': 'Administrador',
-      'COMITEE_MEMBER': 'Miembro del Comité',
-      'RESIDENT': 'Residente',
-      'TENANT': 'Inquilino',
-      'VIGILANCE': 'Vigilancia'
+  getRoleDisplayName(role: RolesEnum): string {
+    const roleNames: { [key in RolesEnum]: string } = {
+      [RolesEnum.SYSTEM_ADMIN]: 'Administrador del Sistema',
+      [RolesEnum.ADMIN_COMPANY]: 'Administrador',
+      [RolesEnum.COMITEE_MEMBER]: 'Miembro del Comité',
+      [RolesEnum.RESIDENT]: 'Residente',
+      [RolesEnum.TENANT]: 'Inquilino',
+      [RolesEnum.VIGILANCE]: 'Vigilancia'
     };
     return roleNames[role] || role;
   }
