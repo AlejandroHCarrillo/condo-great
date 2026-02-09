@@ -30,6 +30,8 @@ public class UserService : IUserService
         
         query = query
             .Include(u => u.Role)
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
             .Include(u => u.Resident)
                 .ThenInclude(r => r!.Community)
             .Include(u => u.UserCommunities)
@@ -41,14 +43,25 @@ public class UserService : IUserService
         {
             var currentUser = await _context.Users
                 .Include(u => u.Role)
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
                 .FirstOrDefaultAsync(u => u.Id == currentUserId.Value);
 
             if (currentUser != null)
             {
-                var allowedRoleCodes = GetAllowedRoleCodesForViewing(currentUser.Role.Code);
+                // Get all role codes from UserRoles, fallback to Role if no UserRoles
+                var currentUserRoleCodes = currentUser.UserRoles.Any() 
+                    ? currentUser.UserRoles.Select(ur => ur.Role.Code).ToList()
+                    : (currentUser.Role != null ? new List<string> { currentUser.Role.Code } : new List<string>());
+                
+                var allowedRoleCodes = GetAllowedRoleCodesForViewing(currentUserRoleCodes);
                 if (allowedRoleCodes.Any())
                 {
-                    query = query.Where(u => allowedRoleCodes.Contains(u.Role.Code));
+                    // Filter users that have at least one allowed role
+                    query = query.Where(u => 
+                        u.UserRoles.Any(ur => allowedRoleCodes.Contains(ur.Role.Code)) ||
+                        (u.Role != null && allowedRoleCodes.Contains(u.Role.Code))
+                    );
                 }
                 else
                 {
@@ -76,8 +89,12 @@ public class UserService : IUserService
         
         var user = await query
             .Include(u => u.Role)
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
             .Include(u => u.Resident)
                 .ThenInclude(r => r!.Community)
+            .Include(u => u.UserCommunities)
+                .ThenInclude(uc => uc.Community)
             .FirstOrDefaultAsync(u => u.Id == id);
 
         if (user == null)
@@ -88,22 +105,48 @@ public class UserService : IUserService
 
     public async Task<UserDto> CreateUserAsync(CreateUserDto createUserDto, Guid? currentUserId = null)
     {
+        // Prepare role IDs list (support backward compatibility with RoleId)
+        var roleIds = new List<Guid>();
+        if (createUserDto.RoleId.HasValue)
+        {
+            roleIds.Add(createUserDto.RoleId.Value);
+        }
+        if (createUserDto.RoleIds.Any())
+        {
+            roleIds.AddRange(createUserDto.RoleIds);
+        }
+        roleIds = roleIds.Distinct().ToList();
+
+        if (!roleIds.Any())
+            throw new InvalidOperationException("At least one role is required");
+
         // Validate permissions if currentUserId is provided
         if (currentUserId.HasValue)
         {
             var currentUser = await _context.Users
                 .Include(u => u.Role)
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
                 .Include(u => u.Resident)
                     .ThenInclude(r => r!.Community)
                 .FirstOrDefaultAsync(u => u.Id == currentUserId.Value);
 
             if (currentUser != null)
             {
-                var targetRole = await _context.Roles.FindAsync(createUserDto.RoleId);
-                if (targetRole == null)
-                    throw new InvalidOperationException("Role not found");
+                // Get all role codes from UserRoles, fallback to Role if no UserRoles
+                var currentUserRoleCodes = currentUser.UserRoles.Any() 
+                    ? currentUser.UserRoles.Select(ur => ur.Role.Code).ToList()
+                    : (currentUser.Role != null ? new List<string> { currentUser.Role.Code } : new List<string>());
 
-                ValidateUserCreationPermission(currentUser.Role.Code, targetRole.Code, currentUser.Resident?.CommunityId);
+                // Validate each target role
+                foreach (var roleId in roleIds)
+                {
+                    var targetRole = await _context.Roles.FindAsync(roleId);
+                    if (targetRole == null)
+                        throw new InvalidOperationException($"Role {roleId} not found");
+
+                    ValidateUserCreationPermission(currentUserRoleCodes, targetRole.Code, currentUser.Resident?.CommunityId);
+                }
             }
         }
 
@@ -114,22 +157,32 @@ public class UserService : IUserService
         if (existingUser != null)
             throw new InvalidOperationException("Username or email already exists");
 
-        // Verify role exists
-        var role = await _context.Roles.FindAsync(createUserDto.RoleId);
-        if (role == null)
-            throw new InvalidOperationException("Role not found");
+        // Verify all roles exist
+        foreach (var roleId in roleIds)
+        {
+            var role = await _context.Roles.FindAsync(roleId);
+            if (role == null)
+                throw new InvalidOperationException($"Role {roleId} not found");
+        }
 
         // Determine community ID
         Guid? communityId = null;
         if (currentUserId.HasValue && createUserDto.CommunityIds.Any())
         {
             var currentUser = await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
                 .Include(u => u.Resident)
                     .ThenInclude(r => r!.Community)
                 .FirstOrDefaultAsync(u => u.Id == currentUserId.Value);
 
             // If current user is ADMIN_COMPANY, use their community
-            if (currentUser?.Role.Code == "ADMIN_COMPANY" && currentUser.Resident?.CommunityId != null)
+            var currentUserRoleCodesForCommunity = currentUser?.UserRoles.Any() == true
+                ? currentUser.UserRoles.Select(ur => ur.Role.Code).ToList()
+                : (currentUser?.Role != null ? new List<string> { currentUser.Role.Code } : new List<string>());
+            
+            if (currentUserRoleCodesForCommunity.Contains("ADMIN_COMPANY") && currentUser?.Resident?.CommunityId != null)
             {
                 communityId = currentUser.Resident.CommunityId;
             }
@@ -155,7 +208,7 @@ public class UserService : IUserService
         var user = new User
         {
             Id = Guid.NewGuid(),
-            RoleId = createUserDto.RoleId,
+            RoleId = roleIds.FirstOrDefault(), // Backward compatibility - set first role
             FirstName = createUserDto.FirstName,
             LastName = createUserDto.LastName,
             Username = createUserDto.Username,
@@ -166,6 +219,20 @@ public class UserService : IUserService
         };
 
         _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        // Create UserRoles for all roles
+        foreach (var roleId in roleIds)
+        {
+            var userRole = new UserRole
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                RoleId = roleId,
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            };
+            _context.UserRoles.Add(userRole);
+        }
         await _context.SaveChangesAsync();
 
         // Create UserCommunities if UserCommunityIds are provided
@@ -211,9 +278,11 @@ public class UserService : IUserService
             await _context.SaveChangesAsync();
         }
 
-        // Reload user with Resident and UserCommunities
+        // Reload user with Resident, UserCommunities, and UserRoles
         var createdUser = await _context.Users
             .Include(u => u.Role)
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
             .Include(u => u.Resident)
                 .ThenInclude(r => r!.Community)
             .Include(u => u.UserCommunities)
@@ -227,29 +296,59 @@ public class UserService : IUserService
     {
         var user = await _context.Users
             .Include(u => u.Role)
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
             .Include(u => u.Resident)
                 .ThenInclude(r => r!.Community)
+            .Include(u => u.UserCommunities)
+                .ThenInclude(uc => uc.Community)
             .FirstOrDefaultAsync(u => u.Id == id);
 
         if (user == null)
             return null;
+
+        // Prepare role IDs list (support backward compatibility with RoleId)
+        var roleIds = new List<Guid>();
+        if (updateUserDto.RoleId.HasValue)
+        {
+            roleIds.Add(updateUserDto.RoleId.Value);
+        }
+        if (updateUserDto.RoleIds.Any())
+        {
+            roleIds.AddRange(updateUserDto.RoleIds);
+        }
+        roleIds = roleIds.Distinct().ToList();
+
+        if (!roleIds.Any())
+            throw new InvalidOperationException("At least one role is required");
 
         // Validate permissions if currentUserId is provided
         if (currentUserId.HasValue)
         {
             var currentUser = await _context.Users
                 .Include(u => u.Role)
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
                 .Include(u => u.Resident)
                     .ThenInclude(r => r!.Community)
                 .FirstOrDefaultAsync(u => u.Id == currentUserId.Value);
 
             if (currentUser != null)
             {
-                var targetRole = await _context.Roles.FindAsync(updateUserDto.RoleId);
-                if (targetRole == null)
-                    throw new InvalidOperationException("Role not found");
+                // Get all role codes from UserRoles, fallback to Role if no UserRoles
+                var currentUserRoleCodes = currentUser.UserRoles.Any() 
+                    ? currentUser.UserRoles.Select(ur => ur.Role.Code).ToList()
+                    : (currentUser.Role != null ? new List<string> { currentUser.Role.Code } : new List<string>());
 
-                ValidateUserCreationPermission(currentUser.Role.Code, targetRole.Code, currentUser.Resident?.CommunityId);
+                // Validate each target role
+                foreach (var roleId in roleIds)
+                {
+                    var targetRole = await _context.Roles.FindAsync(roleId);
+                    if (targetRole == null)
+                        throw new InvalidOperationException($"Role {roleId} not found");
+
+                    ValidateUserCreationPermission(currentUserRoleCodes, targetRole.Code, currentUser.Resident?.CommunityId);
+                }
             }
         }
 
@@ -260,10 +359,33 @@ public class UserService : IUserService
         if (existingUser != null)
             throw new InvalidOperationException("Username or email already exists");
 
-        // Verify role exists
-        var role = await _context.Roles.FindAsync(updateUserDto.RoleId);
-        if (role == null)
-            throw new InvalidOperationException("Role not found");
+        // Verify all roles exist
+        foreach (var roleId in roleIds)
+        {
+            var role = await _context.Roles.FindAsync(roleId);
+            if (role == null)
+                throw new InvalidOperationException($"Role {roleId} not found");
+        }
+
+        // Update UserRoles
+        // Remove existing UserRoles
+        var existingUserRoles = await _context.UserRoles
+            .Where(ur => ur.UserId == user.Id)
+            .ToListAsync();
+        _context.UserRoles.RemoveRange(existingUserRoles);
+
+        // Add new UserRoles
+        foreach (var roleId in roleIds)
+        {
+            var userRole = new UserRole
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                RoleId = roleId,
+                CreatedAt = DateTime.UtcNow.ToString("O")
+            };
+            _context.UserRoles.Add(userRole);
+        }
 
         // Update UserCommunities
         if (updateUserDto.UserCommunityIds.Any())
@@ -310,12 +432,19 @@ public class UserService : IUserService
         if (currentUserId.HasValue && updateUserDto.CommunityIds.Any())
         {
             var currentUser = await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
                 .Include(u => u.Resident)
                     .ThenInclude(r => r!.Community)
                 .FirstOrDefaultAsync(u => u.Id == currentUserId.Value);
 
             // If current user is ADMIN_COMPANY, use their community
-            if (currentUser?.Role.Code == "ADMIN_COMPANY" && currentUser.Resident?.CommunityId != null)
+            var currentUserRoleCodesForCommunity = currentUser?.UserRoles.Any() == true
+                ? currentUser.UserRoles.Select(ur => ur.Role.Code).ToList()
+                : (currentUser?.Role != null ? new List<string> { currentUser.Role.Code } : new List<string>());
+            
+            if (currentUserRoleCodesForCommunity.Contains("ADMIN_COMPANY") && currentUser?.Resident?.CommunityId != null)
             {
                 communityId = currentUser.Resident.CommunityId;
             }
@@ -338,7 +467,7 @@ public class UserService : IUserService
                 throw new InvalidOperationException("Community not found");
         }
 
-        user.RoleId = updateUserDto.RoleId;
+        user.RoleId = roleIds.FirstOrDefault(); // Backward compatibility - set first role
         user.FirstName = updateUserDto.FirstName;
         user.LastName = updateUserDto.LastName;
         user.Username = updateUserDto.Username;
@@ -390,9 +519,11 @@ public class UserService : IUserService
 
         await _context.SaveChangesAsync();
 
-        // Reload user with Resident and UserCommunities
+        // Reload user with Resident, UserCommunities, and UserRoles
         var updatedUser = await _context.Users
             .Include(u => u.Role)
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
             .Include(u => u.Resident)
                 .ThenInclude(r => r!.Community)
             .Include(u => u.UserCommunities)
@@ -424,11 +555,24 @@ public class UserService : IUserService
 
     private UserDto MapToUserDto(User user)
     {
+        // Get roles from UserRoles, fallback to Role for backward compatibility
+        var roles = user.UserRoles.Any() 
+            ? user.UserRoles.Select(ur => ur.Role).ToList()
+            : (user.Role != null ? new List<Role> { user.Role } : new List<Role>());
+
         var dto = new UserDto
         {
             Id = user.Id,
-            RoleId = user.RoleId,
-            RoleCode = user.Role.Code,
+            RoleId = roles.FirstOrDefault()?.Id, // Backward compatibility
+            RoleCode = roles.FirstOrDefault()?.Code, // Backward compatibility
+            Roles = roles.Select(r => new RoleDto
+            {
+                Id = r.Id,
+                Code = r.Code,
+                Description = r.Description
+            }).ToList(),
+            RoleIds = roles.Select(r => r.Id).ToList(),
+            RoleCodes = roles.Select(r => r.Code).ToList(),
             FirstName = user.FirstName,
             LastName = user.LastName,
             Username = user.Username,
@@ -465,24 +609,38 @@ public class UserService : IUserService
         return dto;
     }
 
-    private List<string> GetAllowedRoleCodesForViewing(string currentUserRoleCode)
+    private List<string> GetAllowedRoleCodesForViewing(List<string> currentUserRoleCodes)
     {
-        return currentUserRoleCode switch
+        // If user has SYSTEM_ADMIN role, they can view ADMIN_COMPANY
+        if (currentUserRoleCodes.Contains("SYSTEM_ADMIN"))
         {
-            "SYSTEM_ADMIN" => new List<string> { "ADMIN_COMPANY" },
-            "ADMIN_COMPANY" => new List<string> { "RESIDENT", "COMITEE_MEMBER", "VIGILANCE" },
-            _ => new List<string>()
-        };
+            return new List<string> { "ADMIN_COMPANY" };
+        }
+        
+        // If user has ADMIN_COMPANY role, they can view RESIDENT, COMITEE_MEMBER, VIGILANCE
+        if (currentUserRoleCodes.Contains("ADMIN_COMPANY"))
+        {
+            return new List<string> { "RESIDENT", "COMITEE_MEMBER", "VIGILANCE" };
+        }
+        
+        return new List<string>();
     }
 
-    private void ValidateUserCreationPermission(string currentUserRoleCode, string targetRoleCode, Guid? currentUserCommunityId)
+    private void ValidateUserCreationPermission(List<string> currentUserRoleCodes, string targetRoleCode, Guid? currentUserCommunityId)
     {
-        var allowedRoleCodes = currentUserRoleCode switch
+        List<string> allowedRoleCodes = new List<string>();
+        
+        // If user has SYSTEM_ADMIN role, they can create ADMIN_COMPANY
+        if (currentUserRoleCodes.Contains("SYSTEM_ADMIN"))
         {
-            "SYSTEM_ADMIN" => new List<string> { "ADMIN_COMPANY" },
-            "ADMIN_COMPANY" => new List<string> { "RESIDENT", "COMITEE_MEMBER", "VIGILANCE" },
-            _ => new List<string>()
-        };
+            allowedRoleCodes.Add("ADMIN_COMPANY");
+        }
+        
+        // If user has ADMIN_COMPANY role, they can create RESIDENT, COMITEE_MEMBER, VIGILANCE
+        if (currentUserRoleCodes.Contains("ADMIN_COMPANY"))
+        {
+            allowedRoleCodes.AddRange(new List<string> { "RESIDENT", "COMITEE_MEMBER", "VIGILANCE" });
+        }
 
         if (!allowedRoleCodes.Contains(targetRoleCode))
         {
@@ -490,7 +648,7 @@ public class UserService : IUserService
         }
 
         // ADMIN_COMPANY must have a community
-        if (currentUserRoleCode == "ADMIN_COMPANY" && !currentUserCommunityId.HasValue)
+        if (currentUserRoleCodes.Contains("ADMIN_COMPANY") && !currentUserCommunityId.HasValue)
         {
             throw new InvalidOperationException("Administrator must be associated with a community");
         }

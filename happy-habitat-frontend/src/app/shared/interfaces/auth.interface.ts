@@ -34,8 +34,15 @@ export interface ResidentInfoDto {
   phone?: string;
   number?: string;
   address: string;
-  comunidades?: string[];
-  comunidad?: CommunityDto; // Full community information
+  comunidades?: string[]; // Backward compatibility - IDs only
+  comunidad?: CommunityDto; // Backward compatibility - first community
+  comunidadesCompletas?: CommunityDto[]; // All communities with full information
+}
+
+export interface RoleDto {
+  id: string;
+  code: string;
+  description: string;
 }
 
 export interface LoginResponse {
@@ -43,7 +50,9 @@ export interface LoginResponse {
   userId: string;
   username: string;
   email: string;
-  role: string;
+  role: string; // Backward compatibility - first role
+  roles?: string[]; // Multiple roles support
+  roleDetails?: RoleDto[]; // Full role information
   expiresAt: string; // ISO date string
   residentInfo?: ResidentInfoDto;
 }

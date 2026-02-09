@@ -21,7 +21,7 @@ export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
 
     const user = authService.currentUser();
     console.log('[RoleGuard] Current user:', user);
-    console.log('[RoleGuard] User role:', user?.role);
+    console.log('[RoleGuard] User role:', user?.selectedRole);
 
     // Verificar roles
     if (authService.hasAnyRole(allowedRoles)) {

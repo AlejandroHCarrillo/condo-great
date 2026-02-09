@@ -12,6 +12,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Role> Roles { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<UserRole> UserRoles { get; set; }
     public DbSet<Resident> Residents { get; set; }
     public DbSet<VehicleType> VehicleTypes { get; set; }
     public DbSet<Vehicle> Vehicles { get; set; }
@@ -23,6 +24,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<UserCommunity> UserCommunities { get; set; }
     public DbSet<Contrato> Contratos { get; set; }
     public DbSet<PaymentHistory> PaymentHistories { get; set; }
+    public DbSet<CargosComunidad> CargosComunidad { get; set; }
+    public DbSet<PagoComunidad> PagoComunidad { get; set; }
+    public DbSet<PagoCargoComunidad> PagoCargoComunidad { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -64,11 +68,36 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true);
 
-            // Configure relationship with Role
+            // Configure relationship with Role (backward compatibility - optional)
             entity.HasOne(e => e.Role)
                 .WithMany(r => r.Users)
                 .HasForeignKey(e => e.RoleId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired(false);
+        });
+
+        // Configure UserRole entity (many-to-many relationship)
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+
+            // Configure relationship with User
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.UserRoles)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure relationship with Role
+            entity.HasOne(e => e.Role)
+                .WithMany(r => r.UserRoles)
+                .HasForeignKey(e => e.RoleId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Create unique index to prevent duplicate role assignments
+            entity.HasIndex(e => new { e.UserId, e.RoleId })
+                .IsUnique();
         });
 
         // Configure Resident entity
@@ -409,6 +438,90 @@ public class ApplicationDbContext : DbContext
                 .WithMany(u => u.UpdatedPaymentHistories)
                 .HasForeignKey(e => e.UpdatedByUserId)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Configure CargosComunidad entity
+        modelBuilder.Entity<CargosComunidad>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.MontoCargo)
+                .IsRequired()
+                .HasColumnType("decimal(18,2)");
+            entity.Property(e => e.FechaDePago)
+                .IsRequired();
+            entity.Property(e => e.MontoRecargos)
+                .IsRequired()
+                .HasColumnType("decimal(18,2)");
+            entity.Property(e => e.Estatus)
+                .IsRequired()
+                .HasMaxLength(50); // No vencido, vencido, pagado, pago parcial
+            entity.Property(e => e.Notas)
+                .HasMaxLength(1000);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+            entity.Property(e => e.UpdatedAt);
+
+            // Configure relationship with Contrato
+            entity.HasOne(e => e.Contrato)
+                .WithMany(c => c.CargosComunidad)
+                .HasForeignKey(e => e.ContratoId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure relationship with Community
+            entity.HasOne(e => e.Comunidad)
+                .WithMany()
+                .HasForeignKey(e => e.ComunidadId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // Configure PagoComunidad entity
+        modelBuilder.Entity<PagoComunidad>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.MontoPago)
+                .IsRequired()
+                .HasColumnType("decimal(18,2)");
+            entity.Property(e => e.FormaDePago)
+                .IsRequired()
+                .HasMaxLength(50); // transferencia, tarjeta, efectivo, etc.
+            entity.Property(e => e.FechaDePago)
+                .IsRequired();
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+            entity.Property(e => e.UpdatedAt);
+
+            // Configure relationship with User (UpdatedByUser)
+            entity.HasOne(e => e.UpdatedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.UpdatedByUserId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Configure PagoCargoComunidad entity (junction table)
+        modelBuilder.Entity<PagoCargoComunidad>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.MontoAplicado)
+                .IsRequired()
+                .HasColumnType("decimal(18,2)");
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+
+            // Configure relationship with PagoComunidad
+            entity.HasOne(e => e.PagoComunidad)
+                .WithMany(p => p.PagoCargos)
+                .HasForeignKey(e => e.PagoComunidadId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Configure relationship with CargosComunidad
+            entity.HasOne(e => e.CargosComunidad)
+                .WithMany(c => c.PagoCargos)
+                .HasForeignKey(e => e.CargosComunidadId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Create unique index to prevent duplicate relationships
+            entity.HasIndex(e => new { e.PagoComunidadId, e.CargosComunidadId })
+                .IsUnique();
         });
     }
 }

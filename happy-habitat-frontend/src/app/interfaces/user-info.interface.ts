@@ -19,6 +19,8 @@ export interface UserInfo {
     username: string;
     email: string;
     addres?: string;
-    role: RolesEnum;
+    selectedRole: RolesEnum; // Rol seleccionado/activo
+    userRoles?: RolesEnum[]; // Todos los roles asociados al usuario
+    communities?: Comunidad[]; // Todas las comunidades asociadas al usuario
     residentInfo?: ResidentInfo;
 }

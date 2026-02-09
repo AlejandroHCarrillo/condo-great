@@ -503,10 +503,161 @@ public class DummySeeder : IDataSeeder
             await _context.SaveChangesAsync();
         }
 
-        // Create resident for elgrandeahc user with vehicles, pets, and visits
+        // Add ADMIN_COMPANY role to elgrandeahc user and associate with 3 communities
         var elgrandeahcUserId = new Guid("AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA");
-        var elgrandeahcUser = await _context.Users.FindAsync(elgrandeahcUserId);
+        var elgrandeahcUser = await _context.Users
+            .Include(u => u.UserRoles)
+            .Include(u => u.UserCommunities)
+            .FirstOrDefaultAsync(u => u.Id == elgrandeahcUserId || u.Username == "elgrandeahc");
 
+        if (elgrandeahcUser != null)
+        {
+            // Get SYSTEM_ADMIN role ID
+            var systemAdminRoleId = new Guid("11111111-1111-1111-1111-111111111111");
+            
+            // Add SYSTEM_ADMIN role to UserRoles if not already assigned
+            var hasSystemAdminRole = await _context.UserRoles
+                .AnyAsync(ur => ur.UserId == elgrandeahcUserId && ur.RoleId == systemAdminRoleId);
+
+            if (!hasSystemAdminRole)
+            {
+                var systemAdminUserRole = new UserRole
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = elgrandeahcUserId,
+                    RoleId = systemAdminRoleId,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                };
+                await _context.UserRoles.AddAsync(systemAdminUserRole);
+                await _context.SaveChangesAsync();
+            }
+
+            // Add ADMIN_COMPANY role if not already assigned
+            var hasAdminCompanyRole = await _context.UserRoles
+                .AnyAsync(ur => ur.UserId == elgrandeahcUserId && ur.RoleId == adminCompanyRoleId);
+
+            if (!hasAdminCompanyRole)
+            {
+                var adminCompanyUserRole = new UserRole
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = elgrandeahcUserId,
+                    RoleId = adminCompanyRoleId,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                };
+                await _context.UserRoles.AddAsync(adminCompanyUserRole);
+                await _context.SaveChangesAsync();
+            }
+
+            // Associate with 3 communities (selecting first 3 communities that exist)
+            var communitiesToAssociate = new[]
+            {
+                new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87"), // Residencial El Pueblito
+                new Guid("ff7bc6fb-0f13-4e37-beb4-7d428520c227"), // Colonia Las Palmas
+                new Guid("c4a28c40-a2c7-4190-961c-f3f52ad19c1d")  // Coto San Miguel
+            };
+
+            foreach (var communityId in communitiesToAssociate)
+            {
+                var communityExists = await _context.Communities.AnyAsync(c => c.Id == communityId);
+                if (!communityExists) continue;
+
+                var existingUserCommunity = await _context.UserCommunities
+                    .AnyAsync(uc => uc.UserId == elgrandeahcUserId && uc.CommunityId == communityId);
+
+                if (!existingUserCommunity)
+                {
+                    var userCommunity = new UserCommunity
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = elgrandeahcUserId,
+                        CommunityId = communityId,
+                        CreatedAt = DateTime.UtcNow.ToString("O")
+                    };
+                    await _context.UserCommunities.AddAsync(userCommunity);
+                }
+            }
+            await _context.SaveChangesAsync();
+
+            // Ensure these 3 communities have residents
+            foreach (var communityId in communitiesToAssociate)
+            {
+                var community = await _context.Communities.FindAsync(communityId);
+                if (community == null) continue;
+
+                // Check if community has residents
+                var hasResidents = await _context.Residents
+                    .AnyAsync(r => r.CommunityId == communityId);
+
+                if (!hasResidents)
+                {
+                    // Create a resident user for each community
+                    var localResidentRoleId = new Guid("44444444-4444-4444-4444-444444444444");
+                    
+                    // Sanitize community name for username and email
+                    var sanitizedName = community.Nombre
+                        .Replace(" ", "_")
+                        .Replace("-", "_")
+                        .Replace(".", "")
+                        .Replace(",", "")
+                        .ToLower();
+                    var username = $"residente_{sanitizedName.Substring(0, Math.Min(15, sanitizedName.Length))}";
+                    var emailName = community.Nombre
+                        .Replace(" ", ".")
+                        .Replace("-", ".")
+                        .Replace(",", "")
+                        .ToLower();
+                    var email = $"residente.{emailName.Substring(0, Math.Min(25, emailName.Length))}@example.com";
+                    var lastName = community.Nombre
+                        .Replace(" ", "")
+                        .Replace("-", "")
+                        .Substring(0, Math.Min(20, community.Nombre.Length));
+                    
+                    var residentUser = new User
+                    {
+                        Id = Guid.NewGuid(),
+                        RoleId = localResidentRoleId,
+                        FirstName = "Residente",
+                        LastName = lastName,
+                        Username = username,
+                        Email = email,
+                        Password = _passwordHasher.HashPassword("password123"),
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow.ToString("O")
+                    };
+                    await _context.Users.AddAsync(residentUser);
+                    await _context.SaveChangesAsync();
+
+                    // Add UserRole for the resident
+                    var residentUserRole = new UserRole
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = residentUser.Id,
+                        RoleId = localResidentRoleId,
+                        CreatedAt = DateTime.UtcNow.ToString("O")
+                    };
+                    await _context.UserRoles.AddAsync(residentUserRole);
+
+                    // Create resident
+                    var resident = new Resident
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = residentUser.Id,
+                        CommunityId = communityId,
+                        FullName = $"{residentUser.FirstName} {residentUser.LastName}",
+                        Email = residentUser.Email,
+                        Phone = "4421234567",
+                        Number = "A-101",
+                        Address = community.Direccion,
+                        CreatedAt = DateTime.UtcNow.ToString("O")
+                    };
+                    await _context.Residents.AddAsync(resident);
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
+
+        // Create resident for elgrandeahc user with vehicles, pets, and visits
         if (elgrandeahcUser != null)
         {
             // Check if resident already exists for this user
@@ -1137,6 +1288,15 @@ https://drive.google.com/file/d/1OG95bOMdZKWme-90_dg3VhTuYs1jMlfd/view?usp=shari
 
             await _context.Contratos.AddRangeAsync(contratosBruselas);
             await _context.SaveChangesAsync();
+
+            // Generar cargos para cada contrato
+            foreach (var contrato in contratosBruselas)
+            {
+                await GenerarCargosParaContrato(contrato);
+            }
+
+            // Generar pagos para los cargos de Bruselas
+            await GenerarPagosParaCargos(bruselasCommunityId);
         }
 
         if (!existingContratosCotoBerlin)
@@ -1219,6 +1379,326 @@ https://drive.google.com/file/d/1OG95bOMdZKWme-90_dg3VhTuYs1jMlfd/view?usp=shari
             };
 
             await _context.Contratos.AddRangeAsync(contratosCotoBerlin);
+            await _context.SaveChangesAsync();
+
+            // Generar cargos para cada contrato
+            foreach (var contrato in contratosCotoBerlin)
+            {
+                await GenerarCargosParaContrato(contrato);
+            }
+
+            // Generar pagos para los cargos de Coto Berlin
+            await GenerarPagosParaCargos(cotoBerlinCommunityId);
+        }
+    }
+
+    /// <summary>
+    /// Genera los cargos de comunidad basándose en el número de pagos parciales del contrato
+    /// </summary>
+    private async Task GenerarCargosParaContrato(Contrato contrato)
+    {
+        var cargos = new List<CargosComunidad>();
+        var fechaInicio = DateTime.Parse(contrato.FechaInicio);
+        var today = DateTime.UtcNow;
+
+        for (int i = 0; i < contrato.NumeroPagosParciales; i++)
+        {
+            DateTime fechaPago;
+
+            // Calcular la fecha de pago según la periodicidad
+            switch (contrato.PeriodicidadPago.ToLower())
+            {
+                case "mensual":
+                    fechaPago = fechaInicio.AddMonths(i);
+                    // Ajustar al día de pago especificado
+                    fechaPago = new DateTime(fechaPago.Year, fechaPago.Month, Math.Min(contrato.DiaPago, DateTime.DaysInMonth(fechaPago.Year, fechaPago.Month)));
+                    break;
+                case "trimestral":
+                    fechaPago = fechaInicio.AddMonths(i * 3);
+                    fechaPago = new DateTime(fechaPago.Year, fechaPago.Month, Math.Min(contrato.DiaPago, DateTime.DaysInMonth(fechaPago.Year, fechaPago.Month)));
+                    break;
+                case "anual":
+                    fechaPago = fechaInicio.AddYears(i);
+                    fechaPago = new DateTime(fechaPago.Year, fechaPago.Month, Math.Min(contrato.DiaPago, DateTime.DaysInMonth(fechaPago.Year, fechaPago.Month)));
+                    break;
+                default:
+                    // Por defecto, mensual
+                    fechaPago = fechaInicio.AddMonths(i);
+                    fechaPago = new DateTime(fechaPago.Year, fechaPago.Month, Math.Min(contrato.DiaPago, DateTime.DaysInMonth(fechaPago.Year, fechaPago.Month)));
+                    break;
+            }
+
+            // Determinar el estatus del cargo
+            string estatus;
+            if (fechaPago.Date > today.Date)
+            {
+                estatus = "No vencido";
+            }
+            else
+            {
+                // Si la fecha de pago ya pasó, está vencido
+                estatus = "vencido";
+            }
+
+            var cargo = new CargosComunidad
+            {
+                Id = Guid.NewGuid(),
+                ContratoId = contrato.Id,
+                ComunidadId = contrato.CommunityId,
+                MontoCargo = contrato.MontoPagoParcial,
+                FechaDePago = fechaPago.ToString("O"),
+                MontoRecargos = 0m,
+                Estatus = estatus,
+                Notas = $"Cargo {i + 1} de {contrato.NumeroPagosParciales} - {contrato.FolioContrato}",
+                IsActive = true,
+                CreatedAt = contrato.CreatedAt
+            };
+
+            cargos.Add(cargo);
+        }
+
+        await _context.CargosComunidad.AddRangeAsync(cargos);
+        await _context.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Genera diferentes tipos de pagos relacionados con los cargos:
+    /// 1. Pagos completos de un cargo
+    /// 2. Pagos parciales para un mismo cargo
+    /// 3. Pagos que abarcan múltiples cargos
+    /// </summary>
+    private async Task GenerarPagosParaCargos(Guid comunidadId)
+    {
+        var today = DateTime.UtcNow;
+        
+        // Obtener todos los cargos de la comunidad que estén vencidos o próximos a vencer
+        var cargos = await _context.CargosComunidad
+            .Where(c => c.ComunidadId == comunidadId && c.IsActive)
+            .OrderBy(c => c.FechaDePago)
+            .ToListAsync();
+
+        if (!cargos.Any())
+            return;
+
+        var pagos = new List<PagoComunidad>();
+        var pagoCargos = new List<PagoCargoComunidad>();
+
+        // Obtener un usuario para asignar como UpdatedByUserId (usar el primer admin disponible)
+        var adminUser = await _context.Users
+            .Where(u => u.RoleId == new Guid("22222222-2222-2222-2222-222222222222"))
+            .FirstOrDefaultAsync();
+
+        // 1. PAGO COMPLETO DE UN CARGO (primer cargo vencido)
+        var cargoCompleto = cargos.FirstOrDefault(c => DateTime.Parse(c.FechaDePago) < today);
+        if (cargoCompleto != null)
+        {
+            var pagoCompleto = new PagoComunidad
+            {
+                Id = Guid.NewGuid(),
+                MontoPago = cargoCompleto.MontoCargo + cargoCompleto.MontoRecargos,
+                FormaDePago = "transferencia",
+                FechaDePago = today.AddDays(-5).ToString("O"), // Pago realizado hace 5 días
+                IsActive = true,
+                CreatedAt = today.AddDays(-5).ToString("O"),
+                UpdatedByUserId = adminUser?.Id
+            };
+            pagos.Add(pagoCompleto);
+
+            var pagoCargoCompleto = new PagoCargoComunidad
+            {
+                Id = Guid.NewGuid(),
+                PagoComunidadId = pagoCompleto.Id,
+                CargosComunidadId = cargoCompleto.Id,
+                MontoAplicado = pagoCompleto.MontoPago,
+                CreatedAt = pagoCompleto.CreatedAt
+            };
+            pagoCargos.Add(pagoCargoCompleto);
+
+            // Actualizar estatus del cargo a "pagado"
+            cargoCompleto.Estatus = "pagado";
+        }
+
+        // 2. PAGOS PARCIALES PARA UN MISMO CARGO (segundo cargo vencido, si existe)
+        var cargoParcial = cargos
+            .Where(c => c.Id != cargoCompleto?.Id && DateTime.Parse(c.FechaDePago) < today && c.Estatus != "pagado")
+            .FirstOrDefault();
+        if (cargoParcial != null)
+        {
+            var montoTotal = cargoParcial.MontoCargo + cargoParcial.MontoRecargos;
+            var montoParcial1 = montoTotal * 0.4m; // Primer pago parcial del 40%
+            var montoParcial2 = montoTotal * 0.35m; // Segundo pago parcial del 35%
+            var montoParcial3 = montoTotal - montoParcial1 - montoParcial2; // Tercer pago del 25% restante
+
+            // Primer pago parcial
+            var pagoParcial1 = new PagoComunidad
+            {
+                Id = Guid.NewGuid(),
+                MontoPago = montoParcial1,
+                FormaDePago = "tarjeta",
+                FechaDePago = today.AddDays(-10).ToString("O"),
+                IsActive = true,
+                CreatedAt = today.AddDays(-10).ToString("O"),
+                UpdatedByUserId = adminUser?.Id
+            };
+            pagos.Add(pagoParcial1);
+
+            var pagoCargoParcial1 = new PagoCargoComunidad
+            {
+                Id = Guid.NewGuid(),
+                PagoComunidadId = pagoParcial1.Id,
+                CargosComunidadId = cargoParcial.Id,
+                MontoAplicado = montoParcial1,
+                CreatedAt = pagoParcial1.CreatedAt
+            };
+            pagoCargos.Add(pagoCargoParcial1);
+
+            // Segundo pago parcial
+            var pagoParcial2 = new PagoComunidad
+            {
+                Id = Guid.NewGuid(),
+                MontoPago = montoParcial2,
+                FormaDePago = "efectivo",
+                FechaDePago = today.AddDays(-3).ToString("O"),
+                IsActive = true,
+                CreatedAt = today.AddDays(-3).ToString("O"),
+                UpdatedByUserId = adminUser?.Id
+            };
+            pagos.Add(pagoParcial2);
+
+            var pagoCargoParcial2 = new PagoCargoComunidad
+            {
+                Id = Guid.NewGuid(),
+                PagoComunidadId = pagoParcial2.Id,
+                CargosComunidadId = cargoParcial.Id,
+                MontoAplicado = montoParcial2,
+                CreatedAt = pagoParcial2.CreatedAt
+            };
+            pagoCargos.Add(pagoCargoParcial2);
+
+            // Tercer pago parcial (completa el cargo)
+            var pagoParcial3 = new PagoComunidad
+            {
+                Id = Guid.NewGuid(),
+                MontoPago = montoParcial3,
+                FormaDePago = "transferencia",
+                FechaDePago = today.ToString("O"),
+                IsActive = true,
+                CreatedAt = today.ToString("O"),
+                UpdatedByUserId = adminUser?.Id
+            };
+            pagos.Add(pagoParcial3);
+
+            var pagoCargoParcial3 = new PagoCargoComunidad
+            {
+                Id = Guid.NewGuid(),
+                PagoComunidadId = pagoParcial3.Id,
+                CargosComunidadId = cargoParcial.Id,
+                MontoAplicado = montoParcial3,
+                CreatedAt = pagoParcial3.CreatedAt
+            };
+            pagoCargos.Add(pagoCargoParcial3);
+
+            // Actualizar estatus del cargo a "pagado" (ya se completó con los 3 pagos)
+            cargoParcial.Estatus = "pagado";
+        }
+
+        // 3. PAGO PARCIAL INCOMPLETO (otro cargo - solo se pagó una parte)
+        var cargoParcialIncompleto = cargos
+            .Where(c => c.Id != cargoCompleto?.Id && 
+                       c.Id != cargoParcial?.Id && 
+                       DateTime.Parse(c.FechaDePago) < today && 
+                       c.Estatus != "pagado")
+            .FirstOrDefault();
+        
+        if (cargoParcialIncompleto != null)
+        {
+            var montoTotalIncompleto = cargoParcialIncompleto.MontoCargo + cargoParcialIncompleto.MontoRecargos;
+            var montoPagoParcialIncompleto = montoTotalIncompleto * 0.6m; // Solo se pagó el 60%
+
+            var pagoIncompleto = new PagoComunidad
+            {
+                Id = Guid.NewGuid(),
+                MontoPago = montoPagoParcialIncompleto,
+                FormaDePago = "tarjeta",
+                FechaDePago = today.AddDays(-7).ToString("O"),
+                IsActive = true,
+                CreatedAt = today.AddDays(-7).ToString("O"),
+                UpdatedByUserId = adminUser?.Id
+            };
+            pagos.Add(pagoIncompleto);
+
+            var pagoCargoIncompleto = new PagoCargoComunidad
+            {
+                Id = Guid.NewGuid(),
+                PagoComunidadId = pagoIncompleto.Id,
+                CargosComunidadId = cargoParcialIncompleto.Id,
+                MontoAplicado = montoPagoParcialIncompleto,
+                CreatedAt = pagoIncompleto.CreatedAt
+            };
+            pagoCargos.Add(pagoCargoIncompleto);
+
+            // Actualizar estatus del cargo a "pago parcial"
+            cargoParcialIncompleto.Estatus = "pago parcial";
+        }
+
+        // 4. PAGO QUE ABARCA MÚLTIPLES CARGOS (dos cargos diferentes)
+        var cargosMultiples = cargos
+            .Where(c => c.Id != cargoCompleto?.Id && 
+                       c.Id != cargoParcial?.Id && 
+                       c.Id != cargoParcialIncompleto?.Id &&
+                       DateTime.Parse(c.FechaDePago) < today && 
+                       c.Estatus != "pagado")
+            .Take(2)
+            .ToList();
+
+        if (cargosMultiples.Count == 2)
+        {
+            var montoTotalMultiples = cargosMultiples.Sum(c => c.MontoCargo + c.MontoRecargos);
+            
+            var pagoMultiples = new PagoComunidad
+            {
+                Id = Guid.NewGuid(),
+                MontoPago = montoTotalMultiples,
+                FormaDePago = "transferencia",
+                FechaDePago = today.AddDays(-2).ToString("O"),
+                IsActive = true,
+                CreatedAt = today.AddDays(-2).ToString("O"),
+                UpdatedByUserId = adminUser?.Id
+            };
+            pagos.Add(pagoMultiples);
+
+            // Distribuir el pago entre los dos cargos
+            foreach (var cargo in cargosMultiples)
+            {
+                var montoAplicado = cargo.MontoCargo + cargo.MontoRecargos;
+                var pagoCargoMultiple = new PagoCargoComunidad
+                {
+                    Id = Guid.NewGuid(),
+                    PagoComunidadId = pagoMultiples.Id,
+                    CargosComunidadId = cargo.Id,
+                    MontoAplicado = montoAplicado,
+                    CreatedAt = pagoMultiples.CreatedAt
+                };
+                pagoCargos.Add(pagoCargoMultiple);
+
+                // Actualizar estatus del cargo a "pagado"
+                cargo.Estatus = "pagado";
+            }
+        }
+
+        // Guardar todos los pagos y relaciones
+        if (pagos.Any())
+        {
+            await _context.PagoComunidad.AddRangeAsync(pagos);
+            await _context.SaveChangesAsync();
+
+            if (pagoCargos.Any())
+            {
+                await _context.PagoCargoComunidad.AddRangeAsync(pagoCargos);
+                await _context.SaveChangesAsync();
+            }
+
+            // Actualizar los estatus de los cargos
             await _context.SaveChangesAsync();
         }
     }

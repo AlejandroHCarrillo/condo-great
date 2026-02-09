@@ -108,7 +108,7 @@ export class UsersService {
     this.logger.debug('Current user set in UsersService', 'UsersService', { 
       userId: user.id, 
       username: user.username,
-      role: user.role 
+      role: user.selectedRole 
     });
   }
 

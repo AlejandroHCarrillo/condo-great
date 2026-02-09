@@ -6,7 +6,8 @@ public class Role
     public string Code { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     
-    // Navigation property
-    public ICollection<User> Users { get; set; } = new List<User>();
+    // Navigation properties
+    public ICollection<User> Users { get; set; } = new List<User>(); // Kept for backward compatibility
+    public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
 }
 
