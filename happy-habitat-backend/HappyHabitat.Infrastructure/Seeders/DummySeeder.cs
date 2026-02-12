@@ -381,6 +381,9 @@ public class DummySeeder : IDataSeeder
         }
 
         // Seed 10 residents per community (for all communities in the database)
+        var firstNames = new[] { "María", "José", "Ana", "Carlos", "Laura", "Pedro", "Isabel", "Miguel", "Carmen", "Francisco", "Elena", "Roberto", "Patricia", "Jorge", "Sofía", "Luis", "Gabriela", "Ricardo", "Daniela", "Alejandro" };
+        var lastNames = new[] { "González", "Martínez", "López", "Hernández", "García", "Rodríguez", "Pérez", "Sánchez", "Ramírez", "Torres", "Flores", "Rivera", "Gómez", "Díaz", "Morales", "Reyes", "Jiménez", "Ruiz", "Mendoza", "Vázquez" };
+
         var allCommunitiesForResidents = await _context.Communities.ToListAsync();
         foreach (var community in allCommunitiesForResidents)
         {
@@ -397,8 +400,9 @@ public class DummySeeder : IDataSeeder
                 if (await _context.Users.AnyAsync(u => u.Username == username))
                     continue;
 
-                var firstName = "Residente";
-                var lastName = $"#{suffix}";
+                var nameIndex = (currentCount + created) % (firstNames.Length * lastNames.Length);
+                var firstName = firstNames[nameIndex % firstNames.Length];
+                var lastName = lastNames[nameIndex % lastNames.Length];
                 var email = $"{username}@example.com";
 
                 var user = new User
@@ -675,17 +679,18 @@ public class DummySeeder : IDataSeeder
                         .Replace(",", "")
                         .ToLower();
                     var email = $"residente.{emailName.Substring(0, Math.Min(25, emailName.Length))}@example.com";
-                    var lastNameProcessed = community.Nombre
-                        .Replace(" ", "")
-                        .Replace("-", "");
-                    var lastName = lastNameProcessed.Substring(0, Math.Min(20, lastNameProcessed.Length));
-                    
+                    var residentFirstNames = new[] { "María", "José", "Ana", "Carlos", "Laura" };
+                    var residentLastNames = new[] { "González", "Martínez", "López", "Hernández", "García" };
+                    var idx = Array.IndexOf(communitiesToAssociate, communityId);
+                    var residentFirstName = residentFirstNames[idx % residentFirstNames.Length];
+                    var residentLastName = residentLastNames[idx % residentLastNames.Length];
+
                     var residentUser = new User
                     {
                         Id = Guid.NewGuid(),
                         RoleId = localResidentRoleId,
-                        FirstName = "Residente",
-                        LastName = lastName,
+                        FirstName = residentFirstName,
+                        LastName = residentLastName,
                         Username = username,
                         Email = email,
                         Password = _passwordHasher.HashPassword("password123"),

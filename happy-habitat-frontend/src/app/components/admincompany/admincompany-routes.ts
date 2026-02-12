@@ -7,6 +7,7 @@ import { AdmincompanyProveedoresComponent } from './admincompany-proveedores/adm
 import { AdmincompanyDocumentosComponent } from './admincompany-documentos/admincompany-documentos.component';
 import { AdmincompanyReportesComponent } from './admincompany-reportes/admincompany-reportes.component';
 import { ResidentInfoDetailComponent } from './resident-info-detail/resident-info-detail.component';
+import { AdmincompanyResidenteFormComponent } from './admincompany-residente-form/admincompany-residente-form.component';
 
 export const admincompanyRoutes: Routes = [
     {
@@ -20,6 +21,14 @@ export const admincompanyRoutes: Routes = [
             {
                 path: 'residentes',
                 component: AdmincompanyResidentesComponent
+            },
+            {
+                path: 'residentes/nuevo/:communityId',
+                component: AdmincompanyResidenteFormComponent
+            },
+            {
+                path: 'residentes/editar/:id',
+                component: AdmincompanyResidenteFormComponent
             },
             {
                 path: 'residentes/:id',

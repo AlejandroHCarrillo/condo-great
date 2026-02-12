@@ -4,14 +4,18 @@ import { Residente, ResidentDto } from '../interfaces/residente.interface';
  * Mapea ResidentDto del backend a Residente del frontend.
  */
 export function mapDtoToResidente(dto: ResidentDto): Residente {
+  const rawIds = dto.communityIds ?? [];
+  const fromSingle = dto.communityId != null ? [String(dto.communityId)] : [];
+  const communityIds = rawIds.length > 0 ? rawIds : fromSingle;
   return {
     id: dto.userId,
-    fullname: dto.fullName,
+    residentId: dto.id,
+    fullname: dto.fullName ?? '',
     email: dto.email ?? undefined,
     phone: dto.phone ?? undefined,
     number: dto.number ?? undefined,
-    address: dto.address,
-    comunidades: (dto.communityIds ?? []).map(cid => typeof cid === 'string' ? cid : String(cid))
+    address: dto.address ?? '',
+    comunidades: communityIds.map(cid => typeof cid === 'string' ? cid : String(cid))
   };
 }
 
