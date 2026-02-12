@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using HappyHabitat.Domain.Entities;
 using HappyHabitat.Infrastructure.Data;
 using HappyHabitat.Infrastructure.Services;
+using System.Linq;
 
 namespace HappyHabitat.Infrastructure.Seeders;
 
@@ -379,6 +380,69 @@ public class DummySeeder : IDataSeeder
             await _context.SaveChangesAsync();
         }
 
+        // Seed 10 residents per community (for all communities in the database)
+        var allCommunitiesForResidents = await _context.Communities.ToListAsync();
+        foreach (var community in allCommunitiesForResidents)
+        {
+            var currentCount = await _context.Residents.CountAsync(r => r.CommunityId == community.Id);
+            var toCreate = 10 - currentCount;
+            if (toCreate <= 0) continue;
+
+            var communityPrefix = community.Id.ToString("N")[..8];
+            var created = 0;
+            for (int i = 1; created < toCreate; i++)
+            {
+                var suffix = currentCount + i;
+                var username = $"res_{communityPrefix}_{suffix}";
+                if (await _context.Users.AnyAsync(u => u.Username == username))
+                    continue;
+
+                var firstName = "Residente";
+                var lastName = $"#{suffix}";
+                var email = $"{username}@example.com";
+
+                var user = new User
+                {
+                    Id = Guid.NewGuid(),
+                    RoleId = residentRoleId,
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Username = username,
+                    Email = email,
+                    Password = _passwordHasher.HashPassword("password123"),
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                };
+                await _context.Users.AddAsync(user);
+                await _context.SaveChangesAsync();
+
+                var userRole = new UserRole
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = user.Id,
+                    RoleId = residentRoleId,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                };
+                await _context.UserRoles.AddAsync(userRole);
+
+                var resident = new Resident
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = user.Id,
+                    CommunityId = community.Id,
+                    FullName = $"{firstName} {lastName}",
+                    Email = email,
+                    Phone = "4420000000",
+                    Number = $"{suffix:D3}",
+                    Address = community.Direccion,
+                    CreatedAt = DateTime.UtcNow.ToString("O")
+                };
+                await _context.Residents.AddAsync(resident);
+                await _context.SaveChangesAsync();
+                created++;
+            }
+        }
+
         // Seed 3 Company Administrators with unique communities
         // Company Administrator 1 - 3 communities
         var admin1Id = new Guid("BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB");
@@ -595,23 +659,26 @@ public class DummySeeder : IDataSeeder
                     var localResidentRoleId = new Guid("44444444-4444-4444-4444-444444444444");
                     
                     // Sanitize community name for username and email
+                    // Username has max length of 15, so we use "res_" (4 chars) + up to 11 chars from name
                     var sanitizedName = community.Nombre
                         .Replace(" ", "_")
                         .Replace("-", "_")
                         .Replace(".", "")
                         .Replace(",", "")
                         .ToLower();
-                    var username = $"residente_{sanitizedName.Substring(0, Math.Min(15, sanitizedName.Length))}";
+                    // Generate username with max 15 characters: "res_" (4) + name (max 11)
+                    var usernameSuffix = sanitizedName.Substring(0, Math.Min(11, sanitizedName.Length));
+                    var username = $"res_{usernameSuffix}";
                     var emailName = community.Nombre
                         .Replace(" ", ".")
                         .Replace("-", ".")
                         .Replace(",", "")
                         .ToLower();
                     var email = $"residente.{emailName.Substring(0, Math.Min(25, emailName.Length))}@example.com";
-                    var lastName = community.Nombre
+                    var lastNameProcessed = community.Nombre
                         .Replace(" ", "")
-                        .Replace("-", "")
-                        .Substring(0, Math.Min(20, community.Nombre.Length));
+                        .Replace("-", "");
+                    var lastName = lastNameProcessed.Substring(0, Math.Min(20, lastNameProcessed.Length));
                     
                     var residentUser = new User
                     {
@@ -800,86 +867,55 @@ public class DummySeeder : IDataSeeder
                 await _context.SaveChangesAsync();
             }
 
-            // Create visits: 2 before today and 3 after today
+            // Create 3 visits if they don't exist
             var existingVisitsCount = await _context.ResidentVisits
                 .CountAsync(v => v.ResidentId == resident.Id);
 
             if (existingVisitsCount == 0)
             {
                 var today = DateTime.UtcNow;
-                var visits = new List<ResidentVisit>();
-
-                // 2 visits before today
-                visits.Add(new ResidentVisit
+                var visits = new[]
                 {
-                    Id = Guid.NewGuid(),
-                    ResidentId = resident.Id,
-                    VisitorName = "John Doe",
-                    TotalPeople = 2,
-                    VehicleColor = "Red",
-                    LicensePlate = "VIS-001",
-                    Subject = "Family Visit",
-                    ArrivalDate = today.AddDays(-5).ToString("O"),
-                    DepartureDate = today.AddDays(-4).ToString("O"),
-                    CreatedAt = today.AddDays(-5).ToString("O")
-                });
-
-                visits.Add(new ResidentVisit
-                {
-                    Id = Guid.NewGuid(),
-                    ResidentId = resident.Id,
-                    VisitorName = "Jane Smith",
-                    TotalPeople = 1,
-                    VehicleColor = "White",
-                    LicensePlate = "VIS-002",
-                    Subject = "Friend Visit",
-                    ArrivalDate = today.AddDays(-2).ToString("O"),
-                    DepartureDate = today.AddDays(-1).ToString("O"),
-                    CreatedAt = today.AddDays(-2).ToString("O")
-                });
-
-                // 3 visits after today
-                visits.Add(new ResidentVisit
-                {
-                    Id = Guid.NewGuid(),
-                    ResidentId = resident.Id,
-                    VisitorName = "Robert Johnson",
-                    TotalPeople = 3,
-                    VehicleColor = "Blue",
-                    LicensePlate = "VIS-003",
-                    Subject = "Family Gathering",
-                    ArrivalDate = today.AddDays(2).ToString("O"),
-                    DepartureDate = today.AddDays(4).ToString("O"),
-                    CreatedAt = DateTime.UtcNow.ToString("O")
-                });
-
-                visits.Add(new ResidentVisit
-                {
-                    Id = Guid.NewGuid(),
-                    ResidentId = resident.Id,
-                    VisitorName = "Maria Garcia",
-                    TotalPeople = 2,
-                    VehicleColor = "Green",
-                    LicensePlate = "VIS-004",
-                    Subject = "Weekend Visit",
-                    ArrivalDate = today.AddDays(5).ToString("O"),
-                    DepartureDate = today.AddDays(7).ToString("O"),
-                    CreatedAt = DateTime.UtcNow.ToString("O")
-                });
-
-                visits.Add(new ResidentVisit
-                {
-                    Id = Guid.NewGuid(),
-                    ResidentId = resident.Id,
-                    VisitorName = "David Wilson",
-                    TotalPeople = 1,
-                    VehicleColor = null,
-                    LicensePlate = null,
-                    Subject = "Business Meeting",
-                    ArrivalDate = today.AddDays(10).ToString("O"),
-                    DepartureDate = null, // Ongoing visit
-                    CreatedAt = DateTime.UtcNow.ToString("O")
-                });
+                    new ResidentVisit
+                    {
+                        Id = Guid.NewGuid(),
+                        ResidentId = resident.Id,
+                        VisitorName = "John Doe",
+                        TotalPeople = 2,
+                        VehicleColor = "Red",
+                        LicensePlate = "VIS-001",
+                        Subject = "Family Visit",
+                        ArrivalDate = today.AddDays(-5).ToString("O"),
+                        DepartureDate = today.AddDays(-4).ToString("O"),
+                        CreatedAt = today.AddDays(-5).ToString("O")
+                    },
+                    new ResidentVisit
+                    {
+                        Id = Guid.NewGuid(),
+                        ResidentId = resident.Id,
+                        VisitorName = "Jane Smith",
+                        TotalPeople = 1,
+                        VehicleColor = "White",
+                        LicensePlate = "VIS-002",
+                        Subject = "Friend Visit",
+                        ArrivalDate = today.AddDays(-2).ToString("O"),
+                        DepartureDate = today.AddDays(-1).ToString("O"),
+                        CreatedAt = today.AddDays(-2).ToString("O")
+                    },
+                    new ResidentVisit
+                    {
+                        Id = Guid.NewGuid(),
+                        ResidentId = resident.Id,
+                        VisitorName = "Robert Johnson",
+                        TotalPeople = 3,
+                        VehicleColor = "Blue",
+                        LicensePlate = "VIS-003",
+                        Subject = "Family Gathering",
+                        ArrivalDate = today.AddDays(2).ToString("O"),
+                        DepartureDate = today.AddDays(4).ToString("O"),
+                        CreatedAt = DateTime.UtcNow.ToString("O")
+                    }
+                };
 
                 await _context.ResidentVisits.AddRangeAsync(visits);
                 await _context.SaveChangesAsync();
@@ -1700,6 +1736,250 @@ https://drive.google.com/file/d/1OG95bOMdZKWme-90_dg3VhTuYs1jMlfd/view?usp=shari
 
             // Actualizar los estatus de los cargos
             await _context.SaveChangesAsync();
+        }
+
+        // Add vehicles, pets, and visits for all residents
+        Console.WriteLine("=== Starting AddVehiclesPetsAndVisitsToAllResidents ===");
+        await AddVehiclesPetsAndVisitsToAllResidents();
+        Console.WriteLine("=== Finished AddVehiclesPetsAndVisitsToAllResidents ===");
+    }
+
+    private async Task AddVehiclesPetsAndVisitsToAllResidents()
+    {
+        try
+        {
+            Console.WriteLine("=== AddVehiclesPetsAndVisitsToAllResidents: Starting ===");
+            var random = new Random();
+            
+            // Verificar que hay residentes antes de continuar
+            var residentCount = await _context.Residents.CountAsync();
+            Console.WriteLine($"AddVehiclesPetsAndVisitsToAllResidents: Total residents in database: {residentCount}");
+            
+            if (residentCount == 0)
+            {
+                Console.WriteLine("WARNING: No residents found in database! Skipping vehicles, pets, and visits seeding.");
+                return;
+            }
+            
+            var allResidents = await _context.Residents.ToListAsync();
+            Console.WriteLine($"AddVehiclesPetsAndVisitsToAllResidents: Loaded {allResidents.Count} residents from database");
+
+        // Get vehicle type IDs
+        var carTypeId = new Guid("77777777-7777-7777-7777-777777777777");
+        var suvTypeId = new Guid("AAAAAAAA-BBBB-BBBB-BBBB-BBBBBBBBBBBB");
+        var motorcycleTypeId = new Guid("88888888-8888-8888-8888-888888888888");
+        var truckTypeId = new Guid("99999999-9999-9999-9999-999999999999");
+        var vanTypeId = new Guid("BBBBBBBB-CCCC-CCCC-CCCC-CCCCCCCCCCCC");
+        var vehicleTypes = new[] { carTypeId, suvTypeId, motorcycleTypeId, truckTypeId, vanTypeId };
+
+        var brands = new[] { "Toyota", "Honda", "Ford", "Chevrolet", "Nissan", "Volkswagen", "BMW", "Mercedes-Benz" };
+        var models = new[] { "Camry", "Civic", "F-150", "Silverado", "Altima", "Jetta", "3 Series", "C-Class" };
+        var colors = new[] { "Black", "White", "Silver", "Gray", "Red", "Blue", "Green", "Brown" };
+        var petNames = new[] { "Max", "Luna", "Charlie", "Bella", "Rocky", "Daisy", "Milo", "Lucy", "Cooper", "Sadie" };
+        var petSpecies = new[] { "Dog", "Cat", "Bird", "Rabbit" };
+        var dogBreeds = new[] { "Golden Retriever", "Labrador", "German Shepherd", "Bulldog", "Beagle" };
+        var catBreeds = new[] { "Persian", "Siamese", "Maine Coon", "British Shorthair", "Ragdoll" };
+        var petColors = new[] { "Golden", "Black", "White", "Brown", "Gray", "Orange", "Calico" };
+        var visitorNames = new[] { "John Doe", "Jane Smith", "Robert Johnson", "Maria Garcia", "David Wilson", 
+            "Sarah Martinez", "Michael Brown", "Emily Davis", "James Wilson", "Lisa Anderson" };
+        var visitSubjects = new[] { "Family Visit", "Friend Visit", "Business Meeting", "Weekend Visit", 
+            "Family Gathering", "Social Event", "Maintenance", "Delivery" };
+
+            foreach (var resident in allResidents)
+            {
+                try
+                {
+                    // Skip if resident already has data (elgrandeahc)
+                    var hasVehicles = await _context.Vehicles.AnyAsync(v => v.ResidentId == resident.Id);
+                    var hasPets = await _context.Pets.AnyAsync(p => p.ResidentId == resident.Id);
+                    var hasVisits = await _context.ResidentVisits.AnyAsync(v => v.ResidentId == resident.Id);
+                    
+                    Console.WriteLine($"Processing resident {resident.Id} ({resident.FullName}): hasVehicles={hasVehicles}, hasPets={hasPets}, hasVisits={hasVisits}");
+
+                    // Add 0-3 vehicles (but ensure at least some residents have vehicles)
+                    if (!hasVehicles)
+                    {
+                        // Ensure at least 50% of residents have at least 1 vehicle
+                        var vehicleCount = random.Next(0, 4); // 0 to 3
+                        // If this is one of the first residents and no vehicles yet, ensure at least 1
+                        if (vehicleCount == 0 && allResidents.IndexOf(resident) < allResidents.Count / 2)
+                        {
+                            vehicleCount = random.Next(1, 4); // 1 to 3
+                        }
+                        var vehicles = new List<Vehicle>();
+
+                        for (int i = 0; i < vehicleCount; i++)
+                        {
+                            var vehicleTypeId = vehicleTypes[random.Next(vehicleTypes.Length)];
+                            var brand = brands[random.Next(brands.Length)];
+                            var model = models[random.Next(models.Length)];
+                            var color = colors[random.Next(colors.Length)];
+                            var year = random.Next(2015, 2024);
+                            var licensePlate = $"{brand.Substring(0, 3).ToUpper()}-{random.Next(100, 999)}";
+
+                            vehicles.Add(new Vehicle
+                            {
+                                Id = Guid.NewGuid(),
+                                ResidentId = resident.Id,
+                                VehicleTypeId = vehicleTypeId,
+                                Brand = brand,
+                                Model = model,
+                                Year = year,
+                                Color = color,
+                                LicensePlate = licensePlate,
+                                CreatedAt = DateTime.UtcNow.ToString("O")
+                            });
+                        }
+
+                        if (vehicles.Any())
+                        {
+                            await _context.Vehicles.AddRangeAsync(vehicles);
+                            await _context.SaveChangesAsync();
+                            Console.WriteLine($"✓ Added {vehicles.Count} vehicles for resident {resident.Id}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"  No vehicles added for resident {resident.Id} (random count was 0)");
+                        }
+                    }
+
+                    // Add 0-3 pets (but ensure at least some residents have pets)
+                    if (!hasPets)
+                    {
+                        // Ensure at least 50% of residents have at least 1 pet
+                        var petCount = random.Next(0, 4); // 0 to 3
+                        // If this is one of the first residents and no pets yet, ensure at least 1
+                        if (petCount == 0 && allResidents.IndexOf(resident) < allResidents.Count / 2)
+                        {
+                            petCount = random.Next(1, 4); // 1 to 3
+                        }
+                        var pets = new List<Pet>();
+
+                        for (int i = 0; i < petCount; i++)
+                        {
+                            var species = petSpecies[random.Next(petSpecies.Length)];
+                            string breed;
+                            if (species == "Dog")
+                            {
+                                breed = dogBreeds[random.Next(dogBreeds.Length)];
+                            }
+                            else if (species == "Cat")
+                            {
+                                breed = catBreeds[random.Next(catBreeds.Length)];
+                            }
+                            else
+                            {
+                                breed = species;
+                            }
+
+                            pets.Add(new Pet
+                            {
+                                Id = Guid.NewGuid(),
+                                ResidentId = resident.Id,
+                                Name = petNames[random.Next(petNames.Length)],
+                                Species = species,
+                                Breed = breed,
+                                Age = random.Next(1, 10),
+                                Color = petColors[random.Next(petColors.Length)],
+                                CreatedAt = DateTime.UtcNow.ToString("O")
+                            });
+                        }
+
+                        if (pets.Any())
+                        {
+                            await _context.Pets.AddRangeAsync(pets);
+                            await _context.SaveChangesAsync();
+                            Console.WriteLine($"✓ Added {pets.Count} pets for resident {resident.Id}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"  No pets added for resident {resident.Id} (random count was 0)");
+                        }
+                    }
+
+                    // Add 1-5 visits
+                    if (!hasVisits)
+                    {
+                        var visitCount = random.Next(1, 6); // 1 to 5
+                        var visits = new List<ResidentVisit>();
+                        var today = DateTime.UtcNow;
+
+                        for (int i = 0; i < visitCount; i++)
+                        {
+                            var daysOffset = random.Next(-30, 30); // Visits in the past 30 days or next 30 days
+                            var arrivalDate = today.AddDays(daysOffset);
+                            var departureDate = arrivalDate.AddDays(random.Next(1, 5)); // 1-4 days stay
+                            
+                            // Some visits might be ongoing (no departure date)
+                            var hasDeparture = random.Next(0, 10) < 8; // 80% chance of having departure date
+
+                            var vehicleColor = random.Next(0, 10) < 7 ? colors[random.Next(colors.Length)] : null; // 70% chance
+                            var licensePlate = vehicleColor != null ? $"VIS-{random.Next(100, 999)}" : null;
+
+                            visits.Add(new ResidentVisit
+                            {
+                                Id = Guid.NewGuid(),
+                                ResidentId = resident.Id,
+                                VisitorName = visitorNames[random.Next(visitorNames.Length)],
+                                TotalPeople = random.Next(1, 5),
+                                VehicleColor = vehicleColor,
+                                LicensePlate = licensePlate,
+                                Subject = visitSubjects[random.Next(visitSubjects.Length)],
+                                ArrivalDate = arrivalDate.ToString("O"),
+                                DepartureDate = hasDeparture ? departureDate.ToString("O") : null,
+                                CreatedAt = arrivalDate.ToString("O")
+                            });
+                        }
+
+                        if (visits.Any())
+                        {
+                            await _context.ResidentVisits.AddRangeAsync(visits);
+                            await _context.SaveChangesAsync();
+                            Console.WriteLine($"✓ Added {visits.Count} visits for resident {resident.Id}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"  No visits added for resident {resident.Id} (should not happen, min is 1)");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"ERROR processing resident {resident.Id}: {ex.Message}");
+                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                }
+            }
+            
+            // Verificar datos finales
+            var finalVehicleCount = await _context.Vehicles.CountAsync();
+            var finalPetCount = await _context.Pets.CountAsync();
+            var finalVisitCount = await _context.ResidentVisits.CountAsync();
+            
+            // Verificar cuántos residentes tienen cada tipo de dato
+            var residentsWithVehicles = await _context.Residents
+                .Where(r => _context.Vehicles.Any(v => v.ResidentId == r.Id))
+                .CountAsync();
+            var residentsWithPets = await _context.Residents
+                .Where(r => _context.Pets.Any(p => p.ResidentId == r.Id))
+                .CountAsync();
+            var residentsWithVisits = await _context.Residents
+                .Where(r => _context.ResidentVisits.Any(v => v.ResidentId == r.Id))
+                .CountAsync();
+            
+            Console.WriteLine($"=== AddVehiclesPetsAndVisitsToAllResidents: Completed successfully ===");
+            Console.WriteLine($"Final counts - Vehicles: {finalVehicleCount}, Pets: {finalPetCount}, Visits: {finalVisitCount}");
+            Console.WriteLine($"Residents with data - Vehicles: {residentsWithVehicles}/{allResidents.Count}, Pets: {residentsWithPets}/{allResidents.Count}, Visits: {residentsWithVisits}/{allResidents.Count}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"=== FATAL ERROR in AddVehiclesPetsAndVisitsToAllResidents ===");
+            Console.WriteLine($"Error message: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+            }
+            throw; // Re-throw to let the caller know there was an error
         }
     }
 }

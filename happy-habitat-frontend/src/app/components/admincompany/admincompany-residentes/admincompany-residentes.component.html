@@ -1,64 +1,73 @@
 <div class="p-4">
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold mb-2">Gestión de Residentes</h1>
-        <p class="text-gray-600">Administración de residentes de por comunidad</p>
+    <!-- Título y Selector de Comunidad en la misma línea -->
+    <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+        <h1 class="text-2xl font-bold">Gestión de Residentes</h1>
+        
+        @if (comunidadesAsociadas().length > 0) {
+            <div class="flex items-center gap-4">
+                <label class="text-sm font-medium whitespace-nowrap">
+                    <i class="fa-solid fa-building mr-2"></i>
+                    Filtrar por Comunidad
+                </label>
+                <select 
+                    class="select select-bordered w-full max-w-xs"
+                    [ngModel]="selectedComunidadId()"
+                    (ngModelChange)="onComunidadChange($event)"
+                >
+                    <option value="" disabled>Seleccione una comunidad</option>
+                    @for (comunidad of comunidadesAsociadas(); track comunidad.id) {
+                        <option [value]="comunidad.id">{{ comunidad.nombre }}</option>
+                    }
+                    <option value="all">Todas las comunidades</option>
+                </select>
+            </div>
+        }
     </div>
-    <!-- Selector de Comunidad -->
-    @if (comunidadesAsociadas().length > 0) {
-        <div class="mb-6 flex items-center gap-4">
-            <label class="text-sm font-medium whitespace-nowrap">
-                <i class="fa-solid fa-building mr-2"></i>
-                Filtrar por Comunidad
-            </label>
-            <select 
-                class="select select-bordered w-full max-w-xs"
-                [value]="selectedComunidadId()"
-                (change)="onComunidadChange($event)"
-            >
-                <option value="" disabled>Seleccione una comunidad</option>
-                @for (comunidad of comunidadesAsociadas(); track comunidad.id) {
-                    <option [value]="comunidad.id">{{ comunidad.nombre }}</option>
-                }
-                <option value="all">Todas las comunidades</option>
-            </select>
-        </div>
-    } @else {
+    
+    @if (comunidadesAsociadas().length === 0) {
         <div class="alert alert-warning mb-6">
             <i class="fa-solid fa-triangle-exclamation mr-2"></i>
             <span>No tienes comunidades asociadas. Contacta al administrador del sistema.</span>
         </div>
     }
 
-    <!-- Tabla de Residentes -->
-    <div class="overflow-x-auto">
+    @if (isLoading()) {
+        <div class="flex justify-center items-center py-8">
+            <span class="loading loading-spinner loading-lg"></span>
+            <span class="ml-4">Cargando residentes...</span>
+        </div>
+    } @else {
+        <!-- Tabla de Residentes -->
+        <div class="overflow-x-auto">
         <table class="table table-zebra w-full">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Comunidad</th>
-                    <th>Número de Casa</th>
-                    <th>Nombre Completo</th>
+                    <th># Casa</th>
+                    <th>Residente</th>
                     <th>Email</th>
                     <th>Teléfono</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @if (residentesFiltrados().length === 0) {
                     <tr>
-                        <td colspan="5" class="text-center py-8 text-gray-500">
+                        <td colspan="7" class="text-center py-8 text-gray-500">
                             <i class="fa-solid fa-inbox mr-2"></i>
                             No se encontraron residentes
                         </td>
                     </tr>
                 } @else {
-                    @for (residente of residentesFiltrados(); track residente.id) {
-                        <tr>
+                    @for (residente of residentesFiltrados(); track residente.id; let index = $index) {
+                        <tr class="cursor-pointer hover:bg-base-200 transition-colors" (click)="viewResidentDetail(residente)">
+                            <td><span class="text-sm">{{ index + 1 }} </span> </td>
                             <td>
                                 @if (residente.comunidades && residente.comunidades.length > 0) {
                                     <div class="flex flex-wrap gap-1">
                                         @for (comunidadId of residente.comunidades; track comunidadId) {
-                                            <span class="badge badge-secondary badge-sm">
-                                                {{ getComunidadNombre(comunidadId) }}
-                                            </span>
+                                         <span class="text-[10px]"> {{ getComunidadNombre(comunidadId) }} </span>
                                         }
                                     </div>
                                 } @else {
@@ -67,7 +76,7 @@
                             </td>
                             <td>
                                 @if (residente.number) {
-                                    <span class="badge badge-outline">{{ residente.number }}</span>
+                                    <span class="text-xsm">{{ residente.number }}</span>
                                 } @else {
                                     <span class="text-gray-400">-</span>
                                 }
@@ -91,12 +100,21 @@
                                     <span class="text-gray-400">-</span>
                                 }
                             </td>
+                            <td>
+                                <button 
+                                    class="btn btn-xs btn-primary"
+                                    (click)="viewResidentDetail(residente); $event.stopPropagation()"
+                                >
+                                    Detalles
+                                </button>
+                            </td>
                         </tr>
                     }
                 }
             </tbody>
         </table>
-    </div>
+        </div>
+    }
 
     <!-- Información de resultados -->
     @if (selectedComunidadId()) {

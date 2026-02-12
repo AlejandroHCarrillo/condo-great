@@ -1,0 +1,295 @@
+<div class="p-4">
+  <!-- Botón de regreso -->
+  <div class="mb-4 flex justify-end">
+    <button (click)="goBack()" class="btn btn-sm btn-ghost btn-secondary">
+      <i class="fa-solid fa-arrow-left mr-2"></i>
+      Volver a la lista
+    </button>
+  </div>
+
+  @if (resident(); as currentResident) {
+    <!-- Información del Residente -->
+    <div class="card bg-base-100 shadow-xl mb-6">
+      <div class="card-body">
+        <h2 class="card-title text-2xl mb-4">
+          <i class="fa-solid fa-user mr-2"></i>
+          Información del Residente
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="label">
+              <span class="label-text font-semibold">Nombre Completo</span>
+            </label>
+            <p class="text-lg">{{ currentResident.fullname }}</p>
+          </div>
+
+          <div>
+            <label class="label">
+              <span class="label-text font-semibold">Número de Casa</span>
+            </label>
+            <p class="text-lg">
+              @if (currentResident.number) {
+                <span class="badge badge-outline badge-lg">{{ currentResident.number }}</span>
+              } @else {
+                <span class="text-gray-400">-</span>
+              }
+            </p>
+          </div>
+
+          <div>
+            <label class="label">
+              <span class="label-text font-semibold">Email</span>
+            </label>
+            <p class="text-lg">
+              @if (currentResident.email) {
+                <a [href]="'mailto:' + currentResident.email" class="link link-primary">
+                  {{ currentResident.email }}
+                </a>
+              } @else {
+                <span class="text-gray-400">-</span>
+              }
+            </p>
+          </div>
+
+          <div>
+            <label class="label">
+              <span class="label-text font-semibold">Teléfono</span>
+            </label>
+            <p class="text-lg">
+              @if (currentResident.phone) {
+                <a [href]="'tel:' + currentResident.phone" class="link link-primary">
+                  {{ currentResident.phone }}
+                </a>
+              } @else {
+                <span class="text-gray-400">-</span>
+              }
+            </p>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="label">
+              <span class="label-text font-semibold">Dirección</span>
+            </label>
+            <p class="text-lg">{{ currentResident.address }}</p>
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="label">
+              <span class="label-text font-semibold">Comunidad(es)</span>
+            </label>
+            <div class="flex flex-wrap gap-2">
+              @if (currentResident.comunidades && currentResident.comunidades.length > 0) {
+                @for (comunidadId of currentResident.comunidades; track comunidadId) {
+                  <span class="badge badge-secondary badge-lg">
+                    {{ getComunidadNombre(comunidadId) }}
+                  </span>
+                }
+              } @else {
+                <span class="text-gray-400">-</span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vehículos -->
+    <div class="card bg-base-100 shadow-xl mb-6">
+      <div class="card-body">
+        <h2 class="card-title text-2xl mb-4">
+          <i class="fa-solid fa-car mr-2"></i>
+          Vehículos
+        </h2>
+        
+        @if (vehicles().length === 0) {
+          <div class="alert alert-info">
+            <i class="fa-solid fa-info-circle mr-2"></i>
+            <span>Este residente no tiene vehículos registrados.</span>
+          </div>
+        } @else {
+          <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+              <thead>
+                <tr>
+                  <th>Marca</th>
+                  <th>Modelo</th>
+                  <th>Año</th>
+                  <th>Color</th>
+                  <th>Placas</th>
+                  <th>Tipo</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (vehicle of vehicles(); track vehicle.id) {
+                  <tr>
+                    <td>{{ vehicle.brand }}</td>
+                    <td>{{ vehicle.model }}</td>
+                    <td>{{ vehicle.year }}</td>
+                    <td>
+                      <span class="badge badge-outline">{{ vehicle.color }}</span>
+                    </td>
+                    <td>
+                      <span class="badge badge-primary">{{ vehicle.licensePlate }}</span>
+                    </td>
+                    <td>{{ vehicle.vehicleTypeName }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Mascotas -->
+    <div class="card bg-base-100 shadow-xl mb-6">
+      <div class="card-body">
+        <h2 class="card-title text-2xl mb-4">
+          <i class="fa-solid fa-paw mr-2"></i>
+          Mascotas
+        </h2>
+        
+        @if (pets().length === 0) {
+          <div class="alert alert-info">
+            <i class="fa-solid fa-info-circle mr-2"></i>
+            <span>Este residente no tiene mascotas registradas.</span>
+          </div>
+        } @else {
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @for (pet of pets(); track pet.id) {
+              <div class="card bg-base-200 shadow">
+                <div class="card-body">
+                  <h3 class="card-title text-lg">{{ pet.name }}</h3>
+                  <div class="space-y-2">
+                    <p><span class="font-semibold">Especie:</span> {{ pet.species }}</p>
+                    <p><span class="font-semibold">Raza:</span> {{ pet.breed }}</p>
+                    <p><span class="font-semibold">Edad:</span> {{ pet.age }} años</p>
+                    <p><span class="font-semibold">Color:</span> {{ pet.color }}</p>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Visitas -->
+    <div class="card bg-base-100 shadow-xl mb-6">
+      <div class="card-body">
+        <h2 class="card-title text-2xl mb-4">
+          <i class="fa-solid fa-users mr-2"></i>
+          Visitas
+        </h2>
+        
+        @if (visits().length === 0) {
+          <div class="alert alert-info">
+            <i class="fa-solid fa-info-circle mr-2"></i>
+            <span>Este residente no tiene visitas registradas.</span>
+          </div>
+        } @else {
+          <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+              <thead>
+                <tr>
+                  <th>Visitante</th>
+                  <th>Asunto</th>
+                  <th>Personas</th>
+                  <th>Vehículo</th>
+                  <th>Placas</th>
+                  <th>Llegada</th>
+                  <th>Salida</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (visit of visits(); track visit.id) {
+                  <tr>
+                    <td class="font-medium">{{ visit.visitorName }}</td>
+                    <td>{{ visit.subject }}</td>
+                    <td>
+                      <span class="badge badge-outline">{{ visit.totalPeople }}</span>
+                    </td>
+                    <td>
+                      @if (visit.vehicleColor) {
+                        <span class="badge badge-secondary">{{ visit.vehicleColor }}</span>
+                      } @else {
+                        <span class="text-gray-400">-</span>
+                      }
+                    </td>
+                    <td>
+                      @if (visit.licensePlate) {
+                        <span class="badge badge-primary">{{ visit.licensePlate }}</span>
+                      } @else {
+                        <span class="text-gray-400">-</span>
+                      }
+                    </td>
+                    <td>{{ formatDate(visit.arrivalDate) }}</td>
+                    <td>
+                      @if (visit.departureDate) {
+                        {{ formatDate(visit.departureDate) }}
+                      } @else {
+                        <span class="badge badge-warning">En curso</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Preferencias -->
+    <div class="card bg-base-100 shadow-xl mb-6">
+      <div class="card-body">
+        <h2 class="card-title text-2xl mb-4">
+          <i class="fa-solid fa-heart mr-2"></i>
+          Preferencias
+        </h2>
+        
+        @if (preferences().length === 0) {
+          <div class="alert alert-info">
+            <i class="fa-solid fa-info-circle mr-2"></i>
+            <span>Este residente no tiene preferencias configuradas.</span>
+          </div>
+        } @else {
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            @for (pref of preferences(); track pref.preferencia.id) {
+              <div class="card bg-base-200 shadow">
+                <div class="card-body">
+                  <h3 class="card-title text-lg">{{ pref.preferencia.descripcion }}</h3>
+                  <div class="mt-2">
+                    @if (pref.valores && pref.valores.length > 0) {
+                      <div class="flex flex-wrap gap-2">
+                        @for (valor of pref.valores; track $index) {
+                          @if (valor && valor.trim() !== '') {
+                            <span class="badge badge-primary">{{ valor }}</span>
+                          }
+                        }
+                      </div>
+                    } @else {
+                      <span class="text-gray-400 text-sm">Sin valores configurados</span>
+                    }
+                  </div>
+                  @if (pref.preferencia.opciones && pref.preferencia.opciones.length > 0) {
+                    <div class="mt-2 text-xs text-gray-500">
+                      <span class="font-semibold">Opciones disponibles:</span>
+                      {{ pref.preferencia.opciones.join(', ') }}
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="alert alert-error">
+      <i class="fa-solid fa-exclamation-triangle mr-2"></i>
+      <span>No se pudo cargar la información del residente.</span>
+    </div>
+  }
+</div>

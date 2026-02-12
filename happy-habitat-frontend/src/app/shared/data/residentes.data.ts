@@ -3,6 +3,15 @@ import { v4 as UUIDV4 } from 'uuid';
 
 export const residentesdata: Residente[] = [
   {
+    id: "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA", // elgrandeahc
+    fullname: 'Alejandro Hernandez',
+    number: '101',
+    address: 'Main Building, Apartment 101',
+    email: 'elgrandeahc@happyhabitat.com',
+    phone: '+1-555-0100',
+    comunidades: ['fcdc9a85-88b7-4109-84b3-a75107392d87', 'ff7bc6fb-0f13-4e37-beb4-7d428520c227', 'c4a28c40-a2c7-4190-961c-f3f52ad19c1d']
+  },
+  {
     id: "4f8ddeb4-01a3-4bdf-bc4a-7c43f5d27ef7",// UUIDV4(),
     fullname: 'Alejandro El grande',
     number: 'B-120',
