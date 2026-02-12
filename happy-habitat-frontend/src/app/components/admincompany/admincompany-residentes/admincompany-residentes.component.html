@@ -1,7 +1,10 @@
 <div class="p-4">
     <!-- Título y Selector de Comunidad en la misma línea -->
     <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
-        <h1 class="text-2xl font-bold">Gestión de Residentes</h1>
+        <h1 class="text-2xl font-bold flex items-center gap-2">
+            <i class="fa-solid fa-address-book text-primary"></i>
+            Gestión de Residentes
+        </h1>
 
         @if (comunidadesAsociadas().length > 0) {
             <div class="flex items-center gap-4">
