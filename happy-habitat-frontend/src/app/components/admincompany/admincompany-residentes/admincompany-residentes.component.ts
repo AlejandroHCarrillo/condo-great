@@ -1,114 +1,224 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { switchMap, catchError } from 'rxjs/operators';
+import { rxResource } from '../../../utils/rx-resource.util';
 import { AuthService } from '../../../services/auth.service';
+import { UsersService } from '../../../services/users.service';
+import { ResidentsService, PagedResidentsResult } from '../../../services/residents.service';
+import { CommunitiesService } from '../../../services/communities.service';
 import { Residente } from '../../../shared/interfaces/residente.interface';
 import { Comunidad } from '../../../interfaces/comunidad.interface';
-import { residentesdata } from '../../../shared/data/residentes.data';
-import { comunidadesData } from '../../../shared/data/comunidades.data';
+import { RolesEnum } from '../../../enums/roles.enum';
+import { mapCommunityDtoToComunidad } from '../../../shared/mappers/community.mapper';
+import { PAGE_SIZE_OPTIONS, isPageSizeOption } from '../../../constants/pagination.constants';
 
 @Component({
   selector: 'hh-admincompany-residentes',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './admincompany-residentes.component.html'
 })
-export class AdmincompanyResidentesComponent {
+export class AdmincompanyResidentesComponent implements OnInit {
   private authService = inject(AuthService);
+  private usersService = inject(UsersService);
+  private residentsService = inject(ResidentsService);
+  private communitiesService = inject(CommunitiesService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
-  // Comunidad seleccionada para filtrar
-  // '' = sin selección, 'all' = todas las comunidades, 'id' = comunidad específica
   selectedComunidadId = signal<string>('');
+  private loadedCommunitiesForAdmin = signal<Comunidad[]>([]);
+  currentPage = signal(1);
+  pageSize = signal(10);
+  readonly pageSizeOptions = PAGE_SIZE_OPTIONS;
+  /** Incrementar para forzar recarga del resource tras eliminar. */
+  private refreshTrigger = signal(0);
 
-  // Obtener el usuario actual
-  currentUser = computed(() => this.authService.currentUser());
-
-  // Obtener las comunidades asociadas al admin company
   comunidadesAsociadas = computed(() => {
-    const user = this.currentUser();
+    const user = this.authService.currentUser();
     if (!user) return [];
-    
-    // Priorizar usar user.communities que tiene todas las comunidades completas
-    if (user.communities && user.communities.length > 0) {
-      return user.communities;
-    }
-    
-    // Fallback: obtener desde residentInfo.comunidades (array de IDs)
-    if (user.residentInfo) {
-      const comunidadesIds = (user.residentInfo as any).comunidades || [];
-      // Filtrar las comunidades que coinciden con los IDs
-      return comunidadesData.filter(comunidad => 
-        comunidadesIds.includes(comunidad.id)
-      );
-    }
-    
-    return [];
+    if (user.communities?.length) return user.communities;
+    const loaded = this.loadedCommunitiesForAdmin();
+    return loaded.length ? loaded : [];
   });
 
-  // Todos los residentes (en producción vendría de un servicio)
-  allResidentes = signal<Residente[]>(residentesdata);
+  private residentsResource = rxResource({
+    request: () => ({
+      comunidadId: this.selectedComunidadId(),
+      comunidades: this.comunidadesAsociadas(),
+      page: this.currentPage(),
+      pageSize: this.pageSize(),
+      refresh: this.refreshTrigger()
+    }),
+    loader: ({ request }) => {
+      if (!request.comunidadId) return of({ items: [], totalCount: 0, page: 1, pageSize: request.pageSize, totalPages: 0 });
+      const communityIds =
+        request.comunidadId === 'all'
+          ? request.comunidades.map(c => c.id ?? '').filter(Boolean)
+          : [request.comunidadId];
+      if (!communityIds.length) return of({ items: [], totalCount: 0, page: 1, pageSize: request.pageSize, totalPages: 0 });
+      return communityIds.length === 1
+        ? this.residentsService.getResidentsByCommunityIdPaged(communityIds[0], request.page, request.pageSize)
+        : this.residentsService.getResidentsByCommunitiesPaged(communityIds, request.page, request.pageSize);
+    }
+  });
 
-  // Residentes filtrados por la comunidad seleccionada y ordenados
-  residentesFiltrados = computed(() => {
-    const residentes = this.allResidentes();
-    const comunidadId = this.selectedComunidadId();
-    
-    let residentesFiltrados: Residente[] = [];
-    
-    // Si no hay selección, no mostrar nada
-    if (!comunidadId || comunidadId === '') {
-      return [];
-    }
-    
-    // Si se seleccionó "todas las comunidades"
-    if (comunidadId === 'all') {
-      const comunidadesIds = this.comunidadesAsociadas().map(c => c.id);
-      residentesFiltrados = residentes.filter(residente => 
-        residente.comunidades?.some(comId => comunidadesIds.includes(comId))
-      );
-    } else {
-      // Filtrar por la comunidad seleccionada
-      residentesFiltrados = residentes.filter(residente => 
-        residente.comunidades?.includes(comunidadId)
-      );
-    }
-    
-    // Ordenar por: 1. Comunidad, 2. Número de casa, 3. Nombre
-    return residentesFiltrados.sort((a, b) => {
-      // 1. Ordenar por comunidad (primera comunidad del array)
-      const comunidadA = a.comunidades && a.comunidades.length > 0 
-        ? this.getComunidadNombre(a.comunidades[0]) 
-        : '';
-      const comunidadB = b.comunidades && b.comunidades.length > 0 
-        ? this.getComunidadNombre(b.comunidades[0]) 
-        : '';
-      
-      if (comunidadA !== comunidadB) {
-        return comunidadA.localeCompare(comunidadB);
+  private pagedResult = computed(() => this.residentsResource.value());
+  residentesFiltrados = computed(() => this.pagedResult()?.items ?? []);
+  totalCount = computed(() => this.pagedResult()?.totalCount ?? 0);
+  totalPages = computed(() => this.pagedResult()?.totalPages ?? 0);
+  isLoading = computed(() => this.residentsResource.isLoading());
+
+  /** Números de página a mostrar en el paginador (alrededor de la actual). */
+  paginasVisibles = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    if (total <= 0) return [];
+    const delta = 2;
+    const start = Math.max(1, current - delta);
+    const end = Math.min(total, current + delta);
+    const pages: number[] = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
+  });
+
+  sortColumn = signal<string>('');
+  sortDirection = signal<'asc' | 'desc'>('asc');
+
+  residentesOrdenados = computed(() => {
+    const list = this.residentesFiltrados();
+    const col = this.sortColumn();
+    const dir = this.sortDirection();
+    if (!col) return list;
+    return [...list].sort((a, b) => {
+      let cmp = 0;
+      switch (col) {
+        case 'comunidad':
+          cmp = this.getComunidadNombre(a.comunidades?.[0] ?? '').localeCompare(this.getComunidadNombre(b.comunidades?.[0] ?? ''));
+          break;
+        case 'number':
+          cmp = (a.number ?? '').localeCompare(b.number ?? '', undefined, { numeric: true, sensitivity: 'base' });
+          break;
+        case 'fullname':
+          cmp = (a.fullname ?? '').localeCompare(b.fullname ?? '');
+          break;
+        case 'email':
+          cmp = (a.email ?? '').localeCompare(b.email ?? '');
+          break;
+        case 'phone':
+          cmp = (a.phone ?? '').localeCompare(b.phone ?? '');
+          break;
+        default:
+          return 0;
       }
-      
-      // 2. Si las comunidades son iguales, ordenar por número de casa
-      const numeroA = a.number || '';
-      const numeroB = b.number || '';
-      
-      if (numeroA !== numeroB) {
-        return numeroA.localeCompare(numeroB, undefined, { numeric: true, sensitivity: 'base' });
-      }
-      
-      // 3. Si los números son iguales, ordenar por nombre
-      return a.fullname.localeCompare(b.fullname);
+      return dir === 'asc' ? cmp : -cmp;
     });
   });
 
-  // Obtener el nombre de la comunidad por ID
-  getComunidadNombre(comunidadId: string): string {
-    const comunidad = comunidadesData.find(c => c.id === comunidadId);
-    return comunidad?.nombre || 'Sin comunidad';
+  setSort(column: string): void {
+    if (this.sortColumn() === column) {
+      this.sortDirection.set(this.sortDirection() === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortColumn.set(column);
+      this.sortDirection.set('asc');
+    }
   }
 
-  // Manejar cambio de selección de comunidad
-  onComunidadChange(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    this.selectedComunidadId.set(select.value);
+  getComunidadNombre(comunidadId: string): string {
+    return this.comunidadesAsociadas().find(c => c.id === comunidadId)?.nombre ?? 'Sin comunidad';
+  }
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      const comunidadId = params['comunidad'];
+      if (comunidadId) this.selectedComunidadId.set(comunidadId);
+      const page = params['page'];
+      if (page != null) {
+        const p = Number(page);
+        if (p >= 1) this.currentPage.set(p);
+      }
+      const pageSizeParam = params['pageSize'];
+      if (pageSizeParam != null) {
+        const ps = Number(pageSizeParam);
+        if (isPageSizeOption(ps)) this.pageSize.set(ps);
+      }
+    });
+
+    const user = this.authService.currentUser();
+    if (user?.selectedRole === RolesEnum.ADMIN_COMPANY && !user.communities?.length && user.id) {
+      this.loadCommunitiesForAdmin(user.id);
+    }
+  }
+
+  private loadCommunitiesForAdmin(userId: string): void {
+    this.usersService.getUserById(userId).pipe(
+      switchMap(userDto => {
+        const ids = userDto.userCommunityIds;
+        if (!ids?.length) return of([]);
+        return forkJoin(ids.map(id => this.communitiesService.getCommunityById(id)));
+      }),
+      catchError(() => of([]))
+    ).subscribe(communityDtos => {
+      const comunidades = communityDtos.map(dto => mapCommunityDtoToComunidad(dto));
+      this.loadedCommunitiesForAdmin.set(comunidades);
+    });
+  }
+
+  onComunidadChange(value: string | Event): void {
+    const comunidadId = typeof value === 'string' ? value : (value.target as HTMLSelectElement).value;
+    this.selectedComunidadId.set(comunidadId);
+    this.currentPage.set(1);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { comunidad: comunidadId || null, page: null },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  goToPage(page: number): void {
+    const total = this.totalPages();
+    if (page < 1 || page > total) return;
+    this.currentPage.set(page);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { page: page === 1 ? null : page },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  onPageSizeChange(value: string | number): void {
+    const n = typeof value === 'string' ? Number(value) : value;
+    if (!isPageSizeOption(n)) return;
+    this.pageSize.set(n);
+    this.currentPage.set(1);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { page: null, pageSize: n },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  viewResidentDetail(residente: Residente): void {
+    if (residente.id) {
+      this.router.navigate(['/admincompany/residentes', residente.id], {
+        queryParams: { comunidad: this.selectedComunidadId() || null }
+      });
+    }
+  }
+
+  confirmDeleteResident(residente: Residente): void {
+    const id = residente.residentId;
+    if (!id) return;
+    const nombre = residente.fullname || 'este residente';
+    if (!confirm(`¿Eliminar a ${nombre}? Esta acción no se puede deshacer.`)) return;
+    this.residentsService.deleteResident(id).subscribe({
+      next: () => this.refreshTrigger.update(v => v + 1),
+      error: () => {
+        // ErrorService ya muestra el error; opcional: mensaje específico
+      }
+    });
   }
 }
 

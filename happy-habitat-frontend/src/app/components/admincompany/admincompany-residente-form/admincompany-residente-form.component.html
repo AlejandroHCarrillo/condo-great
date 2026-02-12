@@ -1,0 +1,222 @@
+<div class="p-4 max-w-2xl mx-auto">
+  <div class="flex items-center justify-between gap-4 mb-6">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-address-book text-green-600"></i>
+      {{ title }}
+    </h1>
+    <button type="button" class="btn btn-secondary text-white" (click)="cancel()">
+      Regresar
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando...</span>
+    </div>
+  } @else {
+    @if (errorMessage()) {
+      <div class="alert alert-error mb-4">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form class="space-y-4" (ngSubmit)="save()">
+      @if (!isEditMode()) {
+        <div class="bg-base-200/50 rounded-lg p-4 space-y-4 mb-4">
+          <h2 class="text-lg font-semibold border-b border-base-300 pb-2">Datos del usuario</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="form-control w-full">
+              <label class="label" for="firstName">
+                <span class="label-text font-medium">Nombre</span>
+              </label>
+              <input
+                id="firstName"
+                type="text"
+                class="input input-bordered w-full"
+                [(ngModel)]="form.firstName"
+                name="firstName"
+                required
+              />
+            </div>
+            <div class="form-control w-full">
+              <label class="label" for="lastName">
+                <span class="label-text font-medium">Apellido</span>
+              </label>
+              <input
+                id="lastName"
+                type="text"
+                class="input input-bordered w-full"
+                [(ngModel)]="form.lastName"
+                name="lastName"
+                required
+              />
+            </div>
+          </div>
+          <div class="form-control w-full">
+            <label class="label" for="username">
+              <span class="label-text font-medium">Usuario</span>
+            </label>
+            <input
+              id="username"
+              type="text"
+              class="input input-bordered w-full"
+              [(ngModel)]="form.username"
+              name="username"
+              placeholder="Para iniciar sesión"
+              required
+            />
+          </div>
+          <div class="form-control w-full">
+            <label class="label" for="email">
+              <span class="label-text font-medium">Correo electrónico</span>
+            </label>
+            <input
+              id="email"
+              type="email"
+              class="input input-bordered w-full"
+              [(ngModel)]="form.email"
+              name="email"
+              required
+            />
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="form-control w-full">
+              <label class="label" for="password">
+                <span class="label-text font-medium">Contraseña</span>
+              </label>
+              <input
+                id="password"
+                type="password"
+                class="input input-bordered w-full"
+                [(ngModel)]="form.password"
+                name="password"
+                placeholder="Mínimo 6 caracteres"
+                required
+              />
+            </div>
+            <div class="form-control w-full">
+              <label class="label" for="confirmPassword">
+                <span class="label-text font-medium">Confirmar contraseña</span>
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                class="input input-bordered w-full"
+                [(ngModel)]="form.confirmPassword"
+                name="confirmPassword"
+                required
+              />
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="form-control w-full">
+        <label class="label" for="fullName">
+          <span class="label-text font-medium">Nombre completo</span>
+        </label>
+        <input
+          id="fullName"
+          type="text"
+          class="input input-bordered w-full"
+          [(ngModel)]="form.fullName"
+          name="fullName"
+          required
+        />
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label" for="communityId">
+          <span class="label-text font-medium">Comunidad</span>
+        </label>
+        <select
+          id="communityId"
+          class="select select-bordered w-full"
+          [(ngModel)]="form.communityId"
+          name="communityId"
+          [disabled]="!!communityIdFromRoute()"
+        >
+          <option value="">Sin comunidad</option>
+          @for (c of comunidadesAsociadas(); track c.id) {
+            <option [value]="c.id">{{ c.nombre }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label" for="number">
+          <span class="label-text font-medium">Número de casa</span>
+        </label>
+        <input
+          id="number"
+          type="text"
+          class="input input-bordered w-full"
+          [(ngModel)]="form.number"
+          name="number"
+        />
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label" for="address">
+          <span class="label-text font-medium">Dirección</span>
+        </label>
+        <input
+          id="address"
+          type="text"
+          class="input input-bordered w-full"
+          [(ngModel)]="form.address"
+          name="address"
+          required
+        />
+      </div>
+
+      @if (isEditMode()) {
+        <div class="form-control w-full">
+          <label class="label" for="residentEmail">
+            <span class="label-text font-medium">Email</span>
+          </label>
+          <input
+            id="residentEmail"
+            type="email"
+            class="input input-bordered w-full"
+            [(ngModel)]="form.email"
+            name="residentEmail"
+          />
+        </div>
+      }
+
+      <div class="form-control w-full">
+        <label class="label" for="phone">
+          <span class="label-text font-medium">Teléfono</span>
+        </label>
+        <input
+          id="phone"
+          type="text"
+          class="input input-bordered w-full"
+          [(ngModel)]="form.phone"
+          name="phone"
+        />
+      </div>
+
+      <div class="flex justify-center gap-3 pt-4">
+        <button
+            type="submit"
+            class="btn btn-primary text-white"
+            [disabled]="isSaving()"
+          >
+            @if (isSaving()) {
+              <span class="loading loading-spinner loading-sm"></span>
+              Guardando...
+            } @else {
+              Guardar
+            }
+          </button>
+        <button type="button" class="btn btn-ghost" (click)="cancel()">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  }
+</div>
