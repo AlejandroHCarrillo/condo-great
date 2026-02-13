@@ -21,12 +21,14 @@ public class ApplicationDbContext : DbContext
     public DbSet<Community> Communities { get; set; }
     public DbSet<Banner> Banners { get; set; }
     public DbSet<Comunicado> Comunicados { get; set; }
+    public DbSet<Amenity> Amenities { get; set; }
     public DbSet<UserCommunity> UserCommunities { get; set; }
     public DbSet<Contrato> Contratos { get; set; }
     public DbSet<PaymentHistory> PaymentHistories { get; set; }
     public DbSet<CargosComunidad> CargosComunidad { get; set; }
     public DbSet<PagoComunidad> PagoComunidad { get; set; }
     public DbSet<PagoCargoComunidad> PagoCargoComunidad { get; set; }
+    public DbSet<CommunityProvider> CommunityProviders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -311,6 +313,99 @@ public class ApplicationDbContext : DbContext
                 .WithMany(c => c.Comunicados)
                 .HasForeignKey(e => e.CommunityId)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Configure Amenity entity (FK CommunityId como propiedad sombra; siempre asociada a una comunidad)
+        modelBuilder.Entity<Amenity>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Nombre)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(2000);
+            entity.Property(e => e.Reglas)
+                .HasMaxLength(2000);
+            entity.Property(e => e.Costo)
+                .HasColumnType("decimal(18,2)");
+            entity.Property(e => e.FechaAlta)
+                .IsRequired()
+                .HasColumnType("datetime2");
+            entity.Property(e => e.Imagen)
+                .HasMaxLength(500);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true);
+
+            entity.HasOne(e => e.Community)
+                .WithMany(c => c.Amenities)
+                .HasForeignKey("CommunityId")
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // Configure CommunityProvider entity (FK CommunityId como propiedad sombra)
+        modelBuilder.Entity<CommunityProvider>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.BusinessName)
+                .IsRequired()
+                .HasMaxLength(200);
+            entity.Property(e => e.TaxId)
+                .HasMaxLength(50);
+            entity.Property(e => e.FullAddress)
+                .HasMaxLength(500);
+            entity.Property(e => e.ContactPhones)
+                .HasMaxLength(200);
+            entity.Property(e => e.PrimaryEmail)
+                .HasMaxLength(200);
+            entity.Property(e => e.WebsiteOrSocialMedia)
+                .HasMaxLength(500);
+            entity.Property(e => e.PrimaryContactName)
+                .HasMaxLength(200);
+            entity.Property(e => e.DirectPhone)
+                .HasMaxLength(30);
+            entity.Property(e => e.MobilePhone)
+                .HasMaxLength(30);
+            entity.Property(e => e.ContactEmail)
+                .HasMaxLength(200);
+            entity.Property(e => e.ProductsOrServices)
+                .HasMaxLength(2000);
+            entity.Property(e => e.CategoryOrIndustry)
+                .HasMaxLength(100);
+            entity.Property(e => e.PaymentMethods)
+                .HasMaxLength(500);
+            entity.Property(e => e.Rating)
+                .HasColumnType("decimal(3,2)"); // ej. 4.50
+            entity.Property(e => e.OrderHistory)
+                .HasMaxLength(4000);
+            entity.Property(e => e.PastIncidentsOrClaims)
+                .HasMaxLength(2000);
+            entity.Property(e => e.InternalNotes)
+                .HasMaxLength(2000);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+            entity.Property(e => e.UpdatedAt)
+                .HasMaxLength(50);
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true);
+
+            entity.HasOne(e => e.Community)
+                .WithMany(c => c.CommunityProviders)
+                .HasForeignKey("CommunityId")
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.CreatedByUser)
+                .WithMany(u => u.CreatedByCommunityProviders)
+                .HasForeignKey(e => e.CreatedByUserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(e => e.UpdatedByUser)
+                .WithMany(u => u.UpdatedByCommunityProviders)
+                .HasForeignKey(e => e.UpdatedByUserId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         // Configure UserCommunity entity

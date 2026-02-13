@@ -8,6 +8,12 @@ import { AdmincompanyDocumentosComponent } from './admincompany-documentos/admin
 import { AdmincompanyReportesComponent } from './admincompany-reportes/admincompany-reportes.component';
 import { ResidentInfoDetailComponent } from './resident-info-detail/resident-info-detail.component';
 import { AdmincompanyResidenteFormComponent } from './admincompany-residente-form/admincompany-residente-form.component';
+import { AdmincompanyComunicadoFormComponent } from './admincompany-comunicado-form/admincompany-comunicado-form.component';
+import { AdmincompanyAmenidadFormComponent } from './admincompany-amenidad-form/admincompany-amenidad-form.component';
+import { ComunicadoDetailComponent } from './comunicado-detail/comunicado-detail.component';
+import { AmenidadDetailComponent } from './amenidad-detail/amenidad-detail.component';
+import { AdmincompanyProveedorFormComponent } from './admincompany-proveedor-form/admincompany-proveedor-form.component';
+import { ProveedorDetailComponent } from './proveedor-detail/proveedor-detail.component';
 
 export const admincompanyRoutes: Routes = [
     {
@@ -17,6 +23,18 @@ export const admincompanyRoutes: Routes = [
             {
                 path: 'comunicados',
                 component: AdmincompanyComunicadosComponent
+            },
+            {
+                path: 'comunicados/nuevo/:communityId',
+                component: AdmincompanyComunicadoFormComponent
+            },
+            {
+                path: 'comunicados/editar/:id',
+                component: AdmincompanyComunicadoFormComponent
+            },
+            {
+                path: 'comunicados/:id',
+                component: ComunicadoDetailComponent
             },
             {
                 path: 'residentes',
@@ -37,6 +55,30 @@ export const admincompanyRoutes: Routes = [
             {
                 path: 'amenidades',
                 component: AdmincompanyAmenidadesComponent
+            },
+            {
+                path: 'amenidades/nuevo/:communityId',
+                component: AdmincompanyAmenidadFormComponent
+            },
+            {
+                path: 'amenidades/editar/:id',
+                component: AdmincompanyAmenidadFormComponent
+            },
+            {
+                path: 'amenidades/:id',
+                component: AmenidadDetailComponent
+            },
+            {
+                path: 'proveedores/nuevo/:communityId',
+                component: AdmincompanyProveedorFormComponent
+            },
+            {
+                path: 'proveedores/editar/:id',
+                component: AdmincompanyProveedorFormComponent
+            },
+            {
+                path: 'proveedores/:id',
+                component: ProveedorDetailComponent
             },
             {
                 path: 'proveedores',

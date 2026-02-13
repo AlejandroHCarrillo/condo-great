@@ -68,6 +68,8 @@ builder.Services.AddScoped<IPetService, PetService>();
 builder.Services.AddScoped<IResidentVisitService, ResidentVisitService>();
 builder.Services.AddScoped<IBannerService, BannerService>();
 builder.Services.AddScoped<IComunicadoService, ComunicadoService>();
+builder.Services.AddScoped<IAmenityService, AmenityService>();
+builder.Services.AddScoped<ICommunityProviderService, CommunityProviderService>();
 builder.Services.AddScoped<ICommunityService, CommunityService>();
 builder.Services.AddScoped<IContratoService, ContratoService>();
 builder.Services.AddScoped<IPaymentHistoryService, PaymentHistoryService>();
@@ -150,47 +152,38 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Ensure database is created and seed initial data
+// Ensure database is created and seed initial data (fail startup if this fails)
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    try
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    var configuration = services.GetRequiredService<IConfiguration>();
+
+    var recreateDatabase = configuration.GetValue<bool>("Database:RecreateOnStartup", false);
+    logger.LogInformation("Database:RecreateOnStartup = {RecreateOnStartup}", recreateDatabase);
+
+    if (recreateDatabase)
     {
-        var context = services.GetRequiredService<ApplicationDbContext>();
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        var configuration = services.GetRequiredService<IConfiguration>();
-        
-        // Check if database should be recreated
-        var recreateDatabase = configuration.GetValue<bool>("Database:RecreateOnStartup", false);
-        
-        if (recreateDatabase)
-        {
-            logger.LogWarning("RecreateOnStartup is enabled. Dropping and recreating database...");
-            await context.Database.EnsureDeletedAsync();
-            logger.LogInformation("Database dropped successfully.");
-        }
-        
-        // Ensure database is created
-        await context.Database.EnsureCreatedAsync();
-        logger.LogInformation("Database ensured/created successfully.");
-
-        // Seed initial data (roles and admin user)
-        var initialSeeder = services.GetRequiredService<InitialSeeder>();
-        await initialSeeder.SeedAsync();
-        logger.LogInformation("Initial data seeded successfully.");
-
-        // Seed dummy data only in development environment
-        if (app.Environment.IsDevelopment())
-        {
-            var dummySeeder = services.GetRequiredService<DummySeeder>();
-            await dummySeeder.SeedAsync();
-            logger.LogInformation("Dummy data seeded successfully.");
-        }
+        logger.LogWarning("RecreateOnStartup is enabled. Dropping and recreating database...");
+        await context.Database.EnsureDeletedAsync();
+        logger.LogInformation("Database dropped successfully.");
     }
-    catch (Exception ex)
+
+    // Apply pending migrations (creates/updates schema)
+    await context.Database.MigrateAsync();
+    logger.LogInformation("Database migrations applied successfully.");
+
+    // Seed initial data (roles and admin user)
+    var initialSeeder = services.GetRequiredService<InitialSeeder>();
+    await initialSeeder.SeedAsync();
+    logger.LogInformation("Initial data seeded successfully.");
+
+    if (app.Environment.IsDevelopment())
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while creating the database or seeding data.");
+        var dummySeeder = services.GetRequiredService<DummySeeder>();
+        await dummySeeder.SeedAsync();
+        logger.LogInformation("Dummy data seeded successfully.");
     }
 }
 

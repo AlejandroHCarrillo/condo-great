@@ -1,0 +1,131 @@
+<div class="p-4 max-w-2xl mx-auto">
+  <div class="flex items-center justify-between gap-4 mb-6">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-bullhorn text-green-600"></i>
+      {{ title }}
+    </h1>
+    <button type="button" class="btn btn-secondary text-white" (click)="cancel()">
+      Regresar
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando...</span>
+    </div>
+  } @else {
+    @if (errorMessage()) {
+      <div class="alert alert-error mb-4">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form class="space-y-4" (ngSubmit)="save()">
+      <div class="form-control w-full">
+        <label class="label" for="communityId">
+          <span class="label-text font-medium">Comunidad</span>
+        </label>
+        <select
+          id="communityId"
+          class="select select-bordered w-full"
+          [(ngModel)]="form.communityId"
+          name="communityId"
+          [disabled]="!!communityIdFromRoute()"
+        >
+          <option value="">Sin comunidad</option>
+          @for (c of comunidadesAsociadas(); track c.id) {
+            <option [value]="c.id">{{ c.nombre }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label" for="titulo">
+          <span class="label-text font-medium">Título</span>
+        </label>
+        <input
+          id="titulo"
+          type="text"
+          class="input input-bordered w-full"
+          [(ngModel)]="form.titulo"
+          name="titulo"
+          required
+        />
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label" for="subtitulo">
+          <span class="label-text font-medium">Subtítulo</span>
+        </label>
+        <input
+          id="subtitulo"
+          type="text"
+          class="input input-bordered w-full"
+          [(ngModel)]="form.subtitulo"
+          name="subtitulo"
+        />
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label" for="descripcion">
+          <span class="label-text font-medium">Descripción</span>
+        </label>
+        <textarea
+          id="descripcion"
+          class="textarea textarea-bordered w-full min-h-[120px]"
+          [(ngModel)]="form.descripcion"
+          name="descripcion"
+          required
+        ></textarea>
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label" for="fecha">
+          <span class="label-text font-medium">Fecha</span>
+        </label>
+        <input
+          id="fecha"
+          type="date"
+          class="input input-bordered w-full"
+          [(ngModel)]="form.fecha"
+          name="fecha"
+          required
+        />
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label" for="imagen">
+          <span class="label-text font-medium">Imagen (ruta o URL)</span>
+        </label>
+        <input
+          id="imagen"
+          type="text"
+          class="input input-bordered w-full"
+          [(ngModel)]="form.imagen"
+          name="imagen"
+          placeholder="Ej: images/anuncios/mi-imagen.png"
+        />
+      </div>
+
+      <div class="flex justify-center gap-3 pt-4">
+        <button
+          type="submit"
+          class="btn btn-primary text-white"
+          [disabled]="isSaving()"
+        >
+          @if (isSaving()) {
+            <span class="loading loading-spinner loading-sm"></span>
+            Guardando...
+          } @else {
+            Guardar
+          }
+        </button>
+        <button type="button" class="btn btn-ghost" (click)="cancel()">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  }
+</div>

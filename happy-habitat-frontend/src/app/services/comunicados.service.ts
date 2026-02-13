@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Observable, catchError, throwError, of } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Comunicado } from '../shared/interfaces/comunicado.interface';
+import { Comunicado, CreateComunicadoDto, UpdateComunicadoDto } from '../shared/interfaces/comunicado.interface';
 import { LoggerService } from './logger.service';
 import { ErrorService } from './error.service';
 
@@ -72,12 +72,51 @@ export class ComunicadosService {
   /**
    * Obtiene un comunicado por ID
    */
-  getComunicadoById(id: string): Observable<Comunicado> {
+  getComunicadoById(id: string): Observable<Comunicado | null> {
     this.logger.debug(`Fetching comunicado with id: ${id}`, 'ComunicadosService');
-    
     return this.http.get<Comunicado>(`${this.API_URL}/${id}`).pipe(
       catchError((error) => {
+        if (error.status === 404) return of(null);
         this.logger.error(`Error fetching comunicado ${id}`, error, 'ComunicadosService');
+        this.errorService.handleError(error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Crea un comunicado (POST /api/comunicados)
+   */
+  createComunicado(dto: CreateComunicadoDto): Observable<Comunicado> {
+    return this.http.post<Comunicado>(this.API_URL, dto).pipe(
+      catchError((error) => {
+        this.logger.error('Error creating comunicado', error, 'ComunicadosService');
+        this.errorService.handleError(error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Actualiza un comunicado (PUT /api/comunicados/:id)
+   */
+  updateComunicado(id: string, dto: UpdateComunicadoDto): Observable<Comunicado> {
+    return this.http.put<Comunicado>(`${this.API_URL}/${id}`, dto).pipe(
+      catchError((error) => {
+        this.logger.error(`Error updating comunicado ${id}`, error, 'ComunicadosService');
+        this.errorService.handleError(error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Elimina un comunicado (DELETE /api/comunicados/:id)
+   */
+  deleteComunicado(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.API_URL}/${id}`).pipe(
+      catchError((error) => {
+        this.logger.error(`Error deleting comunicado ${id}`, error, 'ComunicadosService');
         this.errorService.handleError(error);
         return throwError(() => error);
       })
