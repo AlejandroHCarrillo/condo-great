@@ -96,7 +96,7 @@ export class UsersService {
     const user = this.sessionService.getUser();
     if (user) {
       this.currentUser.set(user);
-      this.logger.debug('User initialized from session', 'UsersService', { userId: user.id, username: user.username });
+//      this.logger.debug('User initialized from session', 'UsersService', { userId: user.id, username: user.username });
     }
   }
 
@@ -105,11 +105,11 @@ export class UsersService {
    */
   setCurrentUser(user: UserInfo): void {
     this.currentUser.set(user);
-    this.logger.debug('Current user set in UsersService', 'UsersService', { 
-      userId: user.id, 
-      username: user.username,
-      role: user.selectedRole 
-    });
+    // this.logger.debug('Current user set in UsersService', 'UsersService', { 
+    //   userId: user.id, 
+    //   username: user.username,
+    //   role: user.selectedRole 
+    // });
   }
 
   /**

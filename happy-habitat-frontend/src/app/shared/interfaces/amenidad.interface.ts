@@ -1,12 +1,40 @@
 export interface Amenidad {
-  id?: string;
+  id: string;
   nombre: string;
   descripcion: string;
   reglas: string;
-  costo?: number;
-  fechaalta: Date; // formato ISO: 'YYYY-MM-DD'
-  imagen?: string;
-  comunidad?: string;
-  capacidadMaxima?: number;
-  reservacionesSimultaneas?: number ;
+  costo?: number | null;
+  fechaAlta: string; // ISO string from backend
+  imagen?: string | null;
+  communityId?: string | null;
+  communityName?: string | null;
+  capacidadMaxima?: number | null;
+  numeroReservacionesSimultaneas?: number | null;
+  createdAt?: string;
+}
+
+/** DTO para crear amenidad (POST /api/amenities) */
+export interface CreateAmenityDto {
+  nombre: string;
+  descripcion: string;
+  reglas: string;
+  costo?: number | null;
+  fechaAlta: string; // ISO date string
+  imagen?: string | null;
+  communityId: string;
+  capacidadMaxima?: number | null;
+  numeroReservacionesSimultaneas?: number | null;
+}
+
+/** DTO para actualizar amenidad (PUT /api/amenities/:id) */
+export interface UpdateAmenityDto {
+  nombre: string;
+  descripcion: string;
+  reglas: string;
+  costo?: number | null;
+  fechaAlta: string;
+  imagen?: string | null;
+  communityId: string;
+  capacidadMaxima?: number | null;
+  numeroReservacionesSimultaneas?: number | null;
 }

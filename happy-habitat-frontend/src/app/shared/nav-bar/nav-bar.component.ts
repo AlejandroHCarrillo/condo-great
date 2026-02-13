@@ -48,7 +48,7 @@ export class NavBarComponent implements OnInit {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
         const theme = localStorage.getItem(this.themeKey);
-        console.log('Theme from localStorage:', theme);
+//        console.log('Theme from localStorage:', theme);
         return theme;
       }
     } catch (error) {
@@ -62,14 +62,14 @@ export class NavBarComponent implements OnInit {
    */
   checkThemeStored(): void {
     const storedTheme = this.getStoredTheme();
-    console.log('Stored theme:', storedTheme);
+//    console.log('Stored theme:', storedTheme);
     
     if (storedTheme && storedTheme.trim() !== '') {
       // Aplicar el tema al documento
       document.documentElement.setAttribute('data-theme', storedTheme);
       // Sincronizar el signal con el valor guardado
       this.selectedTheme.set(storedTheme);
-      console.log('Theme applied and signal updated to:', storedTheme);
+//      console.log('Theme applied and signal updated to:', storedTheme);
     } else {
       // Si no hay tema guardado, usar el default y guardarlo
       const defaultTheme = 'lemonade';
@@ -78,7 +78,7 @@ export class NavBarComponent implements OnInit {
       if (typeof window !== 'undefined' && window.localStorage) {
         localStorage.setItem(this.themeKey, defaultTheme);
       }
-      console.log('No theme found, using default:', defaultTheme);
+//      console.log('No theme found, using default:', defaultTheme);
     }
   }
 

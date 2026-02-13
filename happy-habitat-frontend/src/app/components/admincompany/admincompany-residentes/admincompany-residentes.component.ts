@@ -6,6 +6,7 @@ import { forkJoin, of } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
 import { rxResource } from '../../../utils/rx-resource.util';
 import { AuthService } from '../../../services/auth.service';
+import { AdminCompanyContextService } from '../../../services/admin-company-context.service';
 import { UsersService } from '../../../services/users.service';
 import { ResidentsService, PagedResidentsResult } from '../../../services/residents.service';
 import { CommunitiesService } from '../../../services/communities.service';
@@ -14,14 +15,16 @@ import { Comunidad } from '../../../interfaces/comunidad.interface';
 import { RolesEnum } from '../../../enums/roles.enum';
 import { mapCommunityDtoToComunidad } from '../../../shared/mappers/community.mapper';
 import { PAGE_SIZE_OPTIONS, isPageSizeOption } from '../../../constants/pagination.constants';
+import { CommunityFilterComponent } from '../../../shared/components/community-filter/community-filter.component';
 
 @Component({
   selector: 'hh-admincompany-residentes',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, CommunityFilterComponent],
   templateUrl: './admincompany-residentes.component.html'
 })
 export class AdmincompanyResidentesComponent implements OnInit {
   private authService = inject(AuthService);
+  private adminContext = inject(AdminCompanyContextService);
   private usersService = inject(UsersService);
   private residentsService = inject(ResidentsService);
   private communitiesService = inject(CommunitiesService);
@@ -35,6 +38,8 @@ export class AdmincompanyResidentesComponent implements OnInit {
   readonly pageSizeOptions = PAGE_SIZE_OPTIONS;
   /** Incrementar para forzar recarga del resource tras eliminar. */
   private refreshTrigger = signal(0);
+  /** Residente seleccionado para mostrar en el modal de confirmación de eliminación. */
+  residentToDelete = signal<Residente | null>(null);
 
   comunidadesAsociadas = computed(() => {
     const user = this.authService.currentUser();
@@ -133,7 +138,16 @@ export class AdmincompanyResidentesComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       const comunidadId = params['comunidad'];
-      if (comunidadId) this.selectedComunidadId.set(comunidadId);
+      if (comunidadId) {
+        this.selectedComunidadId.set(comunidadId);
+        this.adminContext.setSelectedCommunityId(comunidadId);
+      } else {
+        const stored = this.adminContext.getSelectedCommunityId();
+        if (stored) {
+          this.selectedComunidadId.set(stored);
+          this.router.navigate([], { relativeTo: this.route, queryParams: { comunidad: stored }, queryParamsHandling: 'merge' });
+        }
+      }
       const page = params['page'];
       if (page != null) {
         const p = Number(page);
@@ -168,6 +182,7 @@ export class AdmincompanyResidentesComponent implements OnInit {
 
   onComunidadChange(value: string | Event): void {
     const comunidadId = typeof value === 'string' ? value : (value.target as HTMLSelectElement).value;
+    this.adminContext.setSelectedCommunityId(comunidadId);
     this.selectedComunidadId.set(comunidadId);
     this.currentPage.set(1);
     this.router.navigate([], {
@@ -208,16 +223,30 @@ export class AdmincompanyResidentesComponent implements OnInit {
     }
   }
 
-  confirmDeleteResident(residente: Residente): void {
-    const id = residente.residentId;
-    if (!id) return;
-    const nombre = residente.fullname || 'este residente';
-    if (!confirm(`¿Eliminar a ${nombre}? Esta acción no se puede deshacer.`)) return;
-    this.residentsService.deleteResident(id).subscribe({
-      next: () => this.refreshTrigger.update(v => v + 1),
-      error: () => {
-        // ErrorService ya muestra el error; opcional: mensaje específico
-      }
+  openDeleteModal(residente: Residente): void {
+    if (!residente.residentId) return;
+    this.residentToDelete.set(residente);
+    setTimeout(() => {
+      const modal = document.getElementById('deleteResidentModal') as HTMLDialogElement;
+      if (modal) modal.showModal();
+    }, 0);
+  }
+
+  closeDeleteModal(): void {
+    const modal = document.getElementById('deleteResidentModal') as HTMLDialogElement;
+    if (modal) modal.close();
+    this.residentToDelete.set(null);
+  }
+
+  confirmDeleteResident(): void {
+    const residente = this.residentToDelete();
+    if (!residente?.residentId) return;
+    this.residentsService.deleteResident(residente.residentId).subscribe({
+      next: () => {
+        this.closeDeleteModal();
+        this.refreshTrigger.update(v => v + 1);
+      },
+      error: () => {}
     });
   }
 }

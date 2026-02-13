@@ -1,0 +1,21 @@
+@if (communities().length > 0) {
+  <div class="flex items-center gap-4">
+    <label class="text-sm font-medium whitespace-nowrap">
+      <i class="fa-solid fa-building mr-2"></i>
+      Filtrar por Comunidad
+    </label>
+    <select
+      class="select select-bordered w-full max-w-xs"
+      [ngModel]="selectedId()"
+      (ngModelChange)="onSelectionChange($event)"
+    >
+      <option value="" disabled>Seleccione una comunidad</option>
+      @for (comunidad of communities(); track comunidad.id) {
+        <option [value]="comunidad.id">{{ comunidad.nombre }}</option>
+      }
+      @if (showAllOption()) {
+        <option value="all">Todas las comunidades</option>
+      }
+    </select>
+  </div>
+}

@@ -21,5 +21,7 @@ public class User
     public ICollection<UserCommunity> UserCommunities { get; set; } = new List<UserCommunity>();
     public ICollection<Contrato> UpdatedContratos { get; set; } = new List<Contrato>();
     public ICollection<PaymentHistory> UpdatedPaymentHistories { get; set; } = new List<PaymentHistory>();
+    public ICollection<CommunityProvider> CreatedByCommunityProviders { get; set; } = new List<CommunityProvider>();
+    public ICollection<CommunityProvider> UpdatedByCommunityProviders { get; set; } = new List<CommunityProvider>();
 }
 

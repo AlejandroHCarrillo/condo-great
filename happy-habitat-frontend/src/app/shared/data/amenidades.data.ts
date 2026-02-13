@@ -16,10 +16,10 @@ export const amenidadesdata: Amenidad[] =
              `,
     costo: 1500,
     capacidadMaxima: 35,
-    reservacionesSimultaneas: 1,
-    fechaalta: new Date('2025-11-08'),
+    numeroReservacionesSimultaneas: 1,
+    fechaAlta: '2025-11-08',
     imagen: "images/amenidades/coto-berlin-casa-club.png", 
-    comunidad: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
+    communityId: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
   },
   {
     id: "d847101d-6286-4938-a25e-3de84208d547", // UUIDV4(),
@@ -36,10 +36,10 @@ export const amenidadesdata: Amenidad[] =
              </ul>`,
     costo: 0,
     capacidadMaxima: 35,
-    reservacionesSimultaneas: 7,
-    fechaalta: new Date('2025-11-08'),
+    numeroReservacionesSimultaneas: 7,
+    fechaAlta: '2025-11-08',
     imagen: "images/amenidades/coto-berlin-alberca.jpg",
-    comunidad: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
+    communityId: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
   },  
   {
     id: "efaaa463-7ab3-45e3-926d-4bb244c9dc95", // UUIDV4(),
@@ -49,10 +49,10 @@ export const amenidadesdata: Amenidad[] =
              Se puede hacer uso NO es exclusivo de la alberca.
              `,
     costo: 0,
-    reservacionesSimultaneas: 1,
-    fechaalta: new Date('2025-11-08'),
+    numeroReservacionesSimultaneas: 1,
+    fechaAlta: '2025-11-08',
     imagen: "images/amenidades/coto-berlin-casa-club.png",
-    comunidad: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
+    communityId: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
   },
 
 
@@ -67,10 +67,10 @@ export const amenidadesdata: Amenidad[] =
              dando aviso a vigilancia y a la mesa directiva
              `,
     costo: 0,
-    reservacionesSimultaneas: 1,
-    fechaalta: new Date('2025-11-08'),
+    numeroReservacionesSimultaneas: 1,
+    fechaAlta: '2025-11-08',
     imagen: "images/amenidades/coto-berlin-escalera.png",
-    comunidad: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
+    communityId: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
   },
   {
     id: UUIDV4(),
@@ -78,9 +78,9 @@ export const amenidadesdata: Amenidad[] =
     descripcion: "Cancha de padel",
     reglas: `Debe registrarse el el sistma de TYA o al telefono...`,
     costo: 0,
-    fechaalta: new Date('2025-11-08'),
+    fechaAlta: '2025-11-08',
     imagen: "images/amenidades/",
-    comunidad: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
+    communityId: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
   },
   {
     id: UUIDV4(),
@@ -88,9 +88,9 @@ export const amenidadesdata: Amenidad[] =
     descripcion: "Cancha de futbol reapido",
     reglas: `Debe registrarse el el sistma de TYA o al telefono...`,
     costo: 0,
-    fechaalta: new Date('2025-11-08'),
+    fechaAlta: '2025-11-08',
     imagen: "images/amenidades/",
-    comunidad: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
+    communityId: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
   },
   {
     id: UUIDV4(),
@@ -98,9 +98,9 @@ export const amenidadesdata: Amenidad[] =
     descripcion: "Cancha de basquetbol",
     reglas: `Debe registrarse el el sistma de TYA o al telefono...`,
     costo: 0,
-    fechaalta: new Date('2025-11-08'),
+    fechaAlta: '2025-11-08',
     imagen: "images/amenidades/",
-    comunidad: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
+    communityId: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
   },
   {
     id: UUIDV4(),
@@ -108,9 +108,9 @@ export const amenidadesdata: Amenidad[] =
     descripcion: "Gimnasio Berlin",
     reglas: `Proximamente...`,
     costo: 0,
-    fechaalta: new Date('2025-11-08'),
+    fechaAlta: '2025-11-08',
     imagen: "images/amenidades/",
-    comunidad: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
+    communityId: "9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"
   },
 
   // {

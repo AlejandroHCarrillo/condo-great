@@ -20,7 +20,9 @@ public class Community
     public ICollection<Resident> Residents { get; set; } = new List<Resident>();
     public ICollection<Banner> Banners { get; set; } = new List<Banner>();
     public ICollection<Comunicado> Comunicados { get; set; } = new List<Comunicado>();
+    public ICollection<Amenity> Amenities { get; set; } = new List<Amenity>();
     public ICollection<UserCommunity> UserCommunities { get; set; } = new List<UserCommunity>();
     public ICollection<Contrato> Contratos { get; set; } = new List<Contrato>();
+    public ICollection<CommunityProvider> CommunityProviders { get; set; } = new List<CommunityProvider>();
 }
 

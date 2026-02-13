@@ -1093,172 +1093,169 @@ public class DummySeeder : IDataSeeder
             await _context.SaveChangesAsync();
         }
 
-        // Create comunicados if they don't exist
-        var existingComunicadosCount = await _context.Comunicados.CountAsync();
-
-        if (existingComunicadosCount == 0)
+        // Create 10 comunicados por cada comunidad de prueba (mismo contenido puede repetirse entre comunidades)
+        var allCommunitiesForComunicados = await _context.Communities.ToListAsync();
+        var comunicadosTemplates = new[]
         {
-            var comunicados = new List<Comunicado>();
+            new { Titulo = "Propuesta de reglamento revisión", Subtitulo = "Participación vecinal", Descripcion = "Estimados condóminos: Durante el taller de revisión del reglamento no fue posible concluir con todas las preguntas. La administración compartirá el reglamento con el texto resaltado. Envíen sus dudas o sugerencias por Whatsapp. Fecha límite: 12 de Septiembre.", Fecha = new DateTime(2025, 9, 8), Imagen = (string?)null },
+            new { Titulo = "Mantenimiento de la alberca", Subtitulo = "Cierre temporal por limpieza", Descripcion = "La alberca estará cerrada el 2025-09-12 para realizar limpieza profunda y revisión del sistema de filtrado.", Fecha = new DateTime(2025, 9, 12), Imagen = "images/anuncios/manenimiento_alberca.png" },
+            new { Titulo = "Jornada de reciclaje", Subtitulo = "Trae tus residuos separados", Descripcion = "Este sábado 2025-09-14 se instalará un punto de acopio en el parque central para reciclaje de papel, plástico y electrónicos.", Fecha = new DateTime(2025, 9, 14), Imagen = "images/anuncios/jornada-reciclaje.png" },
+            new { Titulo = "Fumigación preventiva", Subtitulo = "Control de plagas en áreas comunes", Descripcion = "El lunes 2025-09-16 se realizará fumigación en jardines y pasillos. Evita transitar por zonas tratadas durante ese día.", Fecha = new DateTime(2025, 9, 16), Imagen = "images/anuncios/fumigacion.png" },
+            new { Titulo = "Reunión vecinal mensual", Subtitulo = "Temas de seguridad y mantenimiento", Descripcion = "La reunión se llevará a cabo el 2025-09-20 a las 18:00 hrs en el salón común. Participa y haz escuchar tu voz.", Fecha = new DateTime(2025, 9, 20), Imagen = "images/anuncios/reunion-mensual.png" },
+            new { Titulo = "Instalación de cámaras", Subtitulo = "Mejora de seguridad perimetral", Descripcion = "El 2025-09-22 se instalarán nuevas cámaras en los accesos principales. Habrá personal técnico en el área.", Fecha = new DateTime(2025, 9, 22), Imagen = "images/anuncios/instalacion-camaras.png" },
+            new { Titulo = "Decoración de otoño", Subtitulo = "Convocatoria para voluntarios", Descripcion = "El comité invita a decorar áreas comunes con temática otoñal el 2025-09-25. Puedes donar adornos o ayudar en el montaje.", Fecha = new DateTime(2025, 9, 25), Imagen = "images/anuncios/decoracion-otono.png" },
+            new { Titulo = "Poda de árboles", Subtitulo = "Mantenimiento de áreas verdes", Descripcion = "El 2025-09-28 se realizará poda en los jardines del lado norte. Favor de retirar objetos personales cercanos.", Fecha = new DateTime(2025, 9, 28), Imagen = "images/anuncios/poda-arboles.png" },
+            new { Titulo = "Taller de compostaje", Subtitulo = "Aprende a reducir residuos orgánicos", Descripcion = "El 2025-10-01 se impartirá un taller gratuito sobre compostaje en el salón común. Cupo limitado, regístrate con anticipación.", Fecha = new DateTime(2025, 10, 1), Imagen = "images/anuncios/taller-compostaje.png" },
+            new { Titulo = "Festival comunitario", Subtitulo = "Música, comida y juegos", Descripcion = "El 2025-10-06 se celebrará el festival anual en el parque central. ¡Trae a tu familia y disfruta!", Fecha = new DateTime(2025, 10, 6), Imagen = "images/anuncios/festival-comunitario.png" }
+        };
 
-            // Propuesta de reglamento revisión
-            comunicados.Add(new Comunicado
+        if (allCommunitiesForComunicados.Count > 0)
+        {
+            var existingComunicadosCount = await _context.Comunicados.CountAsync();
+            if (existingComunicadosCount == 0)
             {
-                Id = Guid.NewGuid(),
-                CommunityId = firstCommunityId,
-                Titulo = "Propuesta de reglamento revisión",
-                Subtitulo = "Cierre temporal por limpieza",
-                Descripcion = @"Estimados condóminos:
+                var comunicados = new List<Comunicado>();
+                foreach (var community in allCommunitiesForComunicados)
+                {
+                    foreach (var template in comunicadosTemplates)
+                    {
+                        comunicados.Add(new Comunicado
+                        {
+                            Id = Guid.NewGuid(),
+                            CommunityId = community.Id,
+                            Titulo = template.Titulo,
+                            Subtitulo = template.Subtitulo,
+                            Descripcion = template.Descripcion,
+                            Fecha = template.Fecha,
+                            Imagen = template.Imagen,
+                            CreatedAt = DateTime.UtcNow.ToString("O")
+                        });
+                    }
+                }
+                await _context.Comunicados.AddRangeAsync(comunicados);
+                await _context.SaveChangesAsync();
+            }
+        }
 
-Durante el taller de revisión del reglamento no fue posible concluir con todas las preguntas y observaciones planteadas por los vecinos. 
+        // Seed entre 2 y 5 amenidades por cada comunidad (contenido basado en amenidades.data.ts)
+        var allCommunitiesForAmenities = await _context.Communities.ToListAsync();
+        var amenityTemplates = new[]
+        {
+            new { Nombre = "Casa club eventos", Descripcion = "Casa club para eventos", Reglas = "Fines de semana y días festivos reservar por cuatro horas con un costo de 1500 pesos. Uso de asador con costo de 500 pesos extra.", Costo = 1500m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-casa-club.png", CapacidadMaxima = (int?)35, NumeroReservacionesSimultaneas = (int?)1 },
+            new { Nombre = "Alberca", Descripcion = "Alberca de la comunidad.", Reglas = "Capacidad máxima 35 personas. 5 personas por casa. Máximo 3 horas por reservación por día. No se permiten bebidas embriagantes.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-alberca.jpg", CapacidadMaxima = (int?)35, NumeroReservacionesSimultaneas = (int?)7 },
+            new { Nombre = "Casa club residentes", Descripcion = "Casa club para residentes", Reglas = "Lunes a viernes se puede reservar sin costo durante 2 horas.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-casa-club.png", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)1 },
+            new { Nombre = "Escalera", Descripcion = "Escalera de aluminio", Reglas = "Todo residente puede usarla registrándose en el sistema por 48 horas.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-escalera.png", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)1 },
+            new { Nombre = "Cancha de pádel", Descripcion = "Cancha de pádel", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null },
+            new { Nombre = "Cancha de fútbol rápido", Descripcion = "Cancha de fútbol rápido", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null },
+            new { Nombre = "Cancha de basquetbol", Descripcion = "Cancha de basquetbol", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null },
+            new { Nombre = "Gimnasio", Descripcion = "Gimnasio de la comunidad", Reglas = "Próximamente.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null }
+        };
 
-Con el fin de que todos puedan participar activamente en este proceso, la administración compartirá el reglamento con el texto resaltado en aquellos partes que están propuestas para modificación.
-
-Le recordamos que ustedes son quienes construyen y deciden estas modificaciones. Por ello, los invitamos a enviarnos sus dudas, comentarios o sugerencias a través de Whatsapp al número de la administración
-
-La fecha límite para poder recibir este tipo de información será el 12 de Septiembre del presente año.
-
-De esta forma podremos integrar todas las opiniones para la siguiente revisión y asegurar que el reglamento refleje las necesidades y acuerdos de nuestra comunidad. 
-
-¡Gracias por su participación y compromiso!
-
-Este es el link en donde encontrarán la propuesta de reglamento con las señalizaciones específicas. 
-
-https://drive.google.com/file/d/1OG95bOMdZKWme-90_dg3VhTuYs1jMlfd/view?usp=sharing",
-                Fecha = new DateTime(2025, 9, 8),
-                CreatedAt = DateTime.UtcNow.ToString("O")
-            });
-
-            // Mantenimiento de la alberca
-            comunicados.Add(new Comunicado
+        if (allCommunitiesForAmenities.Count > 0)
+        {
+            var existingAmenitiesCount = await _context.Amenities.CountAsync();
+            if (existingAmenitiesCount == 0)
             {
-                Id = Guid.NewGuid(),
-                CommunityId = firstCommunityId,
-                Titulo = "Mantenimiento de la alberca",
-                Subtitulo = "Cierre temporal por limpieza",
-                Descripcion = "La alberca estará cerrada el 2025-09-12 para realizar limpieza profunda y revisión del sistema de filtrado.",
-                Fecha = new DateTime(2025, 9, 12),
-                Imagen = "images/anuncios/manenimiento_alberca.png",
-                CreatedAt = DateTime.UtcNow.ToString("O")
-            });
+                var rnd = new Random();
+                var amenityList = new List<Amenity>();
+                foreach (var community in allCommunitiesForAmenities)
+                {
+                    var count = rnd.Next(2, 6); // 2 a 5 inclusive
+                    for (var i = 0; i < count; i++)
+                    {
+                        var t = amenityTemplates[rnd.Next(amenityTemplates.Length)];
+                        amenityList.Add(new Amenity
+                        {
+                            Id = Guid.NewGuid(),
+                            Community = community,
+                            Nombre = t.Nombre,
+                            Descripcion = t.Descripcion,
+                            Reglas = t.Reglas,
+                            Costo = t.Costo,
+                            FechaAlta = t.FechaAlta,
+                            Imagen = t.Imagen,
+                            CapacidadMaxima = t.CapacidadMaxima,
+                            NumeroReservacionesSimultaneas = t.NumeroReservacionesSimultaneas,
+                            CreatedAt = DateTime.UtcNow.ToString("O")
+                        });
+                    }
+                }
+                await _context.Amenities.AddRangeAsync(amenityList);
+                await _context.SaveChangesAsync();
+            }
+        }
 
-            // Jornada de reciclaje
-            comunicados.Add(new Comunicado
+        // Seed CommunityProviders: entre 3 y 7 proveedores por comunidad
+        if (!await _context.CommunityProviders.AnyAsync())
+        {
+            var providerTemplates = new[]
             {
-                Id = Guid.NewGuid(),
-                CommunityId = firstCommunityId,
-                Titulo = "Jornada de reciclaje",
-                Subtitulo = "Trae tus residuos separados",
-                Descripcion = "Este sábado 2025-09-14 se instalará un punto de acopio en el parque central para reciclaje de papel, plástico y electrónicos.",
-                Fecha = new DateTime(2025, 9, 14),
-                Imagen = "images/anuncios/jornada-reciclaje.png",
-                CreatedAt = DateTime.UtcNow.ToString("O")
-            });
+                new { BusinessName = "Plomería y Gas El Tubo", TaxId = "PTG850101ABC", Category = "Plomería y gas", Products = "Instalación y reparación de tuberías, calentadores, fugas. Emergencias 24h.", PaymentMethods = "Contado, transferencia, tarjeta a 3 MSI", Rating = (decimal?)4.6m },
+                new { BusinessName = "Electricidad Querétaro", TaxId = "EQT920315XYZ", Category = "Electricidad", Products = "Instalaciones eléctricas, mantenimiento, reparación de cortos.", PaymentMethods = "Contado, crédito a 15 días", Rating = (decimal?)4.8m },
+                new { BusinessName = "Super Abarrotes La Esquina", TaxId = "SAE881201MNO", Category = "Alimentos y abarrotes", Products = "Despensa, abarrotes, productos de limpieza. Entregas a domicilio.", PaymentMethods = "Contado, tarjeta, crédito a quincena", Rating = (decimal?)4.4m },
+                new { BusinessName = "Transportes y Mudanzas del Bajío", TaxId = "TMB780512PQR", Category = "Transporte y mudanzas", Products = "Mudanzas locales, fletes, transporte de muebles y electrodomésticos.", PaymentMethods = "Contado, transferencia", Rating = (decimal?)4.5m },
+                new { BusinessName = "Limpieza Profesional Querétaro", TaxId = "LPQ901008STU", Category = "Limpieza", Products = "Limpieza residencial y de áreas comunes, ventanas, pisos.", PaymentMethods = "Contado, mensualidad", Rating = (decimal?)4.7m },
+                new { BusinessName = "Jardinería y Paisajismo Verde", TaxId = "JPV860620VWX", Category = "Jardinería", Products = "Diseño de jardines, poda, riego, mantenimiento de áreas verdes.", PaymentMethods = "Contado, contratos mensuales", Rating = (decimal?)4.6m },
+                new { BusinessName = "Seguridad Privada Sentinela", TaxId = "SPS950415YZA", Category = "Seguridad", Products = "Vigilancia, rondines, control de acceso, cámaras.", PaymentMethods = "Contrato mensual, transferencia", Rating = (decimal?)4.3m },
+                new { BusinessName = "Farmacia del Ahorro - Suc. Centro", TaxId = "FDA751203BCD", Category = "Farmacia", Products = "Medicamentos, productos de cuidado personal, despensa básica.", PaymentMethods = "Contado, tarjeta, meses sin intereses", Rating = (decimal?)4.5m },
+                new { BusinessName = "Materiales para Construcción El Mármol", TaxId = "MCE820910EFG", Category = "Construcción y materiales", Products = "Cemento, varilla, block, acabados, herrería.", PaymentMethods = "Contado, crédito a 30 días", Rating = (decimal?)4.4m },
+                new { BusinessName = "Aire y Clima del Bajío", TaxId = "ACB930715HIJ", Category = "Tecnología y climatización", Products = "Instalación y mantenimiento de aire acondicionado, minisplits.", PaymentMethods = "Contado, tarjeta 6 MSI", Rating = (decimal?)4.7m },
+                new { BusinessName = "Cerrajería Express", TaxId = "CEX880320KLM", Category = "Servicios del hogar", Products = "Cambio de chapas, cerraduras, abrir autos y casas.", PaymentMethods = "Solo contado", Rating = (decimal?)4.2m },
+                new { BusinessName = "Pinturas y Recubrimientos Pro", TaxId = "PRP900115NOP", Category = "Pintura y acabados", Products = "Pintura interior y exterior, texturizados, impermeabilizantes.", PaymentMethods = "Contado, crédito a 15 días", Rating = (decimal?)4.6m },
+                new { BusinessName = "Papelería y Copias La Oficina", TaxId = "PCO871225QRS", Category = "Papelería", Products = "Copias, impresión, encuadernación, papelería y útiles.", PaymentMethods = "Contado, tarjeta", Rating = (decimal?)4.5m },
+                new { BusinessName = "Panadería y Cafetería La Hogaza", TaxId = "PHL940520TUV", Category = "Alimentos", Products = "Pan fresco, repostería, café, desayunos. Pedidos para eventos.", PaymentMethods = "Contado, transferencia", Rating = (decimal?)4.8m },
+                new { BusinessName = "Veterinaria Mascotas Felices", TaxId = "VMF910818WXY", Category = "Veterinaria", Products = "Consulta, vacunas, esterilización, peluquería canina.", PaymentMethods = "Contado, tarjeta", Rating = (decimal?)4.7m },
+                new { BusinessName = "Lavandería y Tintorería Limpia", TaxId = "LTL860412ZAB", Category = "Lavandería", Products = "Lavado, planchado, tintorería, servicio a domicilio.", PaymentMethods = "Contado, tarjeta", Rating = (decimal?)4.4m },
+                new { BusinessName = "Fumigación y Control de Plagas", TaxId = "FCP920630CDE", Category = "Fumigación", Products = "Fumigación residencial, control de plagas, desratización.", PaymentMethods = "Contado, paquetes semestrales", Rating = (decimal?)4.5m },
+                new { BusinessName = "Mantenimiento de Albercas Azul", TaxId = "MAA881015FGH", Category = "Mantenimiento", Products = "Limpieza de albercas, análisis de agua, reparación de filtros.", PaymentMethods = "Contrato mensual, contado", Rating = (decimal?)4.6m },
+                new { BusinessName = "Tienda de Conveniencia Oxxo", TaxId = "OXX123456789", Category = "Alimentos y conveniencia", Products = "Abarrotes, bebidas, recargas, pagos de servicios.", PaymentMethods = "Contado, tarjeta", Rating = (decimal?)4.3m },
+                new { BusinessName = "Tortillería y Molino La Guadalupana", TaxId = "TMG890722IJK", Category = "Alimentos", Products = "Tortillas de maíz y harina, masa, nixtamal.", PaymentMethods = "Contado", Rating = (decimal?)4.7m }
+            };
 
-            // Fumigación preventiva
-            comunicados.Add(new Comunicado
+            var rndProvider = new Random();
+            var allCommunitiesForProviders = await _context.Communities.ToListAsync();
+            var providerList = new List<CommunityProvider>();
+
+            foreach (var community in allCommunitiesForProviders)
             {
-                Id = Guid.NewGuid(),
-                CommunityId = firstCommunityId,
-                Titulo = "Fumigación preventiva",
-                Subtitulo = "Control de plagas en áreas comunes",
-                Descripcion = "El lunes 2025-09-16 se realizará fumigación en jardines y pasillos. Evita transitar por zonas tratadas durante ese día.",
-                Fecha = new DateTime(2025, 9, 16),
-                Imagen = "images/anuncios/fumigacion.png",
-                CreatedAt = DateTime.UtcNow.ToString("O")
-            });
+                var count = rndProvider.Next(3, 8); // 3 a 7
+                var used = new HashSet<int>();
+                for (int i = 0; i < count; i++)
+                {
+                    int idx;
+                    do { idx = rndProvider.Next(providerTemplates.Length); } while (!used.Add(idx));
+                    var t = providerTemplates[idx];
+                    var createdAt = DateTime.UtcNow.AddDays(-rndProvider.Next(30, 400)).ToString("O");
+                    var slugRaw = new string(t.BusinessName.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
+                    var slug = string.IsNullOrEmpty(slugRaw) ? "proveedor" + idx : slugRaw[..Math.Min(12, slugRaw.Length)];
+                    providerList.Add(new CommunityProvider
+                    {
+                        Id = Guid.NewGuid(),
+                        Community = community,
+                        BusinessName = t.BusinessName,
+                        TaxId = t.TaxId,
+                        FullAddress = "Av. Ejemplo 100, Col. Centro, Querétaro, Qro.",
+                        ContactPhones = "442 " + rndProvider.Next(100, 999) + " " + rndProvider.Next(1000, 9999),
+                        PrimaryEmail = "contacto@" + slug + ".mx",
+                        WebsiteOrSocialMedia = "https://www.ejemplo.mx",
+                        PrimaryContactName = "Contacto principal",
+                        DirectPhone = "442" + rndProvider.Next(1000000, 9999999),
+                        MobilePhone = "442" + rndProvider.Next(1000000, 9999999),
+                        ContactEmail = "ventas@" + slug + ".mx",
+                        ProductsOrServices = t.Products,
+                        CategoryOrIndustry = t.Category,
+                        PaymentMethods = t.PaymentMethods,
+                        Rating = t.Rating,
+                        OrderHistory = "Pedidos realizados por la comunidad en el último año. Sin incidencias.",
+                        PastIncidentsOrClaims = null,
+                        InternalNotes = "Proveedor recomendado por administración.",
+                        IsActive = true,
+                        CreatedAt = createdAt
+                    });
+                }
+            }
 
-            // Reunión vecinal mensual
-            comunicados.Add(new Comunicado
-            {
-                Id = Guid.NewGuid(),
-                CommunityId = firstCommunityId,
-                Titulo = "Reunión vecinal mensual",
-                Subtitulo = "Temas de seguridad y mantenimiento",
-                Descripcion = "La reunión se llevará a cabo el 2025-09-20 a las 18:00 hrs en el salón común. Participa y haz escuchar tu voz.",
-                Fecha = new DateTime(2025, 9, 20),
-                Imagen = "images/anuncios/reunion-mensual.png",
-                CreatedAt = DateTime.UtcNow.ToString("O")
-            });
-
-            // Instalación de cámaras
-            comunicados.Add(new Comunicado
-            {
-                Id = Guid.NewGuid(),
-                CommunityId = firstCommunityId,
-                Titulo = "Instalación de cámaras",
-                Subtitulo = "Mejora de seguridad perimetral",
-                Descripcion = "El 2025-09-22 se instalarán nuevas cámaras en los accesos principales. Habrá personal técnico en el área.",
-                Fecha = new DateTime(2025, 9, 22),
-                Imagen = "images/anuncios/instalacion-camaras.png",
-                CreatedAt = DateTime.UtcNow.ToString("O")
-            });
-
-            // Decoración de otoño
-            comunicados.Add(new Comunicado
-            {
-                Id = Guid.NewGuid(),
-                CommunityId = firstCommunityId,
-                Titulo = "Decoración de otoño",
-                Subtitulo = "Convocatoria para voluntarios",
-                Descripcion = "El comité invita a decorar áreas comunes con temática otoñal el 2025-09-25. Puedes donar adornos o ayudar en el montaje.",
-                Fecha = new DateTime(2025, 9, 25),
-                Imagen = "images/anuncios/decoracion-otono.png",
-                CreatedAt = DateTime.UtcNow.ToString("O")
-            });
-
-            // Poda de árboles
-            comunicados.Add(new Comunicado
-            {
-                Id = Guid.NewGuid(),
-                CommunityId = firstCommunityId,
-                Titulo = "Poda de árboles",
-                Subtitulo = "Mantenimiento de áreas verdes",
-                Descripcion = "El 2025-09-28 se realizará poda en los jardines del lado norte. Favor de retirar objetos personales cercanos.",
-                Fecha = new DateTime(2025, 9, 28),
-                Imagen = "images/anuncios/poda-arboles.png",
-                CreatedAt = DateTime.UtcNow.ToString("O")
-            });
-
-            // Taller de compostaje
-            comunicados.Add(new Comunicado
-            {
-                Id = Guid.NewGuid(),
-                CommunityId = firstCommunityId,
-                Titulo = "Taller de compostaje",
-                Subtitulo = "Aprende a reducir residuos orgánicos",
-                Descripcion = "El 2025-10-01 se impartirá un taller gratuito sobre compostaje en el salón común. Cupo limitado, regístrate con anticipación.",
-                Fecha = new DateTime(2025, 10, 1),
-                Imagen = "images/anuncios/taller-compostaje.png",
-                CreatedAt = DateTime.UtcNow.ToString("O")
-            });
-
-            // Reparación del portón
-            comunicados.Add(new Comunicado
-            {
-                Id = Guid.NewGuid(),
-                CommunityId = firstCommunityId,
-                Titulo = "Reparación del portón",
-                Subtitulo = "Acceso restringido temporalmente",
-                Descripcion = "El portón principal estará en mantenimiento el 2025-10-03. Usa el acceso peatonal alternativo durante ese día.",
-                Fecha = new DateTime(2025, 10, 3),
-                Imagen = "images/anuncios/reparacion-porton.png",
-                CreatedAt = DateTime.UtcNow.ToString("O")
-            });
-
-            // Festival comunitario
-            comunicados.Add(new Comunicado
-            {
-                Id = Guid.NewGuid(),
-                CommunityId = firstCommunityId,
-                Titulo = "Festival comunitario",
-                Subtitulo = "Música, comida y juegos",
-                Descripcion = "El 2025-10-06 se celebrará el festival anual en el parque central. ¡Trae a tu familia y disfruta!",
-                Fecha = new DateTime(2025, 10, 6),
-                Imagen = "images/anuncios/festival-comunitario.png",
-                CreatedAt = DateTime.UtcNow.ToString("O")
-            });
-
-            await _context.Comunicados.AddRangeAsync(comunicados.ToArray());
+            await _context.CommunityProviders.AddRangeAsync(providerList);
             await _context.SaveChangesAsync();
         }
 
