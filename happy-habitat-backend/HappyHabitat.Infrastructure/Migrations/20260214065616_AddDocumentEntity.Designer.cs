@@ -4,6 +4,7 @@ using HappyHabitat.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HappyHabitat.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260214065616_AddDocumentEntity")]
+    partial class AddDocumentEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -536,14 +539,9 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CommunityId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Documents");
                 });
@@ -1114,14 +1112,7 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .HasForeignKey("CommunityId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("HappyHabitat.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.Navigation("Community");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HappyHabitat.Domain.Entities.PagoCargoComunidad", b =>

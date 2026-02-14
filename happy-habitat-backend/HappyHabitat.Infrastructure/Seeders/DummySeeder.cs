@@ -1259,6 +1259,56 @@ public class DummySeeder : IDataSeeder
             await _context.SaveChangesAsync();
         }
 
+        // Seed Documents: entre 3 y 6 documentos por comunidad
+        if (!await _context.Documents.AnyAsync())
+        {
+            var documentTemplates = new[]
+            {
+                new { Titulo = "Reglamento interno", Descripcion = "Normas de convivencia y uso de áreas comunes.", NombreDocumento = "reglamento.pdf", UrlDoc = "/docs/reglamento.pdf" },
+                new { Titulo = "Informe mensual de administración", Descripcion = "Resumen financiero y de actividades del mes.", NombreDocumento = "informe_mensual.pdf", UrlDoc = "/docs/informe_mensual.pdf" },
+                new { Titulo = "Lista de proveedores autorizados", Descripcion = "Proveedores activos y datos de contacto.", NombreDocumento = "proveedores.xlsx", UrlDoc = "/docs/proveedores.xlsx" },
+                new { Titulo = "Bitácora de mantenimiento", Descripcion = "Registro de intervenciones técnicas y reparaciones.", NombreDocumento = "bitacora_mantenimiento.pdf", UrlDoc = "/docs/bitacora_mantenimiento.pdf" },
+                new { Titulo = "Acta de asamblea", Descripcion = "Resumen de la última asamblea de vecinos.", NombreDocumento = "acta_asamblea.pdf", UrlDoc = "/docs/acta_asamblea.pdf" },
+                new { Titulo = "Política de mascotas", Descripcion = "Normas para tenencia de mascotas en la comunidad.", NombreDocumento = "politica_mascotas.pdf", UrlDoc = "/docs/politica_mascotas.pdf" },
+                new { Titulo = "Manual de emergencias", Descripcion = "Procedimientos ante siniestros y contactos de emergencia.", NombreDocumento = "manual_emergencias.pdf", UrlDoc = "/docs/manual_emergencias.pdf" },
+                new { Titulo = "Calendario de mantenimiento", Descripcion = "Programa anual de mantenimiento de áreas comunes.", NombreDocumento = "calendario_mantenimiento.pdf", UrlDoc = "/docs/calendario_mantenimiento.pdf" }
+            };
+
+            var userCreatedNames = new[] { "Alejandro Hernández", "Carla Méndez", "Luis Ortega", "María López", "Roberto Díaz", "Patricia Gómez", "Admin Comunidad" };
+            var rndDoc = new Random();
+            var allCommunitiesForDocs = await _context.Communities.ToListAsync();
+            var documentList = new List<Document>();
+
+            foreach (var community in allCommunitiesForDocs)
+            {
+                var count = rndDoc.Next(3, 7); // 3 a 6 documentos
+                var used = new HashSet<int>();
+                for (int i = 0; i < count; i++)
+                {
+                    int idx;
+                    do { idx = rndDoc.Next(documentTemplates.Length); } while (!used.Add(idx));
+                    var t = documentTemplates[idx];
+                    var createdAt = DateTime.UtcNow.AddDays(-rndDoc.Next(10, 180)).ToString("O");
+                    var fecha = DateTime.UtcNow.AddDays(-rndDoc.Next(5, 120));
+                    documentList.Add(new Document
+                    {
+                        Id = Guid.NewGuid(),
+                        CommunityId = community.Id,
+                        Titulo = t.Titulo,
+                        Descripcion = t.Descripcion,
+                        Fecha = fecha,
+                        UserCreated = userCreatedNames[rndDoc.Next(userCreatedNames.Length)],
+                        NombreDocumento = t.NombreDocumento,
+                        UrlDoc = t.UrlDoc,
+                        CreatedAt = createdAt
+                    });
+                }
+            }
+
+            await _context.Documents.AddRangeAsync(documentList);
+            await _context.SaveChangesAsync();
+        }
+
         // Seed Contratos for Bruselas and Coto Berlin communities
         var bruselasCommunityId = new Guid("66666666-6666-6666-6666-666666666666");
         var cotoBerlinCommunityId = new Guid("9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c");
