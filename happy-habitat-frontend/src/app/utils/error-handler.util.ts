@@ -12,6 +12,13 @@ export class GlobalErrorHandler implements ErrorHandler {
   private errorService = inject(ErrorService);
 
   handleError(error: Error | any): void {
+    // Recuperación ante fallo de carga de chunk (versión antigua en caché o dev server reiniciado)
+    const message = error?.message ?? String(error);
+    if (/Failed to fetch dynamically imported module|Loading chunk \d+ failed|Loading CSS chunk \d+ failed/i.test(message)) {
+      typeof window !== 'undefined' && window.location.reload();
+      return;
+    }
+
     // Opciones de manejo de error con toda la información necesaria
     const errorHandlerOptions: PartialErrorHandlerOptions = {
       showNotification: true,
