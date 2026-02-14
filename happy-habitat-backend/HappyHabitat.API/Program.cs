@@ -75,6 +75,7 @@ builder.Services.AddScoped<IContratoService, ContratoService>();
 builder.Services.AddScoped<IPaymentHistoryService, PaymentHistoryService>();
 builder.Services.AddScoped<IChargesService, ChargesService>();
 builder.Services.AddScoped<IResidentService, ResidentService>();
+builder.Services.AddScoped<IDocumentService, DocumentService>();
 
 // Register seeders
 builder.Services.AddScoped<InitialSeeder>();
@@ -147,6 +148,16 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
+// Serve uploaded documents from ContentRoot/uploads (path: communityId/categoria/residentId/file.ext)
+var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "uploads");
+if (!Directory.Exists(uploadsPath))
+    Directory.CreateDirectory(uploadsPath);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(uploadsPath),
+    RequestPath = "/uploads"
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -185,6 +196,12 @@ using (var scope = app.Services.CreateScope())
         await dummySeeder.SeedAsync();
         logger.LogInformation("Dummy data seeded successfully.");
     }
+}
+
+// Si se ejecuta con --seed-only, solo aplica migraciones y seed y termina (útil para ejecutar el seed sin reiniciar el backend).
+if (Environment.GetCommandLineArgs().Any(a => string.Equals(a, "--seed-only", StringComparison.OrdinalIgnoreCase)))
+{
+    return;
 }
 
 app.Run();

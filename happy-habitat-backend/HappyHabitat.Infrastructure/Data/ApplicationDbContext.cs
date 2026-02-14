@@ -29,6 +29,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<PagoComunidad> PagoComunidad { get; set; }
     public DbSet<PagoCargoComunidad> PagoCargoComunidad { get; set; }
     public DbSet<CommunityProvider> CommunityProviders { get; set; }
+    public DbSet<Document> Documents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -617,6 +618,41 @@ public class ApplicationDbContext : DbContext
             // Create unique index to prevent duplicate relationships
             entity.HasIndex(e => new { e.PagoComunidadId, e.CargosComunidadId })
                 .IsUnique();
+        });
+
+        // Configure Document entity
+        modelBuilder.Entity<Document>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Titulo)
+                .IsRequired()
+                .HasMaxLength(200);
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(2000);
+            entity.Property(e => e.Fecha)
+                .IsRequired()
+                .HasColumnType("datetime2");
+            entity.Property(e => e.UserCreated)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.NombreDocumento)
+                .IsRequired()
+                .HasMaxLength(255);
+            entity.Property(e => e.UrlDoc)
+                .IsRequired()
+                .HasMaxLength(1000);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+
+            entity.HasOne(e => e.Community)
+                .WithMany(c => c.Documents)
+                .HasForeignKey(e => e.CommunityId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
     }
 }

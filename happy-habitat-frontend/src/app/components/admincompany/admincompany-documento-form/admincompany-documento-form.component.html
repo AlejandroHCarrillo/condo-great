@@ -1,0 +1,146 @@
+<div class="p-4 max-w-2xl mx-auto">
+  <div class="flex items-center justify-between gap-4 mb-6">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-file-lines text-primary"></i>
+      {{ title }}
+    </h1>
+    <button type="button" class="btn btn-secondary text-white" (click)="cancel()">
+      Regresar
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando...</span>
+    </div>
+  } @else {
+    @if (errorMessage()) {
+      <div class="alert alert-error mb-4">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form class="space-y-4" (ngSubmit)="save()">
+      <div class="form-control w-full">
+        <label class="label" for="titulo">
+          <span class="label-text font-medium">Título</span>
+        </label>
+        <input
+          id="titulo"
+          type="text"
+          class="input input-bordered w-full"
+          [(ngModel)]="form.titulo"
+          name="titulo"
+          required
+        />
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label" for="descripcion">
+          <span class="label-text font-medium">Descripción</span>
+        </label>
+        <textarea
+          id="descripcion"
+          class="textarea textarea-bordered w-full min-h-[120px]"
+          [(ngModel)]="form.descripcion"
+          name="descripcion"
+        ></textarea>
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label" for="category">
+          <span class="label-text font-medium">Categoría</span>
+          <span class="label-text-alt text-base-content/60">(opcional, para la ruta en el servidor)</span>
+        </label>
+        <input
+          id="category"
+          type="text"
+          class="input input-bordered w-full"
+          [(ngModel)]="form.category"
+          (ngModelChange)="updateUrlDocFromPreview()"
+          name="category"
+          placeholder="Ej: reglamentos, informes"
+        />
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label">
+          <span class="label-text font-medium">Subir archivo</span>
+          <span class="label-text-alt text-base-content/60">(opcional si ya tiene URL)</span>
+        </label>
+        <input
+          type="file"
+          class="file-input file-input-bordered w-full"
+          accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.png,.jpg,.jpeg"
+          (change)="onFileSelected($event)"
+          [disabled]="isUploading() || isSaving()"
+        />
+        @if (selectedFile()) {
+          <div class="flex items-center gap-2 mt-2 text-sm">
+            <i class="fa-solid fa-file text-primary"></i>
+            <span class="flex-1">{{ selectedFile()!.name }}</span>
+            <button type="button" class="btn btn-ghost btn-sm" (click)="clearSelectedFile()">
+              Quitar
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label" for="nombreDocumento">
+          <span class="label-text font-medium">Nombre del archivo</span>
+          <span class="label-text-alt text-base-content/60" *ngIf="selectedFile()">(del archivo seleccionado)</span>
+        </label>
+        <input
+          id="nombreDocumento"
+          type="text"
+          class="input input-bordered w-full"
+          [(ngModel)]="form.nombreDocumento"
+          (ngModelChange)="updateUrlDocFromPreview()"
+          name="nombreDocumento"
+          [required]="!selectedFile()"
+          [readonly]="!!selectedFile()"
+          placeholder="Seleccione un archivo arriba para que se complete automáticamente"
+        />
+      </div>
+
+      <div class="form-control w-full" *ngIf="form.urlDoc">
+        <label class="label" for="urlDoc">
+          <span class="label-text font-medium">URL del documento</span>
+          <span class="label-text-alt text-base-content/60">(según comunidad, categoría y archivo)</span>
+        </label>
+        <input
+          id="urlDoc"
+          type="text"
+          class="input input-bordered w-full font-mono text-sm input-disabled"
+          [ngModel]="form.urlDoc"
+          name="urlDoc"
+          readonly
+        />
+      </div>
+
+      <div class="flex justify-center gap-3 pt-4">
+        <button
+          type="submit"
+          class="btn btn-primary text-white"
+          [disabled]="isSaving() || isUploading()"
+        >
+          @if (isUploading()) {
+            <span class="loading loading-spinner loading-sm"></span>
+            Subiendo archivo...
+          } @else if (isSaving()) {
+            <span class="loading loading-spinner loading-sm"></span>
+            Guardando...
+          } @else {
+            Guardar
+          }
+        </button>
+        <button type="button" class="btn btn-ghost" (click)="cancel()">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  }
+</div>

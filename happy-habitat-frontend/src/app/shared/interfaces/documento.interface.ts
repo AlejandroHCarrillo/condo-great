@@ -1,10 +1,40 @@
 export interface Documento {
-  id: string;                // Identificador único del documento
-  titulo: string;            // Título del documento
-  descripcion: string;       // Descripción breve
-  fecha: string;         // Fecha de subida o creación
-  usuarioSubio: string;      // Nombre o ID del usuario que lo subió
-  nombreDocumento: string;   // Nombre original del archivo
-  urlDoc: string;             // URL pública o protegida del documento
+  id: string;
+  communityId?: string | null;
+  communityName?: string | null;
+  titulo: string;
+  descripcion: string;
+  fecha: string; // ISO string desde el backend
+  userCreated: string;
+  nombreDocumento: string;
+  urlDoc: string;
+  createdAt?: string;
+}
+
+export interface CreateDocumentoDto {
+  communityId?: string | null;
+  titulo: string;
+  descripcion: string;
+  fecha: string; // ISO date string (YYYY-MM-DD o ISO completo)
+  userCreated: string;
+  nombreDocumento: string;
+  urlDoc: string;
+}
+
+export interface UpdateDocumentoDto {
+  communityId?: string | null;
+  titulo: string;
+  descripcion: string;
+  fecha: string;
+  userCreated: string;
+  nombreDocumento: string;
+  urlDoc: string;
+}
+
+/** Respuesta del endpoint POST api/documents/upload */
+export interface DocumentUploadResponse {
+  relativePath: string;
+  originalFileName: string;
+  fileSizeBytes: number;
 }
 

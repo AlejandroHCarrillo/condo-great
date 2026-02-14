@@ -6,6 +6,8 @@ import { AdmincompanyAmenidadesComponent } from './admincompany-amenidades/admin
 import { AdmincompanyProveedoresComponent } from './admincompany-proveedores/admincompany-proveedores.component';
 import { AdmincompanyDocumentosComponent } from './admincompany-documentos/admincompany-documentos.component';
 import { AdmincompanyReportesComponent } from './admincompany-reportes/admincompany-reportes.component';
+import { DocumentDetailComponent } from './document-detail/document-detail.component';
+import { AdmincompanyDocumentoFormComponent } from './admincompany-documento-form/admincompany-documento-form.component';
 import { ResidentInfoDetailComponent } from './resident-info-detail/resident-info-detail.component';
 import { AdmincompanyResidenteFormComponent } from './admincompany-residente-form/admincompany-residente-form.component';
 import { AdmincompanyComunicadoFormComponent } from './admincompany-comunicado-form/admincompany-comunicado-form.component';
@@ -87,6 +89,18 @@ export const admincompanyRoutes: Routes = [
             {
                 path: 'documentos',
                 component: AdmincompanyDocumentosComponent
+            },
+            {
+                path: 'documentos/nuevo/:communityId',
+                component: AdmincompanyDocumentoFormComponent
+            },
+            {
+                path: 'documentos/editar/:id',
+                component: AdmincompanyDocumentoFormComponent
+            },
+            {
+                path: 'documentos/:id',
+                component: DocumentDetailComponent
             },
             {
                 path: 'reportes',

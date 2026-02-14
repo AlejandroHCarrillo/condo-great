@@ -1,0 +1,21 @@
+---
+description: Al agregar datos al DummySeeder, ejecutar el seed al terminar
+alwaysApply: true
+---
+
+# DummySeeder: ejecutar seed al terminar
+
+Cuando el usuario pida **agregar información o datos al DummySeeder** (o al "dummy seeder"):
+
+1. Implementa los cambios en `HappyHabitat.Infrastructure/Seeders/DummySeeder.cs` (o el seeder que corresponda).
+2. **Al terminar**, ejecuta el seed para aplicar los cambios sin tener que reiniciar el backend manualmente:
+
+   Desde la raíz del backend (`happy-habitat-backend`):
+
+   ```bash
+   dotnet run --project HappyHabitat.API -- --seed-only
+   ```
+
+3. Si el backend está corriendo, la compilación puede fallar porque los DLL están en uso. En ese caso indica al usuario que detenga el backend un momento, ejecute el comando anterior y vuelva a levantar la API.
+
+El flag `--seed-only` aplica migraciones, InitialSeeder y DummySeeder y luego termina (no inicia el servidor HTTP).

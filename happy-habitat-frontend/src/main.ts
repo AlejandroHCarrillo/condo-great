@@ -4,14 +4,29 @@ import { AppComponent } from './app/app.component';
 import { inject } from '@angular/core';
 import { LoggerService } from './app/services/logger.service';
 
-// Configurar manejo de errores globales
+// Detectar fallo de carga de chunks (p. ej. tras reinicio del dev server o nueva versión)
+function isChunkLoadError(error: unknown): boolean {
+  const message = typeof error === 'object' && error && 'message' in error
+    ? String((error as { message: string }).message)
+    : String(error);
+  return /Failed to fetch dynamically imported module|Loading chunk \d+ failed|Loading CSS chunk \d+ failed/i.test(message);
+}
+
 window.addEventListener('error', (event) => {
-  // El GlobalErrorHandler se encargará de esto, pero también lo capturamos aquí
+  if (isChunkLoadError(event.error)) {
+    event.preventDefault();
+    window.location.reload();
+    return;
+  }
   console.error('Global error:', event.error);
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-  // Capturar promesas rechazadas no manejadas
+  if (isChunkLoadError(event.reason)) {
+    event.preventDefault();
+    window.location.reload();
+    return;
+  }
   console.error('Unhandled promise rejection:', event.reason);
 });
 

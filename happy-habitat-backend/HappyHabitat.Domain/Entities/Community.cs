@@ -24,5 +24,6 @@ public class Community
     public ICollection<UserCommunity> UserCommunities { get; set; } = new List<UserCommunity>();
     public ICollection<Contrato> Contratos { get; set; } = new List<Contrato>();
     public ICollection<CommunityProvider> CommunityProviders { get; set; } = new List<CommunityProvider>();
+    public ICollection<Document> Documents { get; set; } = new List<Document>();
 }
 
