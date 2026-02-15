@@ -649,6 +649,7 @@ public class ApplicationDbContext : DbContext
                 .HasForeignKey(e => e.CommunityId)
                 .OnDelete(DeleteBehavior.SetNull);
 
+            // UserId column added in migration AddDocumentUserId (not in AddDocumentEntity)
             entity.HasOne(e => e.User)
                 .WithMany()
                 .HasForeignKey(e => e.UserId)

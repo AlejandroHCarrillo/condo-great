@@ -130,8 +130,7 @@ public class DocumentsController : ControllerBase
         try
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (Guid.TryParse(userIdClaim, out var userId))
-                createDocumentDto.UserId = userId;
+            createDocumentDto.UserId = Guid.TryParse(userIdClaim, out var userId) ? userId : null;
 
             var document = await _documentService.CreateDocumentAsync(createDocumentDto);
             return CreatedAtAction(nameof(GetDocumentById), new { id = document.Id }, document);
