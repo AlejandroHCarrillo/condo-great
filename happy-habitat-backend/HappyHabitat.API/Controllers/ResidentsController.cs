@@ -69,7 +69,10 @@ public class ResidentsController : ControllerBase
     public async Task<IActionResult> GetByCommunityIds([FromQuery] Guid[] communityIds, [FromQuery] int? page, [FromQuery] int? pageSize)
     {
         if (communityIds == null || communityIds.Length == 0)
-            return Ok(page.HasValue && pageSize.HasValue ? (object)new PagedResultDto<ResidentDto> { Page = page ?? 1, PageSize = pageSize ?? 10 } : Array.Empty<ResidentDto>());
+        {
+            var emptyPaged = new PagedResultDto<ResidentDto> { Items = Array.Empty<ResidentDto>(), TotalCount = 0, Page = page ?? 1, PageSize = pageSize ?? 10 };
+            return Ok(emptyPaged);
+        }
         if (page.HasValue && pageSize.HasValue && page.Value > 0 && pageSize.Value > 0)
         {
             var paged = await _residentService.GetByCommunityIdsPagedAsync(communityIds, page.Value, pageSize.Value);
