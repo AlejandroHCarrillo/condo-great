@@ -99,7 +99,7 @@ public class ContratoService : IContratoService
             Notas = createContratoDto.Notas,
             DocumentosAdjuntos = createContratoDto.DocumentosAdjuntos,
             UpdatedByUserId = updatedByUserId,
-            CreatedAt = DateTime.UtcNow.ToString("O")
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.Contratos.Add(contrato);
@@ -134,7 +134,7 @@ public class ContratoService : IContratoService
         contrato.Notas = updateContratoDto.Notas;
         contrato.DocumentosAdjuntos = updateContratoDto.DocumentosAdjuntos;
         contrato.UpdatedByUserId = updatedByUserId;
-        contrato.UpdatedAt = DateTime.UtcNow.ToString("O");
+        contrato.UpdatedAt = DateTime.UtcNow;
 
         // Marcar la entidad como modificada explícitamente
         _context.Entry(contrato).State = EntityState.Modified;
@@ -202,13 +202,13 @@ public class ContratoService : IContratoService
                     ReferenciaPago = ph.ReferenciaPago,
                     EstadoPago = ph.EstadoPago,
                     Notas = ph.Notas,
-                    CreatedAt = ph.CreatedAt,
-                    UpdatedAt = ph.UpdatedAt,
+                    CreatedAt = ph.CreatedAt.ToString("O"),
+                    UpdatedAt = ph.UpdatedAt?.ToString("O"),
                     UpdatedByUserId = ph.UpdatedByUserId?.ToString()
                 })
                 .ToList(),
-            CreatedAt = contrato.CreatedAt,
-            UpdatedAt = contrato.UpdatedAt,
+            CreatedAt = contrato.CreatedAt.ToString("O"),
+            UpdatedAt = contrato.UpdatedAt?.ToString("O"),
             UpdatedByUserId = contrato.UpdatedByUserId?.ToString()
         };
     }

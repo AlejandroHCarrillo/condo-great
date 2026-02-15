@@ -71,7 +71,7 @@ public class InitialSeeder : IDataSeeder
                 Email = "elgrandeahc@happyhabitat.com",
                 Password = _passwordHasher.HashPassword("abc123"),
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             };
 
             await _context.Users.AddAsync(initialUser);

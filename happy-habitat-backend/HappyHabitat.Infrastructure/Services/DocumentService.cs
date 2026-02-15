@@ -69,7 +69,7 @@ public class DocumentService : IDocumentService
             UserCreated = dto.UserCreated,
             NombreDocumento = dto.NombreDocumento,
             UrlDoc = dto.UrlDoc,
-            CreatedAt = DateTime.UtcNow.ToString("O")
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.Documents.Add(document);
@@ -154,7 +154,7 @@ public class DocumentService : IDocumentService
             UserCreated = d.UserCreated,
             NombreDocumento = d.NombreDocumento,
             UrlDoc = d.UrlDoc,
-            CreatedAt = d.CreatedAt
+            CreatedAt = d.CreatedAt.ToString("O")
         };
     }
 }

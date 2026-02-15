@@ -3,7 +3,7 @@ namespace HappyHabitat.Domain.Entities;
 /// <summary>
 /// Proveedor asociado a una comunidad (servicios, productos, etc.).
 /// </summary>
-public class CommunityProvider
+public class CommunityProvider : AuditBase
 {
     public Guid Id { get; set; }
 
@@ -33,10 +33,6 @@ public class CommunityProvider
     public string? InternalNotes { get; set; } // Notas internas
 
     public bool IsActive { get; set; } = true;
-    public string CreatedAt { get; set; } = string.Empty; // ISO date string
-    public Guid? CreatedByUserId { get; set; } // Usuario creación
-    public string? UpdatedAt { get; set; } // ISO date string (nullable)
-    public Guid? UpdatedByUserId { get; set; } // Usuario actualizó
 
     // Navigation properties (CommunityId como propiedad sombra en DbContext)
     public Community? Community { get; set; }

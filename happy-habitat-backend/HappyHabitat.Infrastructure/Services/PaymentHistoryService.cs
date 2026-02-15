@@ -83,7 +83,7 @@ public class PaymentHistoryService : IPaymentHistoryService
             EstadoPago = createPaymentHistoryDto.EstadoPago,
             Notas = createPaymentHistoryDto.Notas,
             UpdatedByUserId = updatedByUserId,
-            CreatedAt = DateTime.UtcNow.ToString("O")
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.PaymentHistories.Add(paymentHistory);
@@ -107,7 +107,7 @@ public class PaymentHistoryService : IPaymentHistoryService
         paymentHistory.EstadoPago = updatePaymentHistoryDto.EstadoPago;
         paymentHistory.Notas = updatePaymentHistoryDto.Notas;
         paymentHistory.UpdatedByUserId = updatedByUserId;
-        paymentHistory.UpdatedAt = DateTime.UtcNow.ToString("O");
+        paymentHistory.UpdatedAt = DateTime.UtcNow;
 
         // Marcar la entidad como modificada explícitamente
         _context.Entry(paymentHistory).State = EntityState.Modified;
@@ -147,8 +147,8 @@ public class PaymentHistoryService : IPaymentHistoryService
             ReferenciaPago = paymentHistory.ReferenciaPago,
             EstadoPago = paymentHistory.EstadoPago,
             Notas = paymentHistory.Notas,
-            CreatedAt = paymentHistory.CreatedAt,
-            UpdatedAt = paymentHistory.UpdatedAt,
+            CreatedAt = paymentHistory.CreatedAt.ToString("O"),
+            UpdatedAt = paymentHistory.UpdatedAt?.ToString("O"),
             UpdatedByUserId = paymentHistory.UpdatedByUserId?.ToString()
         };
     }

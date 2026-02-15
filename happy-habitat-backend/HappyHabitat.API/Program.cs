@@ -70,6 +70,7 @@ builder.Services.AddScoped<IBannerService, BannerService>();
 builder.Services.AddScoped<IComunicadoService, ComunicadoService>();
 builder.Services.AddScoped<IAmenityService, AmenityService>();
 builder.Services.AddScoped<ICommunityProviderService, CommunityProviderService>();
+builder.Services.AddScoped<ICommunityConfigurationService, CommunityConfigurationService>();
 builder.Services.AddScoped<ICommunityService, CommunityService>();
 builder.Services.AddScoped<IContratoService, ContratoService>();
 builder.Services.AddScoped<IPaymentHistoryService, PaymentHistoryService>();

@@ -234,7 +234,7 @@ public class AuthService : IAuthService
             Email = registerDto.Email,
             Password = _passwordHasher.HashPassword(registerDto.Password),
             IsActive = true,
-            CreatedAt = DateTime.UtcNow.ToString("O")
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.Users.Add(user);
@@ -258,7 +258,7 @@ public class AuthService : IAuthService
                 Username = user.Username,
                 Email = user.Email,
                 IsActive = user.IsActive,
-                CreatedAt = user.CreatedAt
+                CreatedAt = user.CreatedAt.ToString("O")
             },
             ExpiresAt = DateTime.UtcNow.AddMinutes(60)
         };

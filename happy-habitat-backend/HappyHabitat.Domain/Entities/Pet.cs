@@ -1,6 +1,6 @@
 namespace HappyHabitat.Domain.Entities;
 
-public class Pet
+public class Pet : AuditBase
 {
     public Guid Id { get; set; }
     public Guid ResidentId { get; set; }
@@ -10,8 +10,7 @@ public class Pet
     public int Age { get; set; }
     public string Color { get; set; } = string.Empty;
     public bool IsActive { get; set; } = true;
-    public string CreatedAt { get; set; } = string.Empty;
-    
+
     // Navigation property
     public Resident Resident { get; set; } = null!;
 }

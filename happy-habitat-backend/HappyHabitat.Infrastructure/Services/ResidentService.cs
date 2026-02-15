@@ -191,7 +191,7 @@ public class ResidentService : IResidentService
             Phone = string.IsNullOrWhiteSpace(dto.Phone) ? null : dto.Phone.Trim(),
             Number = string.IsNullOrWhiteSpace(dto.Number) ? null : dto.Number.Trim(),
             Address = dto.Address.Trim(),
-            CreatedAt = DateTime.UtcNow.ToString("o")
+            CreatedAt = DateTime.UtcNow
         };
         _context.Residents.Add(resident);
         await _context.SaveChangesAsync();
@@ -262,7 +262,7 @@ public class ResidentService : IResidentService
             Number = r.Number,
             Address = r.Address,
             CommunityIds = r.CommunityId.HasValue ? new List<Guid> { r.CommunityId.Value } : new List<Guid>(),
-            CreatedAt = r.CreatedAt
+            CreatedAt = r.CreatedAt.ToString("O")
         };
     }
 }

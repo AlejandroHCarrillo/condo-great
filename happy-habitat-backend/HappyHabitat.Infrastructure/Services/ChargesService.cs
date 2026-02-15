@@ -123,8 +123,8 @@ public class ChargesService : IChargesService
             Estatus = cargo.Estatus,
             Notas = cargo.Notas,
             IsActive = cargo.IsActive,
-            CreatedAt = cargo.CreatedAt,
-            UpdatedAt = cargo.UpdatedAt
+            CreatedAt = cargo.CreatedAt.ToString("O"),
+            UpdatedAt = cargo.UpdatedAt?.ToString("O")
         };
     }
 
@@ -137,8 +137,8 @@ public class ChargesService : IChargesService
             FormaDePago = pago.FormaDePago,
             FechaDePago = pago.FechaDePago,
             IsActive = pago.IsActive,
-            CreatedAt = pago.CreatedAt,
-            UpdatedAt = pago.UpdatedAt,
+            CreatedAt = pago.CreatedAt.ToString("O"),
+            UpdatedAt = pago.UpdatedAt?.ToString("O"),
             UpdatedByUserId = pago.UpdatedByUserId?.ToString(),
             PagoCargos = pagoCargos.Select(pc => new PagoCargoComunidadDto
             {
@@ -146,7 +146,7 @@ public class ChargesService : IChargesService
                 PagoComunidadId = pc.PagoComunidadId.ToString(),
                 CargosComunidadId = pc.CargosComunidadId.ToString(),
                 MontoAplicado = pc.MontoAplicado,
-                CreatedAt = pc.CreatedAt
+                CreatedAt = pc.CreatedAt.ToString("O")
             }).ToList()
         };
     }

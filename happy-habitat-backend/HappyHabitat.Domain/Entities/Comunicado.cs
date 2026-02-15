@@ -1,6 +1,6 @@
 namespace HappyHabitat.Domain.Entities;
 
-public class Comunicado
+public class Comunicado : AuditBase
 {
     public Guid Id { get; set; }
     public Guid? CommunityId { get; set; }
@@ -10,8 +10,7 @@ public class Comunicado
     public DateTime Fecha { get; set; } // Fecha del comunicado
     public string? Imagen { get; set; }
     public bool IsActive { get; set; } = true;
-    public string CreatedAt { get; set; } = string.Empty; // ISO date string
-    
+
     // Navigation property
     public Community? Community { get; set; }
 }

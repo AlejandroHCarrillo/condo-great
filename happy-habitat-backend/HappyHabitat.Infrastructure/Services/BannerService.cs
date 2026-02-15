@@ -60,7 +60,7 @@ public class BannerService : IBannerService
             IsActive = b.IsActive,
             StartDate = b.StartDate,
             EndDate = b.EndDate,
-            CreatedAt = b.CreatedAt
+            CreatedAt = b.CreatedAt.ToString("O")
         });
     }
 
@@ -103,7 +103,7 @@ public class BannerService : IBannerService
             IsActive = b.IsActive,
             StartDate = b.StartDate,
             EndDate = b.EndDate,
-            CreatedAt = b.CreatedAt
+            CreatedAt = b.CreatedAt.ToString("O")
         });
     }
 
@@ -148,7 +148,7 @@ public class BannerService : IBannerService
             IsActive = b.IsActive,
             StartDate = b.StartDate,
             EndDate = b.EndDate,
-            CreatedAt = b.CreatedAt
+            CreatedAt = b.CreatedAt.ToString("O")
         });
     }
 
@@ -180,7 +180,7 @@ public class BannerService : IBannerService
             IsActive = banner.IsActive,
             StartDate = banner.StartDate,
             EndDate = banner.EndDate,
-            CreatedAt = banner.CreatedAt
+            CreatedAt = banner.CreatedAt.ToString("O")
         };
     }
 
@@ -204,7 +204,7 @@ public class BannerService : IBannerService
             IsActive = createBannerDto.IsActive,
             StartDate = createBannerDto.StartDate,
             EndDate = createBannerDto.EndDate,
-            CreatedAt = DateTime.UtcNow.ToString("O")
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.Banners.Add(banner);
@@ -224,7 +224,7 @@ public class BannerService : IBannerService
             IsActive = banner.IsActive,
             StartDate = banner.StartDate,
             EndDate = banner.EndDate,
-            CreatedAt = banner.CreatedAt
+            CreatedAt = banner.CreatedAt.ToString("O")
         };
     }
 
@@ -269,7 +269,7 @@ public class BannerService : IBannerService
             IsActive = banner.IsActive,
             StartDate = banner.StartDate,
             EndDate = banner.EndDate,
-            CreatedAt = banner.CreatedAt
+            CreatedAt = banner.CreatedAt.ToString("O")
         };
     }
 

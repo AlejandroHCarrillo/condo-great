@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HappyHabitat.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260213060613_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260215072212_AddAuditBaseColumns")]
+    partial class AddAuditBaseColumns
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,9 +40,11 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Property<decimal?>("Costo")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
@@ -74,6 +76,12 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CommunityId");
@@ -90,9 +98,11 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Property<Guid?>("CommunityId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("EndDate")
                         .HasMaxLength(50)
@@ -122,6 +132,12 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CommunityId");
@@ -141,9 +157,11 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Property<Guid>("ContratoId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Estatus")
                         .IsRequired()
@@ -167,8 +185,11 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<string>("UpdatedAt")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -243,6 +264,54 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.ToTable("Communities");
                 });
 
+            modelBuilder.Entity("HappyHabitat.Domain.Entities.CommunityConfiguration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CommunityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("TipoDato")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Valor")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommunityId");
+
+                    b.ToTable("CommunityConfigurations");
+                });
+
             modelBuilder.Entity("HappyHabitat.Domain.Entities.CommunityProvider", b =>
                 {
                     b.Property<Guid>("Id")
@@ -269,9 +338,8 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid?>("CreatedByUserId")
                         .HasColumnType("uniqueidentifier");
@@ -328,9 +396,8 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("UpdatedAt")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid?>("UpdatedByUserId")
                         .HasColumnType("uniqueidentifier");
@@ -359,9 +426,11 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Property<Guid?>("CommunityId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
@@ -388,6 +457,12 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CommunityId");
@@ -411,9 +486,11 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Property<decimal>("CostoTotal")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("DiaPago")
                         .HasColumnType("int");
@@ -482,9 +559,8 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("UpdatedAt")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid?>("UpdatedByUserId")
                         .HasColumnType("uniqueidentifier");
@@ -498,6 +574,67 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.ToTable("Contratos");
                 });
 
+            modelBuilder.Entity("HappyHabitat.Domain.Entities.Document", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CommunityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NombreDocumento")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UrlDoc")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("UserCreated")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommunityId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Documents");
+                });
+
             modelBuilder.Entity("HappyHabitat.Domain.Entities.PagoCargoComunidad", b =>
                 {
                     b.Property<Guid>("Id")
@@ -507,14 +644,22 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Property<Guid>("CargosComunidadId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("MontoAplicado")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("PagoComunidadId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -533,9 +678,11 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("FechaDePago")
                         .IsRequired()
@@ -552,8 +699,8 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Property<decimal>("MontoPago")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("UpdatedAt")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid?>("UpdatedByUserId")
                         .HasColumnType("uniqueidentifier");
@@ -574,9 +721,11 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Property<Guid>("ContratoId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("EstadoPago")
                         .IsRequired()
@@ -608,9 +757,8 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("UpdatedAt")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid?>("UpdatedByUserId")
                         .HasColumnType("uniqueidentifier");
@@ -643,9 +791,11 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -662,6 +812,12 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -684,9 +840,11 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Property<Guid?>("CommunityId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
                         .HasMaxLength(100)
@@ -705,6 +863,12 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -718,6 +882,54 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.ToTable("Residents");
                 });
 
+            modelBuilder.Entity("HappyHabitat.Domain.Entities.ResidentConfiguration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<Guid>("ResidentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TipoDato")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Valor")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ResidentId");
+
+                    b.ToTable("ResidentConfigurations");
+                });
+
             modelBuilder.Entity("HappyHabitat.Domain.Entities.ResidentVisit", b =>
                 {
                     b.Property<Guid>("Id")
@@ -728,9 +940,11 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("DepartureDate")
                         .HasColumnType("nvarchar(max)");
@@ -752,6 +966,12 @@ namespace HappyHabitat.Infrastructure.Migrations
 
                     b.Property<int>("TotalPeople")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("VehicleColor")
                         .HasMaxLength(30)
@@ -796,9 +1016,11 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -828,6 +1050,12 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Property<Guid?>("RoleId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(15)
@@ -849,9 +1077,17 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Property<Guid>("CommunityId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -872,11 +1108,19 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("UserId")
@@ -908,9 +1152,11 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<string>("CreatedAt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -926,6 +1172,12 @@ namespace HappyHabitat.Infrastructure.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<Guid>("ResidentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("VehicleTypeId")
@@ -1004,6 +1256,17 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Navigation("Contrato");
                 });
 
+            modelBuilder.Entity("HappyHabitat.Domain.Entities.CommunityConfiguration", b =>
+                {
+                    b.HasOne("HappyHabitat.Domain.Entities.Community", "Community")
+                        .WithMany("CommunityConfigurations")
+                        .HasForeignKey("CommunityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Community");
+                });
+
             modelBuilder.Entity("HappyHabitat.Domain.Entities.CommunityProvider", b =>
                 {
                     b.HasOne("HappyHabitat.Domain.Entities.Community", "Community")
@@ -1055,6 +1318,23 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Navigation("Community");
 
                     b.Navigation("UpdatedByUser");
+                });
+
+            modelBuilder.Entity("HappyHabitat.Domain.Entities.Document", b =>
+                {
+                    b.HasOne("HappyHabitat.Domain.Entities.Community", "Community")
+                        .WithMany("Documents")
+                        .HasForeignKey("CommunityId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("HappyHabitat.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Community");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HappyHabitat.Domain.Entities.PagoCargoComunidad", b =>
@@ -1131,6 +1411,17 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Navigation("Community");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HappyHabitat.Domain.Entities.ResidentConfiguration", b =>
+                {
+                    b.HasOne("HappyHabitat.Domain.Entities.Resident", "Resident")
+                        .WithMany("ResidentConfigurations")
+                        .HasForeignKey("ResidentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Resident");
                 });
 
             modelBuilder.Entity("HappyHabitat.Domain.Entities.ResidentVisit", b =>
@@ -1222,11 +1513,15 @@ namespace HappyHabitat.Infrastructure.Migrations
 
                     b.Navigation("Banners");
 
+                    b.Navigation("CommunityConfigurations");
+
                     b.Navigation("CommunityProviders");
 
                     b.Navigation("Comunicados");
 
                     b.Navigation("Contratos");
+
+                    b.Navigation("Documents");
 
                     b.Navigation("Residents");
 
@@ -1248,6 +1543,8 @@ namespace HappyHabitat.Infrastructure.Migrations
             modelBuilder.Entity("HappyHabitat.Domain.Entities.Resident", b =>
                 {
                     b.Navigation("Pets");
+
+                    b.Navigation("ResidentConfigurations");
 
                     b.Navigation("Vehicles");
 

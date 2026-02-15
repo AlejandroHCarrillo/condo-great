@@ -9,10 +9,12 @@ namespace HappyHabitat.Infrastructure.Services;
 public class CommunityService : ICommunityService
 {
     private readonly ApplicationDbContext _context;
+    private readonly ICommunityConfigurationService _communityConfigurationService;
 
-    public CommunityService(ApplicationDbContext context)
+    public CommunityService(ApplicationDbContext context, ICommunityConfigurationService communityConfigurationService)
     {
         _context = context;
+        _communityConfigurationService = communityConfigurationService;
     }
 
     public async Task<IEnumerable<CommunityDto>> GetAllCommunitiesAsync(bool includeInactive = false)
@@ -97,6 +99,8 @@ public class CommunityService : ICommunityService
 
         _context.Communities.Add(community);
         await _context.SaveChangesAsync();
+
+        await _communityConfigurationService.SeedDefaultConfigurationsForCommunityAsync(community.Id);
 
         return new CommunityDto
         {

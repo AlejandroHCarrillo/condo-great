@@ -16,6 +16,9 @@ import { ComunicadoDetailComponent } from './comunicado-detail/comunicado-detail
 import { AmenidadDetailComponent } from './amenidad-detail/amenidad-detail.component';
 import { AdmincompanyProveedorFormComponent } from './admincompany-proveedor-form/admincompany-proveedor-form.component';
 import { ProveedorDetailComponent } from './proveedor-detail/proveedor-detail.component';
+import { AdmincompanyConfiguracionesComponent } from './admincompany-configuraciones/admincompany-configuraciones.component';
+import { AdmincompanyConfiguracionFormComponent } from './admincompany-configuracion-form/admincompany-configuracion-form.component';
+import { ConfiguracionDetailComponent } from './configuracion-detail/configuracion-detail.component';
 
 export const admincompanyRoutes: Routes = [
     {
@@ -101,6 +104,22 @@ export const admincompanyRoutes: Routes = [
             {
                 path: 'documentos/:id',
                 component: DocumentDetailComponent
+            },
+            {
+                path: 'configuracion',
+                component: AdmincompanyConfiguracionesComponent
+            },
+            {
+                path: 'configuracion/nuevo/:communityId',
+                component: AdmincompanyConfiguracionFormComponent
+            },
+            {
+                path: 'configuracion/editar/:id',
+                component: AdmincompanyConfiguracionFormComponent
+            },
+            {
+                path: 'configuracion/:id',
+                component: ConfiguracionDetailComponent
             },
             {
                 path: 'reportes',

@@ -38,9 +38,9 @@ public class CommunityProviderService : ICommunityProviderService
         PastIncidentsOrClaims = p.PastIncidentsOrClaims,
         InternalNotes = p.InternalNotes,
         IsActive = p.IsActive,
-        CreatedAt = p.CreatedAt,
+        CreatedAt = p.CreatedAt.ToString("O"),
         CreatedByUserId = p.CreatedByUserId,
-        UpdatedAt = p.UpdatedAt,
+        UpdatedAt = p.UpdatedAt?.ToString("O"),
         UpdatedByUserId = p.UpdatedByUserId
     };
 
@@ -110,7 +110,7 @@ public class CommunityProviderService : ICommunityProviderService
             PastIncidentsOrClaims = dto.PastIncidentsOrClaims,
             InternalNotes = dto.InternalNotes,
             CreatedByUserId = dto.CreatedByUserId,
-            CreatedAt = DateTime.UtcNow.ToString("O")
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.CommunityProviders.Add(provider);
@@ -150,7 +150,7 @@ public class CommunityProviderService : ICommunityProviderService
         provider.PastIncidentsOrClaims = dto.PastIncidentsOrClaims;
         provider.InternalNotes = dto.InternalNotes;
         provider.UpdatedByUserId = dto.UpdatedByUserId;
-        provider.UpdatedAt = DateTime.UtcNow.ToString("O");
+        provider.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
         await _context.Entry(provider).Reference(p => p.Community).LoadAsync();

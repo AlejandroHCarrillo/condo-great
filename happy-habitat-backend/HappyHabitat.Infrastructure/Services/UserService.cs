@@ -215,7 +215,7 @@ public class UserService : IUserService
             Email = createUserDto.Email,
             Password = _passwordHasher.HashPassword(createUserDto.Password),
             IsActive = createUserDto.IsActive,
-            CreatedAt = DateTime.UtcNow.ToString("O")
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.Users.Add(user);
@@ -229,7 +229,7 @@ public class UserService : IUserService
                 Id = Guid.NewGuid(),
                 UserId = user.Id,
                 RoleId = roleId,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             };
             _context.UserRoles.Add(userRole);
         }
@@ -250,7 +250,7 @@ public class UserService : IUserService
                     Id = Guid.NewGuid(),
                     UserId = user.Id,
                     CommunityId = ucCommunityId,
-                    CreatedAt = DateTime.UtcNow.ToString("O")
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 _context.UserCommunities.Add(userCommunity);
@@ -271,7 +271,7 @@ public class UserService : IUserService
                 Phone = createUserDto.ResidentInfo.Phone,
                 Number = createUserDto.ResidentInfo.Number,
                 Address = createUserDto.ResidentInfo.Address,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             };
 
             _context.Residents.Add(resident);
@@ -382,7 +382,7 @@ public class UserService : IUserService
                 Id = Guid.NewGuid(),
                 UserId = user.Id,
                 RoleId = roleId,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             };
             _context.UserRoles.Add(userRole);
         }
@@ -409,7 +409,7 @@ public class UserService : IUserService
                     Id = Guid.NewGuid(),
                     UserId = user.Id,
                     CommunityId = ucCommunityId,
-                    CreatedAt = DateTime.UtcNow.ToString("O")
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 _context.UserCommunities.Add(userCommunity);
@@ -492,7 +492,7 @@ public class UserService : IUserService
                     Phone = updateUserDto.ResidentInfo.Phone,
                     Number = updateUserDto.ResidentInfo.Number,
                     Address = updateUserDto.ResidentInfo.Address,
-                    CreatedAt = DateTime.UtcNow.ToString("O")
+                    CreatedAt = DateTime.UtcNow
                 };
                 _context.Residents.Add(resident);
             }
@@ -578,7 +578,7 @@ public class UserService : IUserService
             Username = user.Username,
             Email = user.Email,
             IsActive = user.IsActive,
-            CreatedAt = user.CreatedAt
+            CreatedAt = user.CreatedAt.ToString("O")
         };
 
         if (user.Resident != null)

@@ -114,6 +114,32 @@ namespace HappyHabitat.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CommunityConfigurations",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CommunityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Titulo = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    Valor = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    TipoDato = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CreatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CommunityConfigurations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CommunityConfigurations_Communities_CommunityId",
+                        column: x => x.CommunityId,
+                        principalTable: "Communities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Comunicados",
                 columns: table => new
                 {
@@ -186,11 +212,11 @@ namespace HappyHabitat.Infrastructure.Migrations
                     PastIncidentsOrClaims = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                     InternalNotes = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
-                    CreatedAt = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CommunityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdatedAt = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    CommunityId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -237,9 +263,10 @@ namespace HappyHabitat.Infrastructure.Migrations
                     Notas = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                     DocumentosAdjuntos = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
-                    CreatedAt = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UpdatedAt = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    UpdatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    CreatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -259,6 +286,38 @@ namespace HappyHabitat.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Documents",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CommunityId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Titulo = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserCreated = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    NombreDocumento = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    UrlDoc = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    CreatedAt = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Documents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Documents_Communities_CommunityId",
+                        column: x => x.CommunityId,
+                        principalTable: "Communities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Documents_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PagoComunidad",
                 columns: table => new
                 {
@@ -267,9 +326,10 @@ namespace HappyHabitat.Infrastructure.Migrations
                     FormaDePago = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     FechaDePago = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UpdatedAt = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UpdatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    CreatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -411,9 +471,10 @@ namespace HappyHabitat.Infrastructure.Migrations
                     EstadoPago = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Notas = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false, defaultValue: true),
-                    CreatedAt = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UpdatedAt = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    UpdatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    CreatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -451,6 +512,32 @@ namespace HappyHabitat.Infrastructure.Migrations
                     table.PrimaryKey("PK_Pets", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Pets_Residents_ResidentId",
+                        column: x => x.ResidentId,
+                        principalTable: "Residents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ResidentConfigurations",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ResidentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Titulo = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Descripcion = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    Valor = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    TipoDato = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CreatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedByUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ResidentConfigurations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ResidentConfigurations_Residents_ResidentId",
                         column: x => x.ResidentId,
                         principalTable: "Residents",
                         principalColumn: "Id",
@@ -564,6 +651,11 @@ namespace HappyHabitat.Infrastructure.Migrations
                 column: "ContratoId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CommunityConfigurations_CommunityId",
+                table: "CommunityConfigurations",
+                column: "CommunityId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CommunityProviders_CommunityId",
                 table: "CommunityProviders",
                 column: "CommunityId");
@@ -594,6 +686,16 @@ namespace HappyHabitat.Infrastructure.Migrations
                 column: "UpdatedByUserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Documents_CommunityId",
+                table: "Documents",
+                column: "CommunityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Documents_UserId",
+                table: "Documents",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PagoCargoComunidad_CargosComunidadId",
                 table: "PagoCargoComunidad",
                 column: "CargosComunidadId");
@@ -622,6 +724,11 @@ namespace HappyHabitat.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Pets_ResidentId",
                 table: "Pets",
+                column: "ResidentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ResidentConfigurations_ResidentId",
+                table: "ResidentConfigurations",
                 column: "ResidentId");
 
             migrationBuilder.CreateIndex(
@@ -688,10 +795,16 @@ namespace HappyHabitat.Infrastructure.Migrations
                 name: "Banners");
 
             migrationBuilder.DropTable(
+                name: "CommunityConfigurations");
+
+            migrationBuilder.DropTable(
                 name: "CommunityProviders");
 
             migrationBuilder.DropTable(
                 name: "Comunicados");
+
+            migrationBuilder.DropTable(
+                name: "Documents");
 
             migrationBuilder.DropTable(
                 name: "PagoCargoComunidad");
@@ -701,6 +814,9 @@ namespace HappyHabitat.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Pets");
+
+            migrationBuilder.DropTable(
+                name: "ResidentConfigurations");
 
             migrationBuilder.DropTable(
                 name: "ResidentVisits");

@@ -2,6 +2,8 @@ export interface Documento {
   id: string;
   communityId?: string | null;
   communityName?: string | null;
+  /** Usuario que subió el documento (para autorización de descarga). */
+  userId?: string | null;
   titulo: string;
   descripcion: string;
   fecha: string; // ISO string desde el backend

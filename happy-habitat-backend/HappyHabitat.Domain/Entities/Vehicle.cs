@@ -1,6 +1,6 @@
 namespace HappyHabitat.Domain.Entities;
 
-public class Vehicle
+public class Vehicle : AuditBase
 {
     public Guid Id { get; set; }
     public Guid ResidentId { get; set; }
@@ -11,8 +11,7 @@ public class Vehicle
     public string Color { get; set; } = string.Empty;
     public string LicensePlate { get; set; } = string.Empty;
     public bool IsActive { get; set; } = true;
-    public string CreatedAt { get; set; } = string.Empty;
-    
+
     // Navigation properties
     public Resident Resident { get; set; } = null!;
     public VehicleType VehicleType { get; set; } = null!;
