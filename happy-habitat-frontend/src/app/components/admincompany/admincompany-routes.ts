@@ -19,6 +19,9 @@ import { ProveedorDetailComponent } from './proveedor-detail/proveedor-detail.co
 import { AdmincompanyConfiguracionesComponent } from './admincompany-configuraciones/admincompany-configuraciones.component';
 import { AdmincompanyConfiguracionFormComponent } from './admincompany-configuracion-form/admincompany-configuracion-form.component';
 import { ConfiguracionDetailComponent } from './configuracion-detail/configuracion-detail.component';
+import { AdmincompanyEncuestasComponent } from './admincompany-encuestas/admincompany-encuestas.component';
+import { AdmincompanyEncuestaFormComponent } from './admincompany-encuesta-form/admincompany-encuesta-form.component';
+import { EncuestaDetailComponent } from './encuesta-detail/encuesta-detail.component';
 
 export const admincompanyRoutes: Routes = [
     {
@@ -120,6 +123,22 @@ export const admincompanyRoutes: Routes = [
             {
                 path: 'configuracion/:id',
                 component: ConfiguracionDetailComponent
+            },
+            {
+                path: 'encuestas',
+                component: AdmincompanyEncuestasComponent
+            },
+            {
+                path: 'encuestas/nuevo/:communityId',
+                component: AdmincompanyEncuestaFormComponent
+            },
+            {
+                path: 'encuestas/editar/:id',
+                component: AdmincompanyEncuestaFormComponent
+            },
+            {
+                path: 'encuestas/:id',
+                component: EncuestaDetailComponent
             },
             {
                 path: 'reportes',

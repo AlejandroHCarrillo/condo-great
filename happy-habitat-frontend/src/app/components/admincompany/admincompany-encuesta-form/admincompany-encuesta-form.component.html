@@ -1,0 +1,93 @@
+<div class="p-4 max-w-2xl mx-auto">
+  <div class="flex items-center justify-between gap-4 mb-6">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-clipboard-list text-primary"></i>
+      {{ title }}
+    </h1>
+    <button type="button" class="btn btn-secondary text-white" (click)="cancel()">
+      Regresar
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando...</span>
+    </div>
+  } @else {
+    @if (errorMessage()) {
+      <div class="alert alert-error mb-4">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form class="space-y-6" (ngSubmit)="save()">
+      @if (isEditMode()) {
+        <div class="rounded-lg border border-base-300 bg-base-200/50 p-4 space-y-3">
+          <p class="text-sm font-medium text-base-content/70">Comunidad (no editable)</p>
+          <p class="mt-1">{{ displayedCommunityName() }}</p>
+        </div>
+      } @else {
+        <div class="form-control w-full">
+          <label class="label" for="communityId"><span class="label-text font-medium">Comunidad</span></label>
+          <select
+            id="communityId"
+            class="select select-bordered w-full"
+            [(ngModel)]="form.communityId"
+            name="communityId"
+            required
+            [disabled]="!!communityIdFromRoute()"
+          >
+            <option value="">Seleccione una comunidad</option>
+            @for (c of comunidadesAsociadas(); track c.id) {
+              <option [value]="c.id">{{ c.nombre }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <div class="form-control w-full">
+        <label class="label" for="titulo"><span class="label-text font-medium">Título</span></label>
+        <input id="titulo" type="text" class="input input-bordered w-full" [(ngModel)]="form.titulo" name="titulo" required placeholder="Ej. Satisfacción con áreas comunes" />
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label" for="descripcion"><span class="label-text font-medium">Descripción</span></label>
+        <textarea id="descripcion" class="textarea textarea-bordered w-full min-h-[80px]" [(ngModel)]="form.descripcion" name="descripcion" placeholder="Opcional"></textarea>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="form-control w-full">
+          <label class="label" for="fechaInicio"><span class="label-text font-medium">Fecha inicio</span></label>
+          <input id="fechaInicio" type="date" class="input input-bordered w-full" [(ngModel)]="form.fechaInicio" name="fechaInicio" required />
+        </div>
+        <div class="form-control w-full">
+          <label class="label" for="fechaFin"><span class="label-text font-medium">Fecha fin</span></label>
+          <input id="fechaFin" type="date" class="input input-bordered w-full" [(ngModel)]="form.fechaFin" name="fechaFin" required />
+        </div>
+      </div>
+
+      <div class="form-control">
+        <label class="label cursor-pointer justify-start gap-2">
+          <input type="checkbox" class="checkbox checkbox-primary" [(ngModel)]="form.isActive" name="isActive" />
+          <span class="label-text font-medium">Encuesta activa (visible para residentes)</span>
+        </label>
+      </div>
+
+      <div class="flex justify-center gap-3 pt-4">
+        <button type="submit" class="btn btn-primary text-white" [disabled]="isSaving()">
+          @if (isSaving()) {
+            <span class="loading loading-spinner loading-sm"></span>
+            Guardando...
+          } @else {
+            Guardar
+          }
+        </button>
+        <button type="button" class="btn btn-ghost" (click)="cancel()">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  }
+</div>

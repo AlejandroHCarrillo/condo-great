@@ -14,6 +14,7 @@ export class AdmincompanyTopMenuComponent {
     { route: 'proveedores', label: 'Proveedores', icon: 'fa-solid fa-phone-volume' },
     { route: 'documentos', label: 'Documentos', icon: 'fa-solid fa-file-lines' },
     { route: 'configuracion', label: 'Configuración', icon: 'fa-solid fa-gear' },
+    { route: 'encuestas', label: 'Encuestas', icon: 'fa-solid fa-clipboard-list' },
     { route: 'reportes', label: 'Reportes', icon: 'fa-solid fa-chart-line' }
   ];
 }

@@ -18,5 +18,6 @@ public class Resident : AuditBase
     public ICollection<Pet> Pets { get; set; } = new List<Pet>();
     public ICollection<ResidentVisit> Visits { get; set; } = new List<ResidentVisit>();
     public ICollection<ResidentConfiguration> ResidentConfigurations { get; set; } = new List<ResidentConfiguration>();
+    public ICollection<RespuestaResidente> RespuestasEncuestas { get; set; } = new List<RespuestaResidente>();
 }
 

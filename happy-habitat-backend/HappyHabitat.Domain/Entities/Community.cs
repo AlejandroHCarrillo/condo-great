@@ -26,5 +26,6 @@ public class Community
     public ICollection<CommunityProvider> CommunityProviders { get; set; } = new List<CommunityProvider>();
     public ICollection<Document> Documents { get; set; } = new List<Document>();
     public ICollection<CommunityConfiguration> CommunityConfigurations { get; set; } = new List<CommunityConfiguration>();
+    public ICollection<Encuesta> Encuestas { get; set; } = new List<Encuesta>();
 }
 

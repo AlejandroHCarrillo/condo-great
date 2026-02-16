@@ -32,6 +32,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<Document> Documents { get; set; }
     public DbSet<CommunityConfiguration> CommunityConfigurations { get; set; }
     public DbSet<ResidentConfiguration> ResidentConfigurations { get; set; }
+    public DbSet<Encuesta> Encuestas { get; set; }
+    public DbSet<PreguntaEncuesta> PreguntasEncuesta { get; set; }
+    public DbSet<OpcionRespuesta> OpcionesRespuesta { get; set; }
+    public DbSet<RespuestaResidente> RespuestasResidente { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -751,6 +755,90 @@ public class ApplicationDbContext : DbContext
                 .HasForeignKey(e => e.ResidentId)
                 .OnDelete(DeleteBehavior.Cascade);
             // CreatedByUserId / UpdatedByUserId sin FK: solo informativos; al eliminar el usuario el valor se conserva.
+        });
+
+        modelBuilder.Entity<Encuesta>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Titulo)
+                .IsRequired()
+                .HasMaxLength(200);
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(2000);
+            entity.Property(e => e.FechaInicio)
+                .IsRequired();
+            entity.Property(e => e.FechaFin)
+                .IsRequired();
+            entity.Property(e => e.CreatedAt)
+                .IsRequired()
+                .HasColumnType("datetime2");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime2");
+            entity.HasOne(e => e.Community)
+                .WithMany(c => c.Encuestas)
+                .HasForeignKey(e => e.CommunityId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<PreguntaEncuesta>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Pregunta)
+                .IsRequired()
+                .HasMaxLength(1000);
+            entity.Property(e => e.TipoPregunta)
+                .IsRequired()
+                .HasConversion<string>()
+                .HasMaxLength(50);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired()
+                .HasColumnType("datetime2");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime2");
+            entity.HasOne(e => e.Encuesta)
+                .WithMany(enc => enc.Preguntas)
+                .HasForeignKey(e => e.EncuestaId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<OpcionRespuesta>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Respuesta)
+                .IsRequired()
+                .HasMaxLength(500);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired()
+                .HasColumnType("datetime2");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime2");
+            entity.HasOne(e => e.PreguntaEncuesta)
+                .WithMany(p => p.OpcionesRespuesta)
+                .HasForeignKey(e => e.PreguntaEncuestaId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<RespuestaResidente>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).UseIdentityColumn();
+            entity.Property(e => e.Respuesta)
+                .IsRequired()
+                .HasMaxLength(2000);
+            entity.Property(e => e.FechaRespuesta)
+                .IsRequired();
+            entity.HasOne(e => e.Encuesta)
+                .WithMany(enc => enc.RespuestasResidentes)
+                .HasForeignKey(e => e.EncuestaId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.PreguntaEncuesta)
+                .WithMany(p => p.RespuestasResidentes)
+                .HasForeignKey(e => e.PreguntaId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.Resident)
+                .WithMany(r => r.RespuestasEncuestas)
+                .HasForeignKey(e => e.ResidenteId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }
