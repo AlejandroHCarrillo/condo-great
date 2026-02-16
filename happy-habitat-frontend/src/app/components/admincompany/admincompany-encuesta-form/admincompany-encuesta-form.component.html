@@ -75,6 +75,10 @@
         </label>
       </div>
 
+      <div class="border-t border-base-300 pt-6">
+        <hh-encuesta-preguntas-editor [(preguntas)]="form.preguntas" />
+      </div>
+
       <div class="flex justify-center gap-3 pt-4">
         <button type="submit" class="btn btn-primary text-white" [disabled]="isSaving()">
           @if (isSaving()) {

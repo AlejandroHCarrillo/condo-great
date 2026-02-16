@@ -58,6 +58,15 @@ public class ResidentService : IResidentService
         return resident == null ? null : MapToDto(resident);
     }
 
+    public async Task<ResidentDto?> GetByUserIdAsync(Guid userId)
+    {
+        var resident = await _context.Residents
+            .Include(r => r.User)
+            .Include(r => r.Community)
+            .FirstOrDefaultAsync(r => r.UserId == userId);
+        return resident == null ? null : MapToDto(resident);
+    }
+
     public async Task<IEnumerable<ResidentDto>> GetByCommunityIdAsync(Guid communityId)
     {
         var residents = await _context.Residents

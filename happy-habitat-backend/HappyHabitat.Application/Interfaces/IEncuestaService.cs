@@ -10,4 +10,6 @@ public interface IEncuestaService
     Task<EncuestaDto> CreateAsync(CreateEncuestaDto dto);
     Task<EncuestaDto?> UpdateAsync(Guid id, UpdateEncuestaDto dto);
     Task<bool> DeleteAsync(Guid id);
+    /// <summary>Envía las respuestas de un residente a una encuesta. Valida que la encuesta esté activa y en fechas.</summary>
+    Task SubmitRespuestasAsync(Guid encuestaId, Guid residentId, SubmitEncuestaRespuestasDto dto);
 }

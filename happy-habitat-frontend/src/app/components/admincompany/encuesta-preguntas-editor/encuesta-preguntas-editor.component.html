@@ -1,0 +1,91 @@
+<div class="space-y-4">
+  <div class="flex items-center justify-between">
+    <h3 class="text-lg font-semibold flex items-center gap-2">
+      <i class="fa-solid fa-list-check text-primary"></i>
+      Preguntas de la encuesta
+    </h3>
+    <button type="button" class="btn btn-sm btn-primary text-white" (click)="addPregunta()">
+      <i class="fa-solid fa-plus"></i>
+      Agregar pregunta
+    </button>
+  </div>
+
+  @if (preguntas.length === 0) {
+    <p class="text-base-content/70 text-sm py-4 border border-dashed border-base-300 rounded-lg text-center">
+      No hay preguntas. Agregue al menos una para que los residentes puedan responder.
+    </p>
+  } @else {
+    <ul class="space-y-4">
+      @for (p of preguntas; track $index; let qi = $index) {
+        <li class="rounded-lg border border-base-300 bg-base-100 p-4 shadow-sm">
+          <div class="flex gap-2 items-start">
+            <span class="flex-shrink-0 mt-2 text-base-content/60 font-medium">{{ qi + 1 }}.</span>
+            <div class="flex-1 min-w-0 space-y-3">
+              <div class="form-control w-full">
+                <label class="label py-0"><span class="label-text font-medium">Tipo de pregunta</span></label>
+                <select
+                  class="select select-bordered select-sm w-full max-w-xs"
+                  [ngModel]="p.tipo"
+                  (ngModelChange)="updatePregunta(qi, 'tipo', $event)"
+                >
+                  @for (opt of tipoOptions; track opt.value) {
+                    <option [value]="opt.value">{{ opt.label }}</option>
+                  }
+                </select>
+              </div>
+              <div class="form-control w-full">
+                <label class="label py-0"><span class="label-text font-medium">Enunciado</span></label>
+                <input
+                  type="text"
+                  class="input input-bordered input-sm w-full"
+                  placeholder="Ej. ¿Qué tan satisfecho está con las áreas comunes?"
+                  [ngModel]="p.pregunta"
+                  (ngModelChange)="updatePregunta(qi, 'pregunta', $event)"
+                />
+              </div>
+              @if (needsOpciones(p.tipo)) {
+                <div class="form-control w-full">
+                  <label class="label py-0">
+                    <span class="label-text font-medium">Opciones de respuesta</span>
+                    <button type="button" class="btn btn-ghost btn-xs" (click)="addOpcion(qi)">
+                      <i class="fa-solid fa-plus text-primary"></i> Añadir opción
+                    </button>
+                  </label>
+                  <ul class="space-y-2 mt-1">
+                    @for (op of getOpciones(qi); track oi; let oi = $index) {
+                      <li class="flex gap-2 items-center">
+                        <input
+                          type="text"
+                          class="input input-bordered input-sm flex-1"
+                          [placeholder]="'Opción ' + (oi + 1)"
+                          [ngModel]="op"
+                          (ngModelChange)="setOpcion(qi, oi, $event)"
+                        />
+                        <button
+                          type="button"
+                          class="btn btn-ghost btn-square btn-sm text-error"
+                          (click)="removeOpcion(qi, oi)"
+                          [attr.aria-label]="'Quitar opción ' + (oi + 1)"
+                        >
+                          <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              }
+            </div>
+            <button
+              type="button"
+              class="btn btn-ghost btn-square btn-sm text-error flex-shrink-0"
+              (click)="removePregunta(qi)"
+              [attr.aria-label]="'Eliminar pregunta ' + (qi + 1)"
+            >
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</div>

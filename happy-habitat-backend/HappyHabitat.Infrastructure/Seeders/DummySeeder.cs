@@ -1264,6 +1264,107 @@ public class DummySeeder : IDataSeeder
             await _context.SaveChangesAsync();
         }
 
+        // Seed Encuestas: 1 encuesta por comunidad con todos los tipos de pregunta (Texto, Sí/No, Opción única, Opción múltiple)
+        if (!await _context.Encuestas.AnyAsync())
+        {
+            var allCommunitiesForEncuestas = await _context.Communities.ToListAsync();
+            var encuestaList = new List<Encuesta>();
+            var preguntaList = new List<PreguntaEncuesta>();
+            var opcionList = new List<OpcionRespuesta>();
+
+            foreach (var community in allCommunitiesForEncuestas)
+            {
+                var encuestaId = Guid.NewGuid();
+                var fechaInicio = DateTime.UtcNow.AddDays(-7);
+                var fechaFin = DateTime.UtcNow.AddDays(30);
+
+                encuestaList.Add(new Encuesta
+                {
+                    Id = encuestaId,
+                    CommunityId = community.Id,
+                    Titulo = "Satisfacción y opinión - " + community.Nombre,
+                    Descripcion = "Encuesta de opinión para mejorar los servicios y áreas comunes de la comunidad.",
+                    FechaInicio = fechaInicio,
+                    FechaFin = fechaFin,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow.AddDays(-10)
+                });
+
+                // Pregunta 1: Texto libre (TipoPregunta = 0)
+                var p1Id = Guid.NewGuid();
+                preguntaList.Add(new PreguntaEncuesta
+                {
+                    Id = p1Id,
+                    EncuestaId = encuestaId,
+                    TipoPregunta = TipoPreguntaEncuesta.Texto,
+                    Pregunta = "¿Qué mejorarías en las áreas comunes? (comentario libre)",
+                    CreatedAt = DateTime.UtcNow.AddDays(-10)
+                });
+
+                // Pregunta 2: Sí/No (TipoPregunta = 1)
+                var p2Id = Guid.NewGuid();
+                preguntaList.Add(new PreguntaEncuesta
+                {
+                    Id = p2Id,
+                    EncuestaId = encuestaId,
+                    TipoPregunta = TipoPreguntaEncuesta.SiNo,
+                    Pregunta = "¿Estás satisfecho con el mantenimiento de las áreas comunes?",
+                    CreatedAt = DateTime.UtcNow.AddDays(-10)
+                });
+
+                // Pregunta 3: Opción única (TipoPregunta = 2)
+                var p3Id = Guid.NewGuid();
+                preguntaList.Add(new PreguntaEncuesta
+                {
+                    Id = p3Id,
+                    EncuestaId = encuestaId,
+                    TipoPregunta = TipoPreguntaEncuesta.OpcionUnica,
+                    Pregunta = "¿Con qué frecuencia usas las áreas comunes?",
+                    CreatedAt = DateTime.UtcNow.AddDays(-10)
+                });
+                var opcionesP3 = new[] { "Varias veces por semana", "Una vez por semana", "Una vez al mes", "Casi nunca" };
+                foreach (var resp in opcionesP3)
+                {
+                    opcionList.Add(new OpcionRespuesta
+                    {
+                        Id = Guid.NewGuid(),
+                        PreguntaEncuestaId = p3Id,
+                        Respuesta = resp,
+                        CreatedAt = DateTime.UtcNow.AddDays(-10)
+                    });
+                }
+
+                // Pregunta 4: Opción múltiple (TipoPregunta = 3)
+                var p4Id = Guid.NewGuid();
+                preguntaList.Add(new PreguntaEncuesta
+                {
+                    Id = p4Id,
+                    EncuestaId = encuestaId,
+                    TipoPregunta = TipoPreguntaEncuesta.OpcionMultiple,
+                    Pregunta = "¿Qué servicios o mejoras te gustaría que se agregaran? (puedes elegir varios)",
+                    CreatedAt = DateTime.UtcNow.AddDays(-10)
+                });
+                var opcionesP4 = new[] { "Gimnasio", "Área de juegos infantil", "Salón de eventos", "Alberca", "Cancha deportiva", "Cafetería o zona de coworking" };
+                foreach (var resp in opcionesP4)
+                {
+                    opcionList.Add(new OpcionRespuesta
+                    {
+                        Id = Guid.NewGuid(),
+                        PreguntaEncuestaId = p4Id,
+                        Respuesta = resp,
+                        CreatedAt = DateTime.UtcNow.AddDays(-10)
+                    });
+                }
+            }
+
+            await _context.Encuestas.AddRangeAsync(encuestaList);
+            await _context.SaveChangesAsync();
+            await _context.PreguntasEncuesta.AddRangeAsync(preguntaList);
+            await _context.SaveChangesAsync();
+            await _context.OpcionesRespuesta.AddRangeAsync(opcionList);
+            await _context.SaveChangesAsync();
+        }
+
         // Seed Documents: entre 3 y 6 documentos por comunidad
         if (!await _context.Documents.AnyAsync())
         {

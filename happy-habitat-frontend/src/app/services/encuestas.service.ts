@@ -5,7 +5,8 @@ import { environment } from '../../environments/environment';
 import {
   Encuesta,
   CreateEncuestaDto,
-  UpdateEncuestaDto
+  UpdateEncuestaDto,
+  SubmitEncuestaRespuestasDto
 } from '../shared/interfaces/encuesta.interface';
 import { LoggerService } from './logger.service';
 import { ErrorService } from './error.service';
@@ -75,6 +76,17 @@ export class EncuestasService {
     return this.http.delete<void>(`${this.API_URL}/${id}`).pipe(
       catchError((err) => {
         this.logger.error(`Error deleting encuesta ${id}`, err, 'EncuestasService');
+        this.errorService.handleError(err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  /** Envía las respuestas del residente a una encuesta (usuario autenticado como residente). */
+  submitRespuestas(encuestaId: string, dto: SubmitEncuestaRespuestasDto): Observable<void> {
+    return this.http.post<void>(`${this.API_URL}/${encuestaId}/responder`, dto).pipe(
+      catchError((err) => {
+        this.logger.error(`Error submitting respuestas for encuesta ${encuestaId}`, err, 'EncuestasService');
         this.errorService.handleError(err);
         return throwError(() => err);
       })

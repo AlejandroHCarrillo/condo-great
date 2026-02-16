@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using HappyHabitat.Application.DTOs;
@@ -11,10 +12,12 @@ namespace HappyHabitat.API.Controllers;
 public class EncuestasController : ControllerBase
 {
     private readonly IEncuestaService _service;
+    private readonly IResidentService _residentService;
 
-    public EncuestasController(IEncuestaService service)
+    public EncuestasController(IEncuestaService service, IResidentService residentService)
     {
         _service = service;
+        _residentService = residentService;
     }
 
     /// <summary>Obtener todas las encuestas.</summary>
@@ -83,5 +86,28 @@ public class EncuestasController : ControllerBase
         if (!result)
             return NotFound();
         return NoContent();
+    }
+
+    /// <summary>El residente envía sus respuestas a la encuesta. El residentId se obtiene del usuario autenticado.</summary>
+    [HttpPost("{id:guid}/responder")]
+    public async Task<IActionResult> Responder(Guid id, [FromBody] SubmitEncuestaRespuestasDto dto)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        var resident = await _residentService.GetByUserIdAsync(userId);
+        if (resident == null)
+            return BadRequest("Usuario no está registrado como residente.");
+
+        try
+        {
+            await _service.SubmitRespuestasAsync(id, resident.Id, dto);
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }

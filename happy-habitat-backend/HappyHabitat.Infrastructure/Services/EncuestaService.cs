@@ -15,19 +15,36 @@ public class EncuestaService : IEncuestaService
         _context = context;
     }
 
-    private static EncuestaDto MapToDto(Encuesta e) => new EncuestaDto
+    private static EncuestaDto MapToDto(Encuesta e)
     {
-        Id = e.Id,
-        CommunityId = e.CommunityId,
-        CommunityName = e.Community?.Nombre,
-        Titulo = e.Titulo,
-        Descripcion = e.Descripcion,
-        FechaInicio = e.FechaInicio,
-        FechaFin = e.FechaFin,
-        IsActive = e.IsActive,
-        CreatedAt = e.CreatedAt.ToString("O"),
-        UpdatedAt = e.UpdatedAt?.ToString("O")
-    };
+        var dto = new EncuestaDto
+        {
+            Id = e.Id,
+            CommunityId = e.CommunityId,
+            CommunityName = e.Community?.Nombre,
+            Titulo = e.Titulo,
+            Descripcion = e.Descripcion,
+            FechaInicio = e.FechaInicio,
+            FechaFin = e.FechaFin,
+            IsActive = e.IsActive,
+            CreatedAt = e.CreatedAt.ToString("O"),
+            UpdatedAt = e.UpdatedAt?.ToString("O")
+        };
+        if (e.Preguntas?.Count > 0)
+        {
+            dto.Preguntas = e.Preguntas
+                .OrderBy(p => p.CreatedAt)
+                .Select(p => new PreguntaEncuestaDto
+                {
+                    Id = p.Id,
+                    TipoPregunta = (int)p.TipoPregunta,
+                    Pregunta = p.Pregunta,
+                    Opciones = p.OpcionesRespuesta?.OrderBy(o => o.CreatedAt).Select(o => o.Respuesta).ToList() ?? new List<string>()
+                })
+                .ToList();
+        }
+        return dto;
+    }
 
     public async Task<IEnumerable<EncuestaDto>> GetAllAsync()
     {
@@ -54,6 +71,8 @@ public class EncuestaService : IEncuestaService
     {
         var item = await _context.Encuestas
             .Include(e => e.Community)
+            .Include(e => e.Preguntas)
+                .ThenInclude(p => p.OpcionesRespuesta)
             .FirstOrDefaultAsync(e => e.Id == id);
         return item == null ? null : MapToDto(item);
     }
@@ -79,7 +98,44 @@ public class EncuestaService : IEncuestaService
 
         _context.Encuestas.Add(encuesta);
         await _context.SaveChangesAsync();
+
+        if (dto.Preguntas?.Count > 0)
+        {
+            foreach (var pr in dto.Preguntas)
+            {
+                var tipo = pr.TipoPregunta >= 0 && pr.TipoPregunta <= 3
+                    ? (TipoPreguntaEncuesta)pr.TipoPregunta
+                    : TipoPreguntaEncuesta.Texto;
+                var pregunta = new PreguntaEncuesta
+                {
+                    Id = Guid.NewGuid(),
+                    EncuestaId = encuesta.Id,
+                    TipoPregunta = tipo,
+                    Pregunta = pr.Pregunta?.Trim() ?? string.Empty,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.PreguntasEncuesta.Add(pregunta);
+                await _context.SaveChangesAsync();
+
+                if (pr.Opciones != null && pr.Opciones.Count > 0)
+                {
+                    foreach (var texto in pr.Opciones.Where(o => !string.IsNullOrWhiteSpace(o)))
+                    {
+                        _context.OpcionesRespuesta.Add(new OpcionRespuesta
+                        {
+                            Id = Guid.NewGuid(),
+                            PreguntaEncuestaId = pregunta.Id,
+                            Respuesta = texto.Trim(),
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
+
         await _context.Entry(encuesta).Reference(e => e.Community).LoadAsync();
+        await _context.Entry(encuesta).Collection(e => e.Preguntas).Query().Include(p => p.OpcionesRespuesta).LoadAsync();
         return MapToDto(encuesta);
     }
 
@@ -87,6 +143,7 @@ public class EncuestaService : IEncuestaService
     {
         var encuesta = await _context.Encuestas
             .Include(e => e.Community)
+            .Include(e => e.Preguntas)
             .FirstOrDefaultAsync(e => e.Id == id);
         if (encuesta == null)
             return null;
@@ -104,8 +161,50 @@ public class EncuestaService : IEncuestaService
         encuesta.IsActive = dto.IsActive;
         encuesta.UpdatedAt = DateTime.UtcNow;
 
+        if (dto.Preguntas != null)
+        {
+            if (encuesta.Preguntas.Count > 0)
+            {
+                _context.PreguntasEncuesta.RemoveRange(encuesta.Preguntas);
+                await _context.SaveChangesAsync();
+            }
+
+            foreach (var pr in dto.Preguntas)
+            {
+                var tipo = pr.TipoPregunta >= 0 && pr.TipoPregunta <= 3
+                    ? (TipoPreguntaEncuesta)pr.TipoPregunta
+                    : TipoPreguntaEncuesta.Texto;
+                var pregunta = new PreguntaEncuesta
+                {
+                    Id = Guid.NewGuid(),
+                    EncuestaId = encuesta.Id,
+                    TipoPregunta = tipo,
+                    Pregunta = pr.Pregunta?.Trim() ?? string.Empty,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.PreguntasEncuesta.Add(pregunta);
+                await _context.SaveChangesAsync();
+
+                if (pr.Opciones != null && pr.Opciones.Count > 0)
+                {
+                    foreach (var texto in pr.Opciones.Where(o => !string.IsNullOrWhiteSpace(o)))
+                    {
+                        _context.OpcionesRespuesta.Add(new OpcionRespuesta
+                        {
+                            Id = Guid.NewGuid(),
+                            PreguntaEncuestaId = pregunta.Id,
+                            Respuesta = texto.Trim(),
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
+
         await _context.SaveChangesAsync();
         await _context.Entry(encuesta).Reference(e => e.Community).LoadAsync();
+        await _context.Entry(encuesta).Collection(e => e.Preguntas).Query().Include(p => p.OpcionesRespuesta).LoadAsync();
         return MapToDto(encuesta);
     }
 
@@ -117,5 +216,44 @@ public class EncuestaService : IEncuestaService
         _context.Encuestas.Remove(encuesta);
         await _context.SaveChangesAsync();
         return true;
+    }
+
+    public async Task SubmitRespuestasAsync(Guid encuestaId, Guid residentId, SubmitEncuestaRespuestasDto dto)
+    {
+        var encuesta = await _context.Encuestas
+            .Include(e => e.Preguntas)
+            .FirstOrDefaultAsync(e => e.Id == encuestaId);
+        if (encuesta == null)
+            throw new InvalidOperationException("Encuesta no encontrada.");
+        if (!encuesta.IsActive)
+            throw new InvalidOperationException("La encuesta no está activa.");
+        var now = DateTime.UtcNow;
+        if (now < encuesta.FechaInicio)
+            throw new InvalidOperationException("La encuesta aún no está disponible.");
+        if (now > encuesta.FechaFin)
+            throw new InvalidOperationException("La encuesta ya ha finalizado.");
+
+        var resident = await _context.Residents.FindAsync(residentId);
+        if (resident == null)
+            throw new InvalidOperationException("Residente no encontrado.");
+        if (resident.CommunityId != encuesta.CommunityId)
+            throw new InvalidOperationException("El residente no pertenece a la comunidad de esta encuesta.");
+
+        var preguntaIds = encuesta.Preguntas.Select(p => p.Id).ToHashSet();
+        foreach (var item in dto.Respuestas ?? new List<SubmitRespuestaItemDto>())
+        {
+            if (!preguntaIds.Contains(item.PreguntaId))
+                continue;
+            _context.RespuestasResidente.Add(new RespuestaResidente
+            {
+                EncuestaId = encuestaId,
+                PreguntaId = item.PreguntaId,
+                ResidenteId = residentId,
+                Respuesta = item.Respuesta?.Trim() ?? string.Empty,
+                FechaRespuesta = now,
+                CreatedAt = now
+            });
+        }
+        await _context.SaveChangesAsync();
     }
 }

@@ -12,12 +12,18 @@ import { CommunitiesService } from '../../../services/communities.service';
 import { Comunidad } from '../../../interfaces/comunidad.interface';
 import { RolesEnum } from '../../../enums/roles.enum';
 import { mapCommunityDtoToComunidad } from '../../../shared/mappers/community.mapper';
-import type { CreateEncuestaDto, UpdateEncuestaDto } from '../../../shared/interfaces/encuesta.interface';
+import type {
+  CreateEncuestaDto,
+  UpdateEncuestaDto,
+  PreguntaFormItem,
+  CreatePreguntaEncuestaDto
+} from '../../../shared/interfaces/encuesta.interface';
+import { EncuestaPreguntasEditorComponent } from '../encuesta-preguntas-editor/encuesta-preguntas-editor.component';
 
 @Component({
   selector: 'hh-admincompany-encuesta-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, EncuestaPreguntasEditorComponent],
   templateUrl: './admincompany-encuesta-form.component.html'
 })
 export class AdmincompanyEncuestaFormComponent implements OnInit, OnDestroy {
@@ -51,7 +57,8 @@ export class AdmincompanyEncuestaFormComponent implements OnInit, OnDestroy {
     descripcion: '',
     fechaInicio: '',
     fechaFin: '',
-    isActive: true
+    isActive: true,
+    preguntas: [] as PreguntaFormItem[]
   };
 
   ngOnInit(): void {
@@ -91,6 +98,7 @@ export class AdmincompanyEncuestaFormComponent implements OnInit, OnDestroy {
     this.form.fechaInicio = today;
     this.form.fechaFin = nextMonth.toISOString().slice(0, 10);
     this.form.isActive = true;
+    this.form.preguntas = [];
   }
 
   private loadCommunitiesForAdmin(userId: string): void {
@@ -122,6 +130,7 @@ export class AdmincompanyEncuestaFormComponent implements OnInit, OnDestroy {
           this.form.fechaInicio = encuesta.fechaInicio ? encuesta.fechaInicio.slice(0, 10) : '';
           this.form.fechaFin = encuesta.fechaFin ? encuesta.fechaFin.slice(0, 10) : '';
           this.form.isActive = encuesta.isActive ?? true;
+          this.form.preguntas = this.mapPreguntasFromApi(encuesta.preguntas);
           const name = encuesta.communityName?.trim() || this.getCommunityNameById(encuesta.communityId);
           this.displayedCommunityName.set(name || encuesta.communityId || '—');
         } else {
@@ -151,6 +160,27 @@ export class AdmincompanyEncuestaFormComponent implements OnInit, OnDestroy {
   private toIsoDate(dateStr: string): string {
     if (!dateStr) return new Date().toISOString();
     return new Date(dateStr + 'T00:00:00').toISOString();
+  }
+
+  private mapPreguntasFromApi(preguntas?: { tipoPregunta: number; pregunta: string; opciones?: string[] }[]): PreguntaFormItem[] {
+    if (!preguntas?.length) return [];
+    return preguntas.map((p) => ({
+      tipo: p.tipoPregunta as PreguntaFormItem['tipo'],
+      pregunta: p.pregunta ?? '',
+      opciones: p.opciones?.length ? p.opciones : undefined
+    }));
+  }
+
+  private mapPreguntasToApi(preguntas: PreguntaFormItem[]): CreatePreguntaEncuestaDto[] {
+    if (!preguntas.length) return [];
+    return preguntas.map((p) => {
+      const opciones = p.opciones?.filter((o) => o?.trim());
+      return {
+        tipoPregunta: p.tipo,
+        pregunta: p.pregunta?.trim() ?? '',
+        opciones: opciones?.length ? opciones : undefined
+      };
+    });
   }
 
   save(): void {
@@ -188,7 +218,8 @@ export class AdmincompanyEncuestaFormComponent implements OnInit, OnDestroy {
         descripcion: this.form.descripcion?.trim() ?? '',
         fechaInicio,
         fechaFin,
-        isActive: this.form.isActive
+        isActive: this.form.isActive,
+        preguntas: this.mapPreguntasToApi(this.form.preguntas)
       };
       this.encuestasService.update(id, dto).subscribe({
         next: () => {
@@ -207,7 +238,8 @@ export class AdmincompanyEncuestaFormComponent implements OnInit, OnDestroy {
         descripcion: this.form.descripcion?.trim() ?? '',
         fechaInicio,
         fechaFin,
-        isActive: this.form.isActive
+        isActive: this.form.isActive,
+        preguntas: this.mapPreguntasToApi(this.form.preguntas)
       };
       this.encuestasService.create(dto).subscribe({
         next: () => {
