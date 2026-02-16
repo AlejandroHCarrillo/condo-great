@@ -1,0 +1,145 @@
+<div class="p-4">
+  <!-- Subnavegación: Gestión de residentes (Listado | Tickets) -->
+  <div class="mb-4 flex flex-wrap items-center gap-2 border-b border-base-300 pb-3">
+    <span class="text-sm font-semibold text-base-content/80 mr-2">Gestión de residentes:</span>
+    <a
+      routerLink="/admincompany/residentes"
+      [queryParams]="ticket()?.communityId ? { comunidad: ticket()?.communityId } : {}"
+      class="btn btn-ghost btn-sm gap-2"
+    >
+      <i class="fa-solid fa-list"></i>
+      Listado
+    </a>
+    <a
+      routerLink="/admincompany/residentes/tickets"
+      [queryParams]="ticket()?.communityId ? { comunidad: ticket()?.communityId } : {}"
+      class="btn btn-primary btn-sm gap-2"
+    >
+      <i class="fa-solid fa-ticket"></i>
+      Tickets
+    </a>
+    <span class="flex-1"></span>
+    <button type="button" (click)="goBack()" class="btn btn-ghost btn-sm gap-2">
+      <i class="fa-solid fa-arrow-left"></i>
+      Volver a lista
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando ticket...</span>
+    </div>
+  } @else if (ticket()) {
+    <div class="card bg-base-100 shadow-xl mb-6">
+      <div class="card-body">
+        <h2 class="card-title text-xl flex items-center gap-2">
+          <i class="fa-solid fa-ticket text-primary"></i>
+          Ticket #{{ ticket()!.id }}
+        </h2>
+
+        @if (errorMessage()) {
+          <div class="alert alert-error text-sm">
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="label"><span class="label-text font-semibold">Fecha reporte</span></label>
+            <p>{{ formatDate(ticket()!.fechaReporte) }}</p>
+          </div>
+          <div>
+            <label class="label"><span class="label-text font-semibold">Residente</span></label>
+            <p>{{ ticket()!.residentName ?? '—' }}</p>
+          </div>
+          <div>
+            <label class="label"><span class="label-text font-semibold">Tipo</span></label>
+            <p>{{ ticket()!.tipoReporteNombre ?? '—' }}</p>
+          </div>
+          <div>
+            <label class="label"><span class="label-text font-semibold">Estado</span></label>
+            <div class="flex items-center gap-2 flex-wrap">
+              <select
+                class="select select-bordered select-sm max-w-xs"
+                [value]="ticket()!.statusId"
+                (change)="onStatusChange(+$any($event.target).value)"
+                [disabled]="isSavingStatus()"
+              >
+                @for (s of statusList(); track s.id) {
+                  <option [value]="s.id">{{ s.code }}</option>
+                }
+              </select>
+              @if (isSavingStatus()) {
+                <span class="loading loading-spinner loading-sm"></span>
+              }
+            </div>
+          </div>
+        </div>
+
+        @if (ticket()!.createdAt) {
+          <div>
+            <label class="label"><span class="label-text font-semibold">Creado</span></label>
+            <p class="text-sm text-base-content/70">{{ formatDate(ticket()!.createdAt) }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Comentarios -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h3 class="card-title text-lg">
+          <i class="fa-solid fa-comments mr-2"></i>
+          Comentarios ({{ comentarios().length }})
+        </h3>
+
+        <div class="space-y-4">
+          @if (comentarios().length === 0) {
+            <p class="text-base-content/70">Aún no hay comentarios.</p>
+          } @else {
+            @for (c of comentarios(); track c.id) {
+              <div class="bg-base-200 rounded-lg p-3">
+                <p class="text-sm font-medium">{{ c.residentName ?? 'Residente' }} · {{ formatDate(c.createdAt) }}</p>
+                <p class="whitespace-pre-wrap mt-1">{{ c.comentarioTexto }}</p>
+              </div>
+            }
+          }
+        </div>
+
+        <div class="divider"></div>
+
+        <div>
+          <label class="label"><span class="label-text font-semibold">Nuevo comentario</span></label>
+          <div class="flex gap-2 flex-wrap">
+            <textarea
+              class="textarea textarea-bordered flex-1 min-w-[200px] min-h-[80px]"
+              placeholder="Escriba un comentario..."
+              [value]="nuevoComentario()"
+              (input)="nuevoComentario.set($any($event.target).value)"
+              [disabled]="isSavingComment()"
+            ></textarea>
+            <button
+              type="button"
+              class="btn btn-primary"
+              [disabled]="!nuevoComentario().trim() || isSavingComment()"
+              (click)="submitComentario()"
+            >
+              @if (isSavingComment()) {
+                <span class="loading loading-spinner loading-sm"></span>
+              } @else {
+                <i class="fa-solid fa-paper-plane mr-2"></i>
+                Enviar
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="alert alert-error">
+      <i class="fa-solid fa-exclamation-triangle mr-2"></i>
+      <span>No se pudo cargar el ticket.</span>
+    </div>
+  }
+</div>

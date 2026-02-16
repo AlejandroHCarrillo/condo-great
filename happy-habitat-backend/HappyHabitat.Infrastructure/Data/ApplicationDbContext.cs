@@ -36,6 +36,10 @@ public class ApplicationDbContext : DbContext
     public DbSet<PreguntaEncuesta> PreguntasEncuesta { get; set; }
     public DbSet<OpcionRespuesta> OpcionesRespuesta { get; set; }
     public DbSet<RespuestaResidente> RespuestasResidente { get; set; }
+    public DbSet<TipoReporte> TiposReporte { get; set; }
+    public DbSet<StatusTicket> StatusTickets { get; set; }
+    public DbSet<Ticket> Tickets { get; set; }
+    public DbSet<Comentario> Comentarios { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -838,6 +842,65 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(e => e.Resident)
                 .WithMany(r => r.RespuestasEncuestas)
                 .HasForeignKey(e => e.ResidenteId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<TipoReporte>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).UseIdentityColumn();
+            entity.Property(e => e.Tipo).IsRequired().HasMaxLength(100);
+        });
+
+        modelBuilder.Entity<StatusTicket>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).UseIdentityColumn();
+            entity.Property(e => e.Code).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Descripcion).IsRequired().HasMaxLength(200);
+        });
+
+        modelBuilder.Entity<Ticket>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).UseIdentityColumn();
+            entity.Property(e => e.FechaReporte).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired().HasColumnType("datetime2");
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime2");
+            entity.HasOne(e => e.Community)
+                .WithMany(c => c.Tickets)
+                .HasForeignKey(e => e.CommunityId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.Resident)
+                .WithMany(r => r.Tickets)
+                .HasForeignKey(e => e.ResidentId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.TipoReporte)
+                .WithMany(t => t.Tickets)
+                .HasForeignKey(e => e.TipoReporteId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.StatusTicket)
+                .WithMany(s => s.Tickets)
+                .HasForeignKey(e => e.StatusId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Comentario>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).UseIdentityColumn();
+            entity.Property(e => e.Origen).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.IdOrigen).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.ComentarioTexto).IsRequired().HasMaxLength(4000);
+            entity.Property(e => e.CreatedAt).IsRequired().HasColumnType("datetime2");
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime2");
+            entity.HasOne(e => e.Resident)
+                .WithMany(r => r.Comentarios)
+                .HasForeignKey(e => e.ResidentId)
+                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(e => e.ParentComment)
+                .WithMany(c => c.Replies)
+                .HasForeignKey(e => e.IdComment)
                 .OnDelete(DeleteBehavior.Restrict);
         });
     }

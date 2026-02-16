@@ -22,6 +22,8 @@ import { ConfiguracionDetailComponent } from './configuracion-detail/configuraci
 import { AdmincompanyEncuestasComponent } from './admincompany-encuestas/admincompany-encuestas.component';
 import { AdmincompanyEncuestaFormComponent } from './admincompany-encuesta-form/admincompany-encuesta-form.component';
 import { EncuestaDetailComponent } from './encuesta-detail/encuesta-detail.component';
+import { AdmincompanyTicketsComponent } from './admincompany-tickets/admincompany-tickets.component';
+import { AdmincompanyTicketDetailComponent } from './admincompany-ticket-detail/admincompany-ticket-detail.component';
 
 export const admincompanyRoutes: Routes = [
     {
@@ -55,6 +57,14 @@ export const admincompanyRoutes: Routes = [
             {
                 path: 'residentes/editar/:id',
                 component: AdmincompanyResidenteFormComponent
+            },
+            {
+                path: 'residentes/tickets',
+                component: AdmincompanyTicketsComponent
+            },
+            {
+                path: 'residentes/tickets/:id',
+                component: AdmincompanyTicketDetailComponent
             },
             {
                 path: 'residentes/:id',

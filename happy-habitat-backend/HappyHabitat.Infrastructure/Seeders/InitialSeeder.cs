@@ -93,6 +93,42 @@ public class InitialSeeder : IDataSeeder
             existingUser.IsActive = true;
             await _context.SaveChangesAsync();
         }
+
+        // Seed TipoReporte and StatusTicket if tables exist (migration AddTicketsAndComentarios must be applied first)
+        try
+        {
+            if (!await _context.TiposReporte.AnyAsync())
+            {
+                var tipos = new[]
+                {
+                    new TipoReporte { Tipo = "Mascotas" },
+                    new TipoReporte { Tipo = "Amenidades" },
+                    new TipoReporte { Tipo = "Ruido" },
+                    new TipoReporte { Tipo = "Otro" }
+                };
+                await _context.TiposReporte.AddRangeAsync(tipos);
+                await _context.SaveChangesAsync();
+            }
+
+            if (!await _context.StatusTickets.AnyAsync())
+            {
+                var statuses = new[]
+            {
+                new StatusTicket { Code = "Nuevo", Descripcion = "Ticket recién creado" },
+                new StatusTicket { Code = "En revisión", Descripcion = "En revisión por el equipo" },
+                new StatusTicket { Code = "En investigación", Descripcion = "En proceso de investigación" },
+                new StatusTicket { Code = "En proceso", Descripcion = "Se está atendiendo" },
+                new StatusTicket { Code = "Cancelado", Descripcion = "Ticket cancelado" },
+                new StatusTicket { Code = "Resuelto", Descripcion = "Ticket resuelto" }
+            };
+                await _context.StatusTickets.AddRangeAsync(statuses);
+                await _context.SaveChangesAsync();
+            }
+        }
+        catch (Microsoft.Data.SqlClient.SqlException)
+        {
+            // Tables TiposReporte/StatusTickets do not exist yet. Run: dotnet ef database update -p HappyHabitat.Infrastructure -s HappyHabitat.API
+        }
     }
 }
 

@@ -78,7 +78,7 @@
             </div>
           }
 
-          @if (isOpcionUnica(p) && p.opciones?.length) {
+          @if (isOpcionUnica(p) && p.opciones.length) {
             <div class="space-y-2">
               @for (op of p.opciones; track op) {
                 <label class="flex items-center gap-2 cursor-pointer">
@@ -95,7 +95,7 @@
             </div>
           }
 
-          @if (isOpcionMultiple(p) && p.opciones?.length) {
+          @if (isOpcionMultiple(p) && p.opciones.length) {
             <div class="space-y-2">
               @for (op of p.opciones; track op) {
                 <label class="flex items-center gap-2 cursor-pointer">
