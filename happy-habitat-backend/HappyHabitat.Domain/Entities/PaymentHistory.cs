@@ -1,6 +1,6 @@
 namespace HappyHabitat.Domain.Entities;
 
-public class PaymentHistory
+public class PaymentHistory : AuditBase
 {
     public Guid Id { get; set; }
     public Guid ContratoId { get; set; }
@@ -11,10 +11,7 @@ public class PaymentHistory
     public string EstadoPago { get; set; } = string.Empty; // pendiente, pagado, cancelado, reembolsado
     public string? Notas { get; set; }
     public bool IsActive { get; set; } = true;
-    public string CreatedAt { get; set; } = string.Empty; // ISO date string
-    public string? UpdatedAt { get; set; } // ISO date string (nullable)
-    public Guid? UpdatedByUserId { get; set; } // Usuario que modificó
-    
+
     // Navigation properties
     public Contrato Contrato { get; set; } = null!;
     public User? UpdatedByUser { get; set; }

@@ -1,0 +1,131 @@
+<div class="w-full max-w-4xl p-4 sm:p-6 md:p-8">
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando encuesta...</span>
+    </div>
+  } @else if (!encuesta()) {
+    <div class="alert alert-warning">
+      <span>Encuesta no encontrada.</span>
+      <a routerLink="/resident/encuestas" class="link">Volver al listado</a>
+    </div>
+  } @else {
+    <div class="mb-6">
+      <a routerLink="/resident/encuestas" class="text-primary hover:underline flex items-center gap-1 text-sm mb-4">
+        <i class="fa-solid fa-arrow-left"></i> Volver a encuestas
+      </a>
+      <h2 class="text-xl sm:text-2xl font-bold flex items-center gap-2">
+        <i class="fa-solid fa-clipboard-list text-primary"></i>
+        {{ encuesta()!.titulo }}
+      </h2>
+      @if (encuesta()!.descripcion) {
+        <p class="mt-2 text-base-content/70">{{ encuesta()!.descripcion }}</p>
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <div class="alert alert-error mb-4">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+    @if (successMessage()) {
+      <div class="alert alert-success mb-4">
+        <i class="fa-solid fa-check-circle"></i>
+        <span>{{ successMessage() }}</span>
+      </div>
+    }
+
+    <form (ngSubmit)="submit()" class="space-y-6">
+      @for (p of encuesta()!.preguntas; track p.id) {
+        <div class="card bg-base-100 border border-base-300 rounded-lg p-4">
+          <label class="font-semibold text-base block mb-2">
+            {{ $index + 1 }}. {{ p.pregunta }}
+          </label>
+
+          @if (isTexto(p)) {
+            <input
+              type="text"
+              class="input input-bordered w-full"
+              [value]="getValor(p.id)"
+              (input)="setValor(p.id, $any($event.target).value)"
+              placeholder="Escribe tu respuesta"
+            />
+          }
+
+          @if (isSiNo(p)) {
+            <div class="flex gap-4">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="p-{{ p.id }}"
+                  [checked]="getValor(p.id) === 'Sí'"
+                  (change)="setValor(p.id, 'Sí')"
+                  class="radio radio-primary"
+                />
+                <span>Sí</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="p-{{ p.id }}"
+                  [checked]="getValor(p.id) === 'No'"
+                  (change)="setValor(p.id, 'No')"
+                  class="radio radio-primary"
+                />
+                <span>No</span>
+              </label>
+            </div>
+          }
+
+          @if (isOpcionUnica(p) && p.opciones.length) {
+            <div class="space-y-2">
+              @for (op of p.opciones; track op) {
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    [name]="'p-' + p.id"
+                    [checked]="getValor(p.id) === op"
+                    (change)="setValor(p.id, op)"
+                    class="radio radio-primary"
+                  />
+                  <span>{{ op }}</span>
+                </label>
+              }
+            </div>
+          }
+
+          @if (isOpcionMultiple(p) && p.opciones.length) {
+            <div class="space-y-2">
+              @for (op of p.opciones; track op) {
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    [checked]="isOpcionMultipleChecked(p.id, op)"
+                    (change)="toggleOpcionMultiple(p.id, op)"
+                    class="checkbox checkbox-primary"
+                  />
+                  <span>{{ op }}</span>
+                </label>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <div class="flex gap-3 pt-4">
+        <button type="submit" class="btn btn-primary text-white" [disabled]="isSaving()">
+          @if (isSaving()) {
+            <span class="loading loading-spinner loading-sm"></span>
+            Enviando...
+          } @else {
+            Enviar respuestas
+          }
+        </button>
+        <button type="button" class="btn btn-ghost" (click)="back()">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  }
+</div>

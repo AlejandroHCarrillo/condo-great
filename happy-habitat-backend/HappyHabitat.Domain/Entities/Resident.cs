@@ -1,6 +1,6 @@
 namespace HappyHabitat.Domain.Entities;
 
-public class Resident
+public class Resident : AuditBase
 {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
@@ -10,13 +10,16 @@ public class Resident
     public string? Phone { get; set; }
     public string? Number { get; set; }
     public string Address { get; set; } = string.Empty;
-    public string CreatedAt { get; set; } = string.Empty;
-    
+
     // Navigation properties
     public User User { get; set; } = null!;
     public Community? Community { get; set; } // Navigation property to Community
     public ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
     public ICollection<Pet> Pets { get; set; } = new List<Pet>();
     public ICollection<ResidentVisit> Visits { get; set; } = new List<ResidentVisit>();
+    public ICollection<ResidentConfiguration> ResidentConfigurations { get; set; } = new List<ResidentConfiguration>();
+    public ICollection<RespuestaResidente> RespuestasEncuestas { get; set; } = new List<RespuestaResidente>();
+    public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+    public ICollection<Comentario> Comentarios { get; set; } = new List<Comentario>();
 }
 

@@ -1,3 +1,5 @@
+using System.Reflection;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using HappyHabitat.Domain.Entities;
 using HappyHabitat.Infrastructure.Data;
@@ -39,7 +41,7 @@ public class DummySeeder : IDataSeeder
                 Username = "admin1",
                 Password = _passwordHasher.HashPassword("password123"),
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
         }
 
@@ -53,7 +55,7 @@ public class DummySeeder : IDataSeeder
                 Username = "committee1",
                 Password = _passwordHasher.HashPassword("password123"),
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
         }
 
@@ -66,7 +68,7 @@ public class DummySeeder : IDataSeeder
                 Username = "committee2",
                 Password = _passwordHasher.HashPassword("password123"),
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
         }
 
@@ -80,7 +82,7 @@ public class DummySeeder : IDataSeeder
                 Username = "resident1",
                 Password = _passwordHasher.HashPassword("password123"),
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
         }
 
@@ -93,7 +95,7 @@ public class DummySeeder : IDataSeeder
                 Username = "resident2",
                 Password = _passwordHasher.HashPassword("password123"),
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
         }
 
@@ -106,7 +108,7 @@ public class DummySeeder : IDataSeeder
                 Username = "resident3",
                 Password = _passwordHasher.HashPassword("password123"),
                 IsActive = false, // Inactive user for testing
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
         }
 
@@ -120,7 +122,7 @@ public class DummySeeder : IDataSeeder
                 Username = "renter1",
                 Password = _passwordHasher.HashPassword("password123"),
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
         }
 
@@ -133,7 +135,7 @@ public class DummySeeder : IDataSeeder
                 Username = "renter2",
                 Password = _passwordHasher.HashPassword("password123"),
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
         }
 
@@ -147,7 +149,7 @@ public class DummySeeder : IDataSeeder
                 Username = "vigilance1",
                 Password = _passwordHasher.HashPassword("password123"),
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
         }
 
@@ -160,7 +162,7 @@ public class DummySeeder : IDataSeeder
                 Username = "vigilance2",
                 Password = _passwordHasher.HashPassword("password123"),
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
         }
 
@@ -380,6 +382,9 @@ public class DummySeeder : IDataSeeder
             await _context.SaveChangesAsync();
         }
 
+        // Seed default community configurations from CommunityConfigurationBase.json for all communities
+        await SeedCommunityConfigurationsFromBaseAsync();
+
         // Seed 10 residents per community (for all communities in the database)
         var firstNames = new[] { "María", "José", "Ana", "Carlos", "Laura", "Pedro", "Isabel", "Miguel", "Carmen", "Francisco", "Elena", "Roberto", "Patricia", "Jorge", "Sofía", "Luis", "Gabriela", "Ricardo", "Daniela", "Alejandro" };
         var lastNames = new[] { "González", "Martínez", "López", "Hernández", "García", "Rodríguez", "Pérez", "Sánchez", "Ramírez", "Torres", "Flores", "Rivera", "Gómez", "Díaz", "Morales", "Reyes", "Jiménez", "Ruiz", "Mendoza", "Vázquez" };
@@ -415,7 +420,7 @@ public class DummySeeder : IDataSeeder
                     Email = email,
                     Password = _passwordHasher.HashPassword("password123"),
                     IsActive = true,
-                    CreatedAt = DateTime.UtcNow.ToString("O")
+                    CreatedAt = DateTime.UtcNow
                 };
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
@@ -425,7 +430,7 @@ public class DummySeeder : IDataSeeder
                     Id = Guid.NewGuid(),
                     UserId = user.Id,
                     RoleId = residentRoleId,
-                    CreatedAt = DateTime.UtcNow.ToString("O")
+                    CreatedAt = DateTime.UtcNow
                 };
                 await _context.UserRoles.AddAsync(userRole);
 
@@ -439,7 +444,7 @@ public class DummySeeder : IDataSeeder
                     Phone = "4420000000",
                     Number = $"{suffix:D3}",
                     Address = community.Direccion,
-                    CreatedAt = DateTime.UtcNow.ToString("O")
+                    CreatedAt = DateTime.UtcNow
                 };
                 await _context.Residents.AddAsync(resident);
                 await _context.SaveChangesAsync();
@@ -463,7 +468,7 @@ public class DummySeeder : IDataSeeder
                 Email = "maria.gonzalez@admincom1.com",
                 Password = _passwordHasher.HashPassword("admin123"),
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             };
             await _context.Users.AddAsync(admin1);
             await _context.SaveChangesAsync();
@@ -476,21 +481,21 @@ public class DummySeeder : IDataSeeder
                     Id = Guid.NewGuid(),
                     UserId = admin1Id,
                     CommunityId = new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87"), // Residencial El Pueblito
-                    CreatedAt = DateTime.UtcNow.ToString("O")
+                    CreatedAt = DateTime.UtcNow
                 },
                 new UserCommunity
                 {
                     Id = Guid.NewGuid(),
                     UserId = admin1Id,
                     CommunityId = new Guid("ff7bc6fb-0f13-4e37-beb4-7d428520c227"), // Colonia Las Palmas
-                    CreatedAt = DateTime.UtcNow.ToString("O")
+                    CreatedAt = DateTime.UtcNow
                 },
                 new UserCommunity
                 {
                     Id = Guid.NewGuid(),
                     UserId = admin1Id,
                     CommunityId = new Guid("c4a28c40-a2c7-4190-961c-f3f52ad19c1d"), // Coto San Miguel
-                    CreatedAt = DateTime.UtcNow.ToString("O")
+                    CreatedAt = DateTime.UtcNow
                 }
             };
             await _context.UserCommunities.AddRangeAsync(admin1Communities);
@@ -512,7 +517,7 @@ public class DummySeeder : IDataSeeder
                 Email = "carlos.rodriguez@admincom2.com",
                 Password = _passwordHasher.HashPassword("admin123"),
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             };
             await _context.Users.AddAsync(admin2);
             await _context.SaveChangesAsync();
@@ -525,14 +530,14 @@ public class DummySeeder : IDataSeeder
                     Id = Guid.NewGuid(),
                     UserId = admin2Id,
                     CommunityId = new Guid("aa2f0511-bedd-413c-8681-34f3eee11ac9"), // Villa del Sol
-                    CreatedAt = DateTime.UtcNow.ToString("O")
+                    CreatedAt = DateTime.UtcNow
                 },
                 new UserCommunity
                 {
                     Id = Guid.NewGuid(),
                     UserId = admin2Id,
                     CommunityId = new Guid("9f3cfa42-d4cd-41b3-95d4-e8f6ffdb204c"), // Capital Sur - Coto Berlin
-                    CreatedAt = DateTime.UtcNow.ToString("O")
+                    CreatedAt = DateTime.UtcNow
                 }
             };
             await _context.UserCommunities.AddRangeAsync(admin2Communities);
@@ -554,7 +559,7 @@ public class DummySeeder : IDataSeeder
                 Email = "ana.martinez@admincom3.com",
                 Password = _passwordHasher.HashPassword("admin123"),
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             };
             await _context.Users.AddAsync(admin3);
             await _context.SaveChangesAsync();
@@ -565,7 +570,7 @@ public class DummySeeder : IDataSeeder
                 Id = Guid.NewGuid(),
                 UserId = admin3Id,
                 CommunityId = new Guid("11111111-1111-1111-1111-111111111111"), // Residencial Los Pinos
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             };
             await _context.UserCommunities.AddAsync(admin3Community);
             await _context.SaveChangesAsync();
@@ -594,7 +599,7 @@ public class DummySeeder : IDataSeeder
                     Id = Guid.NewGuid(),
                     UserId = elgrandeahcUserId,
                     RoleId = systemAdminRoleId,
-                    CreatedAt = DateTime.UtcNow.ToString("O")
+                    CreatedAt = DateTime.UtcNow
                 };
                 await _context.UserRoles.AddAsync(systemAdminUserRole);
                 await _context.SaveChangesAsync();
@@ -611,7 +616,7 @@ public class DummySeeder : IDataSeeder
                     Id = Guid.NewGuid(),
                     UserId = elgrandeahcUserId,
                     RoleId = adminCompanyRoleId,
-                    CreatedAt = DateTime.UtcNow.ToString("O")
+                    CreatedAt = DateTime.UtcNow
                 };
                 await _context.UserRoles.AddAsync(adminCompanyUserRole);
                 await _context.SaveChangesAsync();
@@ -640,7 +645,7 @@ public class DummySeeder : IDataSeeder
                         Id = Guid.NewGuid(),
                         UserId = elgrandeahcUserId,
                         CommunityId = communityId,
-                        CreatedAt = DateTime.UtcNow.ToString("O")
+                        CreatedAt = DateTime.UtcNow
                     };
                     await _context.UserCommunities.AddAsync(userCommunity);
                 }
@@ -695,7 +700,7 @@ public class DummySeeder : IDataSeeder
                         Email = email,
                         Password = _passwordHasher.HashPassword("password123"),
                         IsActive = true,
-                        CreatedAt = DateTime.UtcNow.ToString("O")
+                        CreatedAt = DateTime.UtcNow
                     };
                     await _context.Users.AddAsync(residentUser);
                     await _context.SaveChangesAsync();
@@ -706,7 +711,7 @@ public class DummySeeder : IDataSeeder
                         Id = Guid.NewGuid(),
                         UserId = residentUser.Id,
                         RoleId = localResidentRoleId,
-                        CreatedAt = DateTime.UtcNow.ToString("O")
+                        CreatedAt = DateTime.UtcNow
                     };
                     await _context.UserRoles.AddAsync(residentUserRole);
 
@@ -721,7 +726,7 @@ public class DummySeeder : IDataSeeder
                         Phone = "4421234567",
                         Number = "A-101",
                         Address = community.Direccion,
-                        CreatedAt = DateTime.UtcNow.ToString("O")
+                        CreatedAt = DateTime.UtcNow
                     };
                     await _context.Residents.AddAsync(resident);
                     await _context.SaveChangesAsync();
@@ -753,7 +758,7 @@ public class DummySeeder : IDataSeeder
                     Phone = "+1-555-0100",
                     Number = "101",
                     Address = "Main Building, Apartment 101",
-                    CreatedAt = DateTime.UtcNow.ToString("O")
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 await _context.Residents.AddAsync(resident);
@@ -793,7 +798,7 @@ public class DummySeeder : IDataSeeder
                         Year = 2020,
                         Color = "Silver",
                         LicensePlate = "ABC-123",
-                        CreatedAt = DateTime.UtcNow.ToString("O")
+                        CreatedAt = DateTime.UtcNow
                     },
                     new Vehicle
                     {
@@ -805,7 +810,7 @@ public class DummySeeder : IDataSeeder
                         Year = 2021,
                         Color = "Black",
                         LicensePlate = "XYZ-789",
-                        CreatedAt = DateTime.UtcNow.ToString("O")
+                        CreatedAt = DateTime.UtcNow
                     },
                     new Vehicle
                     {
@@ -817,7 +822,7 @@ public class DummySeeder : IDataSeeder
                         Year = 2022,
                         Color = "Blue",
                         LicensePlate = "MOT-456",
-                        CreatedAt = DateTime.UtcNow.ToString("O")
+                        CreatedAt = DateTime.UtcNow
                     }
                 };
 
@@ -842,7 +847,7 @@ public class DummySeeder : IDataSeeder
                         Breed = "Golden Retriever",
                         Age = 3,
                         Color = "Golden",
-                        CreatedAt = DateTime.UtcNow.ToString("O")
+                        CreatedAt = DateTime.UtcNow
                     },
                     new Pet
                     {
@@ -853,7 +858,7 @@ public class DummySeeder : IDataSeeder
                         Breed = "Persian",
                         Age = 2,
                         Color = "White",
-                        CreatedAt = DateTime.UtcNow.ToString("O")
+                        CreatedAt = DateTime.UtcNow
                     },
                     new Pet
                     {
@@ -864,7 +869,7 @@ public class DummySeeder : IDataSeeder
                         Breed = "Labrador",
                         Age = 5,
                         Color = "Black",
-                        CreatedAt = DateTime.UtcNow.ToString("O")
+                        CreatedAt = DateTime.UtcNow
                     }
                 };
 
@@ -892,7 +897,7 @@ public class DummySeeder : IDataSeeder
                         Subject = "Family Visit",
                         ArrivalDate = today.AddDays(-5).ToString("O"),
                         DepartureDate = today.AddDays(-4).ToString("O"),
-                        CreatedAt = today.AddDays(-5).ToString("O")
+                        CreatedAt = today.AddDays(-5)
                     },
                     new ResidentVisit
                     {
@@ -905,7 +910,7 @@ public class DummySeeder : IDataSeeder
                         Subject = "Friend Visit",
                         ArrivalDate = today.AddDays(-2).ToString("O"),
                         DepartureDate = today.AddDays(-1).ToString("O"),
-                        CreatedAt = today.AddDays(-2).ToString("O")
+                        CreatedAt = today.AddDays(-2)
                     },
                     new ResidentVisit
                     {
@@ -918,7 +923,7 @@ public class DummySeeder : IDataSeeder
                         Subject = "Family Gathering",
                         ArrivalDate = today.AddDays(2).ToString("O"),
                         DepartureDate = today.AddDays(4).ToString("O"),
-                        CreatedAt = DateTime.UtcNow.ToString("O")
+                        CreatedAt = DateTime.UtcNow
                     }
                 };
 
@@ -946,7 +951,7 @@ public class DummySeeder : IDataSeeder
                 IsActive = true,
                 StartDate = new DateTime(currentYear, 1, 1).ToString("yyyy-MM-dd"),
                 EndDate = new DateTime(currentYear, 1, 7).ToString("yyyy-MM-dd"),
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
 
             // Día de la Constitución - 5 de febrero (se celebra el lunes más cercano)
@@ -960,7 +965,7 @@ public class DummySeeder : IDataSeeder
                 IsActive = true,
                 StartDate = new DateTime(currentYear, 2, 1).ToString("yyyy-MM-dd"),
                 EndDate = new DateTime(currentYear, 2, 10).ToString("yyyy-MM-dd"),
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
 
             // Día de las Madres - 10 de mayo (usar banner genérico disponible)
@@ -974,7 +979,7 @@ public class DummySeeder : IDataSeeder
                 IsActive = true,
                 StartDate = new DateTime(currentYear, 5, 1).ToString("yyyy-MM-dd"),
                 EndDate = new DateTime(currentYear, 5, 15).ToString("yyyy-MM-dd"),
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
 
             // Día del Padre - 3er domingo de junio (aproximado 15-21)
@@ -988,7 +993,7 @@ public class DummySeeder : IDataSeeder
                 IsActive = true,
                 StartDate = new DateTime(currentYear, 6, 10).ToString("yyyy-MM-dd"),
                 EndDate = new DateTime(currentYear, 6, 25).ToString("yyyy-MM-dd"),
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
 
             // Día de la Independencia - 16 de septiembre
@@ -1002,7 +1007,7 @@ public class DummySeeder : IDataSeeder
                 IsActive = true,
                 StartDate = new DateTime(currentYear, 9, 10).ToString("yyyy-MM-dd"),
                 EndDate = new DateTime(currentYear, 9, 20).ToString("yyyy-MM-dd"),
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
 
             // Halloween - 31 de octubre
@@ -1016,7 +1021,7 @@ public class DummySeeder : IDataSeeder
                 IsActive = true,
                 StartDate = new DateTime(currentYear, 10, 25).ToString("yyyy-MM-dd"),
                 EndDate = new DateTime(currentYear, 11, 1).ToString("yyyy-MM-dd"),
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
 
             // Día de Muertos - 1-2 de noviembre
@@ -1030,7 +1035,7 @@ public class DummySeeder : IDataSeeder
                 IsActive = true,
                 StartDate = new DateTime(currentYear, 10, 28).ToString("yyyy-MM-dd"),
                 EndDate = new DateTime(currentYear, 11, 5).ToString("yyyy-MM-dd"),
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
 
             // Día de la Revolución - 20 de noviembre (se celebra el lunes más cercano)
@@ -1044,7 +1049,7 @@ public class DummySeeder : IDataSeeder
                 IsActive = true,
                 StartDate = new DateTime(currentYear, 11, 15).ToString("yyyy-MM-dd"),
                 EndDate = new DateTime(currentYear, 11, 25).ToString("yyyy-MM-dd"),
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
 
             // Día de la Virgen de Guadalupe - 12 de diciembre
@@ -1058,7 +1063,7 @@ public class DummySeeder : IDataSeeder
                 IsActive = true,
                 StartDate = new DateTime(currentYear, 12, 1).ToString("yyyy-MM-dd"),
                 EndDate = new DateTime(currentYear, 12, 15).ToString("yyyy-MM-dd"),
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
 
             // Navidad - 25 de diciembre
@@ -1072,7 +1077,7 @@ public class DummySeeder : IDataSeeder
                 IsActive = true,
                 StartDate = new DateTime(currentYear, 12, 15).ToString("yyyy-MM-dd"),
                 EndDate = new DateTime(currentYear, 12, 31).ToString("yyyy-MM-dd"),
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
 
             // Año Nuevo (fin de año) - 31 de diciembre
@@ -1086,7 +1091,7 @@ public class DummySeeder : IDataSeeder
                 IsActive = true,
                 StartDate = new DateTime(currentYear, 12, 28).ToString("yyyy-MM-dd"),
                 EndDate = new DateTime(currentYear + 1, 1, 3).ToString("yyyy-MM-dd"),
-                CreatedAt = DateTime.UtcNow.ToString("O")
+                CreatedAt = DateTime.UtcNow
             });
 
             await _context.Banners.AddRangeAsync(banners.ToArray());
@@ -1128,7 +1133,7 @@ public class DummySeeder : IDataSeeder
                             Descripcion = template.Descripcion,
                             Fecha = template.Fecha,
                             Imagen = template.Imagen,
-                            CreatedAt = DateTime.UtcNow.ToString("O")
+                            CreatedAt = DateTime.UtcNow
                         });
                     }
                 }
@@ -1176,7 +1181,7 @@ public class DummySeeder : IDataSeeder
                             Imagen = t.Imagen,
                             CapacidadMaxima = t.CapacidadMaxima,
                             NumeroReservacionesSimultaneas = t.NumeroReservacionesSimultaneas,
-                            CreatedAt = DateTime.UtcNow.ToString("O")
+                            CreatedAt = DateTime.UtcNow
                         });
                     }
                 }
@@ -1225,7 +1230,7 @@ public class DummySeeder : IDataSeeder
                     int idx;
                     do { idx = rndProvider.Next(providerTemplates.Length); } while (!used.Add(idx));
                     var t = providerTemplates[idx];
-                    var createdAt = DateTime.UtcNow.AddDays(-rndProvider.Next(30, 400)).ToString("O");
+                    var createdAt = DateTime.UtcNow.AddDays(-rndProvider.Next(30, 400));
                     var slugRaw = new string(t.BusinessName.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
                     var slug = string.IsNullOrEmpty(slugRaw) ? "proveedor" + idx : slugRaw[..Math.Min(12, slugRaw.Length)];
                     providerList.Add(new CommunityProvider
@@ -1259,6 +1264,107 @@ public class DummySeeder : IDataSeeder
             await _context.SaveChangesAsync();
         }
 
+        // Seed Encuestas: 1 encuesta por comunidad con todos los tipos de pregunta (Texto, Sí/No, Opción única, Opción múltiple)
+        if (!await _context.Encuestas.AnyAsync())
+        {
+            var allCommunitiesForEncuestas = await _context.Communities.ToListAsync();
+            var encuestaList = new List<Encuesta>();
+            var preguntaList = new List<PreguntaEncuesta>();
+            var opcionList = new List<OpcionRespuesta>();
+
+            foreach (var community in allCommunitiesForEncuestas)
+            {
+                var encuestaId = Guid.NewGuid();
+                var fechaInicio = DateTime.UtcNow.AddDays(-7);
+                var fechaFin = DateTime.UtcNow.AddDays(30);
+
+                encuestaList.Add(new Encuesta
+                {
+                    Id = encuestaId,
+                    CommunityId = community.Id,
+                    Titulo = "Satisfacción y opinión - " + community.Nombre,
+                    Descripcion = "Encuesta de opinión para mejorar los servicios y áreas comunes de la comunidad.",
+                    FechaInicio = fechaInicio,
+                    FechaFin = fechaFin,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow.AddDays(-10)
+                });
+
+                // Pregunta 1: Texto libre (TipoPregunta = 0)
+                var p1Id = Guid.NewGuid();
+                preguntaList.Add(new PreguntaEncuesta
+                {
+                    Id = p1Id,
+                    EncuestaId = encuestaId,
+                    TipoPregunta = TipoPreguntaEncuesta.Texto,
+                    Pregunta = "¿Qué mejorarías en las áreas comunes? (comentario libre)",
+                    CreatedAt = DateTime.UtcNow.AddDays(-10)
+                });
+
+                // Pregunta 2: Sí/No (TipoPregunta = 1)
+                var p2Id = Guid.NewGuid();
+                preguntaList.Add(new PreguntaEncuesta
+                {
+                    Id = p2Id,
+                    EncuestaId = encuestaId,
+                    TipoPregunta = TipoPreguntaEncuesta.SiNo,
+                    Pregunta = "¿Estás satisfecho con el mantenimiento de las áreas comunes?",
+                    CreatedAt = DateTime.UtcNow.AddDays(-10)
+                });
+
+                // Pregunta 3: Opción única (TipoPregunta = 2)
+                var p3Id = Guid.NewGuid();
+                preguntaList.Add(new PreguntaEncuesta
+                {
+                    Id = p3Id,
+                    EncuestaId = encuestaId,
+                    TipoPregunta = TipoPreguntaEncuesta.OpcionUnica,
+                    Pregunta = "¿Con qué frecuencia usas las áreas comunes?",
+                    CreatedAt = DateTime.UtcNow.AddDays(-10)
+                });
+                var opcionesP3 = new[] { "Varias veces por semana", "Una vez por semana", "Una vez al mes", "Casi nunca" };
+                foreach (var resp in opcionesP3)
+                {
+                    opcionList.Add(new OpcionRespuesta
+                    {
+                        Id = Guid.NewGuid(),
+                        PreguntaEncuestaId = p3Id,
+                        Respuesta = resp,
+                        CreatedAt = DateTime.UtcNow.AddDays(-10)
+                    });
+                }
+
+                // Pregunta 4: Opción múltiple (TipoPregunta = 3)
+                var p4Id = Guid.NewGuid();
+                preguntaList.Add(new PreguntaEncuesta
+                {
+                    Id = p4Id,
+                    EncuestaId = encuestaId,
+                    TipoPregunta = TipoPreguntaEncuesta.OpcionMultiple,
+                    Pregunta = "¿Qué servicios o mejoras te gustaría que se agregaran? (puedes elegir varios)",
+                    CreatedAt = DateTime.UtcNow.AddDays(-10)
+                });
+                var opcionesP4 = new[] { "Gimnasio", "Área de juegos infantil", "Salón de eventos", "Alberca", "Cancha deportiva", "Cafetería o zona de coworking" };
+                foreach (var resp in opcionesP4)
+                {
+                    opcionList.Add(new OpcionRespuesta
+                    {
+                        Id = Guid.NewGuid(),
+                        PreguntaEncuestaId = p4Id,
+                        Respuesta = resp,
+                        CreatedAt = DateTime.UtcNow.AddDays(-10)
+                    });
+                }
+            }
+
+            await _context.Encuestas.AddRangeAsync(encuestaList);
+            await _context.SaveChangesAsync();
+            await _context.PreguntasEncuesta.AddRangeAsync(preguntaList);
+            await _context.SaveChangesAsync();
+            await _context.OpcionesRespuesta.AddRangeAsync(opcionList);
+            await _context.SaveChangesAsync();
+        }
+
         // Seed Documents: entre 3 y 6 documentos por comunidad
         if (!await _context.Documents.AnyAsync())
         {
@@ -1288,7 +1394,7 @@ public class DummySeeder : IDataSeeder
                     int idx;
                     do { idx = rndDoc.Next(documentTemplates.Length); } while (!used.Add(idx));
                     var t = documentTemplates[idx];
-                    var createdAt = DateTime.UtcNow.AddDays(-rndDoc.Next(10, 180)).ToString("O");
+                    var createdAt = DateTime.UtcNow.AddDays(-rndDoc.Next(10, 180));
                     var fecha = DateTime.UtcNow.AddDays(-rndDoc.Next(5, 120));
                     documentList.Add(new Document
                     {
@@ -1346,7 +1452,7 @@ public class DummySeeder : IDataSeeder
                     Notas = "Contrato estándar para servicios de administración y mantenimiento",
                     DocumentosAdjuntos = "/documentos/contratos/CT-BRU-2024-001.pdf",
                     IsActive = true,
-                    CreatedAt = today.AddMonths(-6).ToString("O")
+                    CreatedAt = today.AddMonths(-6)
                 },
                 new Contrato
                 {
@@ -1370,7 +1476,7 @@ public class DummySeeder : IDataSeeder
                     Notas = "Contrato promocional para servicios de seguridad",
                     DocumentosAdjuntos = "/documentos/contratos/CT-BRU-2024-002.pdf",
                     IsActive = true,
-                    CreatedAt = today.AddMonths(-3).ToString("O")
+                    CreatedAt = today.AddMonths(-3)
                 }
             };
 
@@ -1414,7 +1520,7 @@ public class DummySeeder : IDataSeeder
                     Notas = "Contrato estándar anual para servicios completos de administración",
                     DocumentosAdjuntos = "/documentos/contratos/CT-CB-2024-001.pdf",
                     IsActive = true,
-                    CreatedAt = today.AddMonths(-12).ToString("O")
+                    CreatedAt = today.AddMonths(-12)
                 },
                 new Contrato
                 {
@@ -1438,7 +1544,7 @@ public class DummySeeder : IDataSeeder
                     Notas = "Contrato para servicios de mantenimiento de áreas comunes",
                     DocumentosAdjuntos = "/documentos/contratos/CT-CB-2024-002.pdf",
                     IsActive = true,
-                    CreatedAt = today.AddMonths(-8).ToString("O")
+                    CreatedAt = today.AddMonths(-8)
                 },
                 new Contrato
                 {
@@ -1462,7 +1568,7 @@ public class DummySeeder : IDataSeeder
                     Notas = "Contrato de prueba para nuevo servicio de limpieza",
                     DocumentosAdjuntos = "/documentos/contratos/CT-CB-2024-003.pdf",
                     IsActive = true,
-                    CreatedAt = today.AddMonths(-1).ToString("O")
+                    CreatedAt = today.AddMonths(-1)
                 }
             };
 
@@ -1587,7 +1693,7 @@ public class DummySeeder : IDataSeeder
                 FormaDePago = "transferencia",
                 FechaDePago = today.AddDays(-5).ToString("O"), // Pago realizado hace 5 días
                 IsActive = true,
-                CreatedAt = today.AddDays(-5).ToString("O"),
+                CreatedAt = today.AddDays(-5),
                 UpdatedByUserId = adminUser?.Id
             };
             pagos.Add(pagoCompleto);
@@ -1625,7 +1731,7 @@ public class DummySeeder : IDataSeeder
                 FormaDePago = "tarjeta",
                 FechaDePago = today.AddDays(-10).ToString("O"),
                 IsActive = true,
-                CreatedAt = today.AddDays(-10).ToString("O"),
+                CreatedAt = today.AddDays(-10),
                 UpdatedByUserId = adminUser?.Id
             };
             pagos.Add(pagoParcial1);
@@ -1648,7 +1754,7 @@ public class DummySeeder : IDataSeeder
                 FormaDePago = "efectivo",
                 FechaDePago = today.AddDays(-3).ToString("O"),
                 IsActive = true,
-                CreatedAt = today.AddDays(-3).ToString("O"),
+                CreatedAt = today.AddDays(-3),
                 UpdatedByUserId = adminUser?.Id
             };
             pagos.Add(pagoParcial2);
@@ -1671,7 +1777,7 @@ public class DummySeeder : IDataSeeder
                 FormaDePago = "transferencia",
                 FechaDePago = today.ToString("O"),
                 IsActive = true,
-                CreatedAt = today.ToString("O"),
+                CreatedAt = today,
                 UpdatedByUserId = adminUser?.Id
             };
             pagos.Add(pagoParcial3);
@@ -1710,7 +1816,7 @@ public class DummySeeder : IDataSeeder
                 FormaDePago = "tarjeta",
                 FechaDePago = today.AddDays(-7).ToString("O"),
                 IsActive = true,
-                CreatedAt = today.AddDays(-7).ToString("O"),
+                CreatedAt = today.AddDays(-7),
                 UpdatedByUserId = adminUser?.Id
             };
             pagos.Add(pagoIncompleto);
@@ -1750,7 +1856,7 @@ public class DummySeeder : IDataSeeder
                 FormaDePago = "transferencia",
                 FechaDePago = today.AddDays(-2).ToString("O"),
                 IsActive = true,
-                CreatedAt = today.AddDays(-2).ToString("O"),
+                CreatedAt = today.AddDays(-2),
                 UpdatedByUserId = adminUser?.Id
             };
             pagos.Add(pagoMultiples);
@@ -1879,7 +1985,7 @@ public class DummySeeder : IDataSeeder
                                 Year = year,
                                 Color = color,
                                 LicensePlate = licensePlate,
-                                CreatedAt = DateTime.UtcNow.ToString("O")
+                                CreatedAt = DateTime.UtcNow
                             });
                         }
 
@@ -1933,7 +2039,7 @@ public class DummySeeder : IDataSeeder
                                 Breed = breed,
                                 Age = random.Next(1, 10),
                                 Color = petColors[random.Next(petColors.Length)],
-                                CreatedAt = DateTime.UtcNow.ToString("O")
+                                CreatedAt = DateTime.UtcNow
                             });
                         }
 
@@ -1979,7 +2085,7 @@ public class DummySeeder : IDataSeeder
                                 Subject = visitSubjects[random.Next(visitSubjects.Length)],
                                 ArrivalDate = arrivalDate.ToString("O"),
                                 DepartureDate = hasDeparture ? departureDate.ToString("O") : null,
-                                CreatedAt = arrivalDate.ToString("O")
+                                CreatedAt = arrivalDate
                             });
                         }
 
@@ -2033,6 +2139,65 @@ public class DummySeeder : IDataSeeder
             }
             throw; // Re-throw to let the caller know there was an error
         }
+    }
+
+    /// <summary>
+    /// Loads CommunityConfigurationBase.json (embedded resource) and creates one CommunityConfiguration per template for each community that does not have any config yet.
+    /// </summary>
+    private async Task SeedCommunityConfigurationsFromBaseAsync()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var resourceName = assembly.GetManifestResourceNames()
+            .FirstOrDefault(n => n.EndsWith("CommunityConfigurationBase.json", StringComparison.OrdinalIgnoreCase));
+        if (string.IsNullOrEmpty(resourceName))
+            return;
+
+        await using var stream = assembly.GetManifestResourceStream(resourceName);
+        if (stream == null)
+            return;
+
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var templates = await JsonSerializer.DeserializeAsync<List<CommunityConfigurationBaseItem>>(stream, options);
+        if (templates == null || templates.Count == 0)
+            return;
+
+        var communityIds = await _context.Communities.Select(c => c.Id).ToListAsync();
+        var configsToAdd = new List<CommunityConfiguration>();
+
+        foreach (var communityId in communityIds)
+        {
+            var existingCount = await _context.CommunityConfigurations.CountAsync(cc => cc.CommunityId == communityId);
+            if (existingCount > 0)
+                continue;
+
+            foreach (var t in templates)
+            {
+                configsToAdd.Add(new CommunityConfiguration
+                {
+                    Id = Guid.NewGuid(),
+                    CommunityId = communityId,
+                    Titulo = t.Titulo ?? string.Empty,
+                    Descripcion = t.Descripcion ?? string.Empty,
+                    Valor = t.Valor ?? string.Empty,
+                    TipoDato = t.TipoDato ?? "string",
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+        }
+
+        if (configsToAdd.Count > 0)
+        {
+            await _context.CommunityConfigurations.AddRangeAsync(configsToAdd);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    private sealed class CommunityConfigurationBaseItem
+    {
+        public string? Titulo { get; set; }
+        public string? Descripcion { get; set; }
+        public string? Valor { get; set; }
+        public string? TipoDato { get; set; }
     }
 }
 

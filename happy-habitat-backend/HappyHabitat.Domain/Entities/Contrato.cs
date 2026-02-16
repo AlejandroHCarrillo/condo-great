@@ -1,6 +1,6 @@
 namespace HappyHabitat.Domain.Entities;
 
-public class Contrato
+public class Contrato : AuditBase
 {
     public Guid Id { get; set; }
     public Guid CommunityId { get; set; }
@@ -22,10 +22,7 @@ public class Contrato
     public string? Notas { get; set; }
     public string? DocumentosAdjuntos { get; set; } // ruta o referencia al archivo
     public bool IsActive { get; set; } = true;
-    public string CreatedAt { get; set; } = string.Empty; // ISO date string
-    public string? UpdatedAt { get; set; } // ISO date string (nullable)
-    public Guid? UpdatedByUserId { get; set; } // Usuario que modificó
-    
+
     // Navigation properties
     public Community Community { get; set; } = null!;
     public User? UpdatedByUser { get; set; }

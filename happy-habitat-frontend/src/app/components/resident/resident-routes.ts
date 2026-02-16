@@ -5,6 +5,8 @@ import { RegistroMascotaComponent } from './registro-mascota/registrar-mascota.c
 import { RegistroAutoComponent } from './registro-auto/registrar-auto.component';
 import { RegistroPreferenciasComponent } from './registro-preferencias/registro-preferencias.component';
 import { ReservacionesComponent } from '../reservaciones/reservaciones.component';
+import { ResidentEncuestasComponent } from './resident-encuestas/resident-encuestas.component';
+import { ResidentEncuestaResponderComponent } from './resident-encuesta-responder/resident-encuesta-responder.component';
 
 export const residentRoutes: Routes = [
     {
@@ -31,6 +33,14 @@ export const residentRoutes: Routes = [
             path: 'reservaciones',
             component: ReservacionesComponent
         },
+        {
+            path: 'encuestas',
+            component: ResidentEncuestasComponent
+        },
+        {
+            path: 'encuestas/:id',
+            component: ResidentEncuestaResponderComponent
+        },
         /*
         {
             path: 'pagos',
@@ -47,8 +57,8 @@ export const residentRoutes: Routes = [
         //     path: 'by/:code',
         //     component: CountryPageComponent
         // }
-        { 
-            path :'**',
+        {
+            path: '**',
             redirectTo: 'visitantes'
         }
     ]

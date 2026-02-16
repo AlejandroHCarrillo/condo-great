@@ -7,6 +7,7 @@ public interface IResidentService
     Task<IEnumerable<ResidentDto>> GetAllAsync();
     Task<PagedResultDto<ResidentDto>> GetAllPagedAsync(int page, int pageSize);
     Task<ResidentDto?> GetByIdAsync(Guid id);
+    Task<ResidentDto?> GetByUserIdAsync(Guid userId);
     Task<IEnumerable<ResidentDto>> GetByCommunityIdAsync(Guid communityId);
     Task<PagedResultDto<ResidentDto>> GetByCommunityIdPagedAsync(Guid communityId, int page, int pageSize);
     Task<IEnumerable<ResidentDto>> GetByCommunityIdsAsync(IEnumerable<Guid> communityIds);

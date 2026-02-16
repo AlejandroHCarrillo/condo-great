@@ -41,7 +41,7 @@ public class ResidentVisitService : IResidentVisitService
             Subject = v.Subject,
             ArrivalDate = v.ArrivalDate,
             DepartureDate = v.DepartureDate,
-            CreatedAt = v.CreatedAt
+            CreatedAt = v.CreatedAt.ToString("O")
         });
     }
 
@@ -74,7 +74,7 @@ public class ResidentVisitService : IResidentVisitService
             Subject = visit.Subject,
             ArrivalDate = visit.ArrivalDate,
             DepartureDate = visit.DepartureDate,
-            CreatedAt = visit.CreatedAt
+            CreatedAt = visit.CreatedAt.ToString("O")
         };
     }
 
@@ -106,7 +106,7 @@ public class ResidentVisitService : IResidentVisitService
             Subject = v.Subject,
             ArrivalDate = v.ArrivalDate,
             DepartureDate = v.DepartureDate,
-            CreatedAt = v.CreatedAt
+            CreatedAt = v.CreatedAt.ToString("O")
         });
     }
 
@@ -128,7 +128,7 @@ public class ResidentVisitService : IResidentVisitService
             Subject = createVisitDto.Subject,
             ArrivalDate = createVisitDto.ArrivalDate,
             DepartureDate = createVisitDto.DepartureDate,
-            CreatedAt = DateTime.UtcNow.ToString("O")
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.ResidentVisits.Add(visit);
@@ -146,7 +146,7 @@ public class ResidentVisitService : IResidentVisitService
             Subject = visit.Subject,
             ArrivalDate = visit.ArrivalDate,
             DepartureDate = visit.DepartureDate,
-            CreatedAt = visit.CreatedAt
+            CreatedAt = visit.CreatedAt.ToString("O")
         };
     }
 
@@ -187,7 +187,7 @@ public class ResidentVisitService : IResidentVisitService
             Subject = visit.Subject,
             ArrivalDate = visit.ArrivalDate,
             DepartureDate = visit.DepartureDate,
-            CreatedAt = visit.CreatedAt
+            CreatedAt = visit.CreatedAt.ToString("O")
         };
     }
 

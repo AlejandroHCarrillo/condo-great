@@ -1,0 +1,48 @@
+<div class="w-full max-w-4xl p-4 sm:p-6 md:p-8">
+  <h2 class="text-xl sm:text-2xl font-bold mb-4 flex items-center gap-2">
+    <i class="fa-solid fa-clipboard-list text-primary"></i>
+    <span>Encuestas</span>
+  </h2>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando encuestas...</span>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="alert alert-warning">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  } @else if (encuestasActivas().length === 0) {
+    <div class="rounded-lg border border-base-300 bg-base-200/50 p-8 text-center text-base-content/70">
+      <i class="fa-solid fa-clipboard-list text-4xl mb-4 opacity-50"></i>
+      <p class="font-medium">No hay encuestas activas en este momento.</p>
+      <p class="text-sm mt-2">Cuando tu comunidad publique una encuesta, aparecerá aquí.</p>
+    </div>
+  } @else {
+    <ul class="space-y-3">
+      @for (e of encuestasActivas(); track e.id) {
+        <li>
+          <a
+            [routerLink]="['/resident/encuestas', e.id]"
+            class="block card bg-base-100 shadow hover:shadow-md transition-shadow border border-base-300 rounded-lg p-4"
+          >
+            <div class="flex items-start justify-between gap-4">
+              <div class="min-w-0 flex-1">
+                <h3 class="font-semibold text-lg">{{ e.titulo }}</h3>
+                @if (e.descripcion) {
+                  <p class="text-sm text-base-content/70 mt-1 line-clamp-2">{{ e.descripcion }}</p>
+                }
+                <p class="text-xs text-base-content/50 mt-2">
+                  Vigente hasta {{ e.fechaFin | date:'dd/MM/yyyy' }}
+                </p>
+              </div>
+              <i class="fa-solid fa-chevron-right text-primary flex-shrink-0 mt-1"></i>
+            </div>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+</div>

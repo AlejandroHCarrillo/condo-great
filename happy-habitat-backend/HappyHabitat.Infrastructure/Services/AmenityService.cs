@@ -28,7 +28,7 @@ public class AmenityService : IAmenityService
         CommunityName = a.Community?.Nombre,
         CapacidadMaxima = a.CapacidadMaxima,
         NumeroReservacionesSimultaneas = a.NumeroReservacionesSimultaneas,
-        CreatedAt = a.CreatedAt
+        CreatedAt = a.CreatedAt.ToString("O")
     };
 
     public async Task<IEnumerable<AmenityDto>> GetAllAmenitiesAsync(bool includeInactive = false)
@@ -86,7 +86,7 @@ public class AmenityService : IAmenityService
             Community = community,
             CapacidadMaxima = dto.CapacidadMaxima,
             NumeroReservacionesSimultaneas = dto.NumeroReservacionesSimultaneas,
-            CreatedAt = DateTime.UtcNow.ToString("O")
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.Amenities.Add(amenity);

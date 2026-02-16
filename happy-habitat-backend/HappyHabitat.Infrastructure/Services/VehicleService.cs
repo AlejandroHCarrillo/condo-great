@@ -42,7 +42,7 @@ public class VehicleService : IVehicleService
             Year = v.Year,
             Color = v.Color,
             LicensePlate = v.LicensePlate,
-            CreatedAt = v.CreatedAt
+            CreatedAt = v.CreatedAt.ToString("O")
         });
     }
 
@@ -76,7 +76,7 @@ public class VehicleService : IVehicleService
             Year = vehicle.Year,
             Color = vehicle.Color,
             LicensePlate = vehicle.LicensePlate,
-            CreatedAt = vehicle.CreatedAt
+            CreatedAt = vehicle.CreatedAt.ToString("O")
         };
     }
 
@@ -109,7 +109,7 @@ public class VehicleService : IVehicleService
             Year = v.Year,
             Color = v.Color,
             LicensePlate = v.LicensePlate,
-            CreatedAt = v.CreatedAt
+            CreatedAt = v.CreatedAt.ToString("O")
         });
     }
 
@@ -135,7 +135,7 @@ public class VehicleService : IVehicleService
             Year = createVehicleDto.Year,
             Color = createVehicleDto.Color,
             LicensePlate = createVehicleDto.LicensePlate,
-            CreatedAt = DateTime.UtcNow.ToString("O")
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.Vehicles.Add(vehicle);
@@ -153,7 +153,7 @@ public class VehicleService : IVehicleService
             Year = vehicle.Year,
             Color = vehicle.Color,
             LicensePlate = vehicle.LicensePlate,
-            CreatedAt = vehicle.CreatedAt
+            CreatedAt = vehicle.CreatedAt.ToString("O")
         };
     }
 
@@ -199,7 +199,7 @@ public class VehicleService : IVehicleService
             Year = vehicle.Year,
             Color = vehicle.Color,
             LicensePlate = vehicle.LicensePlate,
-            CreatedAt = vehicle.CreatedAt
+            CreatedAt = vehicle.CreatedAt.ToString("O")
         };
     }
 

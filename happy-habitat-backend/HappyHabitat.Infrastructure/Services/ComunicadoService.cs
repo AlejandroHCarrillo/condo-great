@@ -40,7 +40,7 @@ public class ComunicadoService : IComunicadoService
             Descripcion = c.Descripcion,
             Fecha = c.Fecha,
             Imagen = c.Imagen,
-            CreatedAt = c.CreatedAt
+            CreatedAt = c.CreatedAt.ToString("O")
         });
     }
 
@@ -71,7 +71,7 @@ public class ComunicadoService : IComunicadoService
             Descripcion = c.Descripcion,
             Fecha = c.Fecha,
             Imagen = c.Imagen,
-            CreatedAt = c.CreatedAt
+            CreatedAt = c.CreatedAt.ToString("O")
         });
     }
 
@@ -112,7 +112,7 @@ public class ComunicadoService : IComunicadoService
             Descripcion = c.Descripcion,
             Fecha = c.Fecha,
             Imagen = c.Imagen,
-            CreatedAt = c.CreatedAt
+            CreatedAt = c.CreatedAt.ToString("O")
         });
     }
 
@@ -143,7 +143,7 @@ public class ComunicadoService : IComunicadoService
             Descripcion = comunicado.Descripcion,
             Fecha = comunicado.Fecha,
             Imagen = comunicado.Imagen,
-            CreatedAt = comunicado.CreatedAt
+            CreatedAt = comunicado.CreatedAt.ToString("O")
         };
     }
 
@@ -166,7 +166,7 @@ public class ComunicadoService : IComunicadoService
             Descripcion = createComunicadoDto.Descripcion,
             Fecha = createComunicadoDto.Fecha,
             Imagen = createComunicadoDto.Imagen,
-            CreatedAt = DateTime.UtcNow.ToString("O")
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.Comunicados.Add(comunicado);
@@ -185,7 +185,7 @@ public class ComunicadoService : IComunicadoService
             Descripcion = comunicado.Descripcion,
             Fecha = comunicado.Fecha,
             Imagen = comunicado.Imagen,
-            CreatedAt = comunicado.CreatedAt
+            CreatedAt = comunicado.CreatedAt.ToString("O")
         };
     }
 
@@ -228,7 +228,7 @@ public class ComunicadoService : IComunicadoService
             Descripcion = comunicado.Descripcion,
             Fecha = comunicado.Fecha,
             Imagen = comunicado.Imagen,
-            CreatedAt = comunicado.CreatedAt
+            CreatedAt = comunicado.CreatedAt.ToString("O")
         };
     }
 

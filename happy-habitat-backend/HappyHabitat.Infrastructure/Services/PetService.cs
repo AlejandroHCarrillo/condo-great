@@ -39,7 +39,7 @@ public class PetService : IPetService
             Breed = p.Breed,
             Age = p.Age,
             Color = p.Color,
-            CreatedAt = p.CreatedAt
+            CreatedAt = p.CreatedAt.ToString("O")
         });
     }
 
@@ -70,7 +70,7 @@ public class PetService : IPetService
             Breed = pet.Breed,
             Age = pet.Age,
             Color = pet.Color,
-            CreatedAt = pet.CreatedAt
+            CreatedAt = pet.CreatedAt.ToString("O")
         };
     }
 
@@ -100,7 +100,7 @@ public class PetService : IPetService
             Breed = p.Breed,
             Age = p.Age,
             Color = p.Color,
-            CreatedAt = p.CreatedAt
+            CreatedAt = p.CreatedAt.ToString("O")
         });
     }
 
@@ -120,7 +120,7 @@ public class PetService : IPetService
             Breed = createPetDto.Breed,
             Age = createPetDto.Age,
             Color = createPetDto.Color,
-            CreatedAt = DateTime.UtcNow.ToString("O")
+            CreatedAt = DateTime.UtcNow
         };
 
         _context.Pets.Add(pet);
@@ -136,7 +136,7 @@ public class PetService : IPetService
             Breed = pet.Breed,
             Age = pet.Age,
             Color = pet.Color,
-            CreatedAt = pet.CreatedAt
+            CreatedAt = pet.CreatedAt.ToString("O")
         };
     }
 
@@ -173,7 +173,7 @@ public class PetService : IPetService
             Breed = pet.Breed,
             Age = pet.Age,
             Color = pet.Color,
-            CreatedAt = pet.CreatedAt
+            CreatedAt = pet.CreatedAt.ToString("O")
         };
     }
 

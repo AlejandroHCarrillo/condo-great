@@ -1,6 +1,6 @@
 namespace HappyHabitat.Domain.Entities;
 
-public class ResidentVisit
+public class ResidentVisit : AuditBase
 {
     public Guid Id { get; set; }
     public Guid ResidentId { get; set; }
@@ -12,8 +12,7 @@ public class ResidentVisit
     public string ArrivalDate { get; set; } = string.Empty; // ISO date string
     public string? DepartureDate { get; set; } // ISO date string
     public bool IsActive { get; set; } = true;
-    public string CreatedAt { get; set; } = string.Empty;
-    
+
     // Navigation property
     public Resident Resident { get; set; } = null!;
 }

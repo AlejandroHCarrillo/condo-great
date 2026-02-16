@@ -1,0 +1,62 @@
+[
+  {
+    "titulo": "Logo de la comunidad",
+    "descripcion": "URL o ruta del logo de la comunidad",
+    "valor": "",
+    "tipoDato": "string"
+  },
+  {
+    "titulo": "Imagen principal",
+    "descripcion": "URL o ruta de la imagen principal de la comunidad",
+    "valor": "",
+    "tipoDato": "string"
+  },
+  {
+    "titulo": "Nombre del contacto principal",
+    "descripcion": "Nombre de la persona de contacto principal",
+    "valor": "",
+    "tipoDato": "string"
+  },
+  {
+    "titulo": "Nombre del administrador",
+    "descripcion": "Nombre del administrador de la comunidad",
+    "valor": "",
+    "tipoDato": "string"
+  },
+  {
+    "titulo": "Teléfono del administrador",
+    "descripcion": "Teléfono de contacto del administrador",
+    "valor": "",
+    "tipoDato": "string"
+  },
+  {
+    "titulo": "Correo electrónico del administrador",
+    "descripcion": "Correo electrónico del administrador",
+    "valor": "",
+    "tipoDato": "string"
+  },
+  {
+    "titulo": "WhatsApp del administrador",
+    "descripcion": "Número de WhatsApp del administrador",
+    "valor": "",
+    "tipoDato": "string"
+  },
+  {
+    "titulo": "RFC de la comunidad",
+    "descripcion": "Registro Federal de Contribuyentes de la comunidad",
+    "valor": "",
+    "tipoDato": "string"
+  },
+  {
+    "titulo": "Cuenta bancaria de la comunidad",
+    "descripcion": "Número de cuenta bancaria de la comunidad",
+    "valor": "",
+    "tipoDato": "string"
+  },
+  {
+    "titulo": "Banco",
+    "descripcion": "Nombre del banco de la comunidad",
+    "valor": "",
+    "tipoDato": "string"
+  }
+]

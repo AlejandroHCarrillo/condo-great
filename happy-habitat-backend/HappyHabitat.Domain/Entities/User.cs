@@ -1,6 +1,6 @@
 namespace HappyHabitat.Domain.Entities;
 
-public class User
+public class User : AuditBase
 {
     public Guid Id { get; set; }
     // RoleId is kept for backward compatibility but will be deprecated
@@ -12,8 +12,7 @@ public class User
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public bool IsActive { get; set; } = true;
-    public string CreatedAt { get; set; } = string.Empty;
-    
+
     // Navigation properties
     public Role? Role { get; set; } // Kept for backward compatibility
     public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
