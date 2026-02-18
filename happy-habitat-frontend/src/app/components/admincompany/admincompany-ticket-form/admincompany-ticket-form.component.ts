@@ -2,7 +2,11 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { TicketsService } from '../../../services/tickets.service';
+import { FileService } from '../../../services/file.service';
+import { AdminCompanyContextService } from '../../../services/admin-company-context.service';
 import { CategoriaTicketDto } from '../../../shared/interfaces/ticket.interface';
 
 @Component({
@@ -16,8 +20,13 @@ export class AdmincompanyTicketFormComponent implements OnInit {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private ticketsService = inject(TicketsService);
+  private fileService = inject(FileService);
+  private adminContext = inject(AdminCompanyContextService);
 
-  communityId = this.route.snapshot.paramMap.get('communityId') ?? '';
+  /** Comunidad para el ticket: parámetro de ruta o la seleccionada en el filtro (admin company). */
+  get communityId(): string {
+    return this.route.snapshot.paramMap.get('communityId') ?? this.adminContext.getSelectedCommunityId() ?? '';
+  }
   categorias = signal<CategoriaTicketDto[]>([]);
   isSubmitting = signal(false);
   errorMessage = signal<string | null>(null);
@@ -102,18 +111,43 @@ export class AdmincompanyTicketFormComponent implements OnInit {
     this.imageFiles.set(files);
   }
 
+  /** Genera un nombre único para un archivo (guid + extensión original). */
+  private uniqueFileName(originalName: string): string {
+    const ext = originalName.includes('.') ? originalName.slice(originalName.lastIndexOf('.')) : '.jpg';
+    const guid = crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    return `${guid}${ext}`;
+  }
+
   submit(): void {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
 
     const v = this.form.getRawValue();
+    const filesToUpload = this.imageFiles().filter((f): f is File => f != null && f.size > 0);
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
+    const communityId = this.communityId && this.communityId !== 'all' ? this.communityId : undefined;
     this.ticketsService.createTicket({
       categoriaTicketId: v.categoriaTicketId,
-      contenido: v.contenido.trim() || undefined
-    }).subscribe({
+      contenido: v.contenido.trim() || undefined,
+      ...(communityId ? { communityId } : {})
+    }).pipe(
+      switchMap((ticket) => {
+        if (filesToUpload.length === 0) return of(ticket);
+        const uploads = filesToUpload.map((file) => {
+          const fileName = this.uniqueFileName(file.name);
+          const path = `uploads/tickets/${ticket.id}/${fileName}`;
+          return this.fileService.uploadFile(file, path);
+        });
+        return forkJoin(uploads).pipe(
+          switchMap((responses) => {
+            const imageUrls = responses.map((r) => r.relativePath);
+            return this.ticketsService.updateTicket(ticket.id, { imageUrls });
+          })
+        );
+      })
+    ).subscribe({
       next: (ticket) => {
         this.isSubmitting.set(false);
         this.router.navigate(['/admincompany/residentes/tickets', ticket.id], {
@@ -122,7 +156,7 @@ export class AdmincompanyTicketFormComponent implements OnInit {
       },
       error: () => {
         this.isSubmitting.set(false);
-        this.errorMessage.set('No se pudo crear el ticket. Intente de nuevo.');
+        this.errorMessage.set('No se pudo crear el ticket o subir las imágenes. Intente de nuevo.');
       }
     });
   }

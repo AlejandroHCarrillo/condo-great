@@ -14,6 +14,8 @@ public class TicketDto
     public int StatusId { get; set; }
     public string? StatusCode { get; set; }
     public string? StatusDescripcion { get; set; }
+    /// <summary>Color del estado (hex) para el badge en la lista.</summary>
+    public string? StatusColor { get; set; }
     public DateTime FechaReporte { get; set; }
     public string? Contenido { get; set; }
     /// <summary>Rutas relativas de imágenes del ticket (ej. uploads/tickets/1/photo.jpg).</summary>
@@ -26,12 +28,16 @@ public class CreateTicketDto
 {
     public int CategoriaTicketId { get; set; }
     public string? Contenido { get; set; }
-    /// <summary>Opcional. Si el usuario es admin, usa este residente; si no, usa el residente del token.</summary>
+    /// <summary>Opcional. Si el usuario es ADMIN_COMPANY/SYSTEM_ADMIN, indica el residente a nombre del cual se crea el ticket.</summary>
     public Guid? ResidentId { get; set; }
+    /// <summary>Opcional. Si el usuario es ADMIN_COMPANY/SYSTEM_ADMIN, indica la comunidad del ticket; se usará un residente de esa comunidad si no se envía ResidentId.</summary>
+    public Guid? CommunityId { get; set; }
 }
 
 public class UpdateTicketDto
 {
     public int? StatusId { get; set; }
     public string? Contenido { get; set; }
+    /// <summary>Rutas relativas de imágenes (ej. uploads/tickets/1/photo.jpg).</summary>
+    public List<string>? ImageUrls { get; set; }
 }

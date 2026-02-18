@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using HappyHabitat.Domain.Entities;
 using HappyHabitat.Infrastructure.Data;
@@ -116,18 +117,33 @@ public class InitialSeeder : IDataSeeder
                 await _context.SaveChangesAsync();
             }
 
+            var statusDefinitions = new[]
+            {
+                new { Code = "Nuevo", Descripcion = "Ticket recién creado", Color = "#3b82f6" },
+                new { Code = "En revisión", Descripcion = "En revisión por el equipo", Color = "#f59e0b" },
+                new { Code = "En investigación", Descripcion = "En proceso de investigación", Color = "#8b5cf6" },
+                new { Code = "En proceso", Descripcion = "Se está atendiendo", Color = "#06b6d4" },
+                new { Code = "Cancelado", Descripcion = "Ticket cancelado", Color = "#6b7280" },
+                new { Code = "Resuelto", Descripcion = "Ticket resuelto", Color = "#22c55e" }
+            };
+
             if (!await _context.StatusTickets.AnyAsync())
             {
-                var statuses = new[]
-                {
-                    new StatusTicket { Code = "Nuevo", Descripcion = "Ticket recién creado", Color = "#3b82f6" },
-                    new StatusTicket { Code = "En revisión", Descripcion = "En revisión por el equipo", Color = "#f59e0b" },
-                    new StatusTicket { Code = "En investigación", Descripcion = "En proceso de investigación", Color = "#8b5cf6" },
-                    new StatusTicket { Code = "En proceso", Descripcion = "Se está atendiendo", Color = "#06b6d4" },
-                    new StatusTicket { Code = "Cancelado", Descripcion = "Ticket cancelado", Color = "#6b7280" },
-                    new StatusTicket { Code = "Resuelto", Descripcion = "Ticket resuelto", Color = "#22c55e" }
-                };
+                var statuses = statusDefinitions.Select(s => new StatusTicket { Code = s.Code, Descripcion = s.Descripcion, Color = s.Color });
                 await _context.StatusTickets.AddRangeAsync(statuses);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                foreach (var def in statusDefinitions)
+                {
+                    var existing = await _context.StatusTickets.FirstOrDefaultAsync(s => s.Code == def.Code);
+                    if (existing != null && (existing.Color != def.Color || existing.Descripcion != def.Descripcion))
+                    {
+                        existing.Color = def.Color;
+                        existing.Descripcion = def.Descripcion;
+                    }
+                }
                 await _context.SaveChangesAsync();
             }
         }

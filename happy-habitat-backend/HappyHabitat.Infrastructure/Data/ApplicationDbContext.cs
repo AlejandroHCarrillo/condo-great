@@ -895,6 +895,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Origen).IsRequired().HasMaxLength(50);
             entity.Property(e => e.IdOrigen).IsRequired().HasMaxLength(50);
             entity.Property(e => e.ComentarioTexto).IsRequired().HasMaxLength(4000);
+            entity.Property(e => e.ImageUrlsJson).HasMaxLength(8000);
             entity.Property(e => e.CreatedAt).IsRequired().HasColumnType("datetime2");
             entity.Property(e => e.UpdatedAt).HasColumnType("datetime2");
             entity.HasOne(e => e.Resident)

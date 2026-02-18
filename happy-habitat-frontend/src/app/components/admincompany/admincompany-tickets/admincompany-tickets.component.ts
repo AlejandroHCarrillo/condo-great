@@ -11,7 +11,7 @@ import { UsersService } from '../../../services/users.service';
 import { TicketsService } from '../../../services/tickets.service';
 import { CommunitiesService } from '../../../services/communities.service';
 import { CommunityFilterComponent } from '../../../shared/components/community-filter/community-filter.component';
-import { Ticket } from '../../../shared/interfaces/ticket.interface';
+import { Ticket, StatusTicketDto } from '../../../shared/interfaces/ticket.interface';
 import { Comunidad } from '../../../interfaces/comunidad.interface';
 import { RolesEnum } from '../../../enums/roles.enum';
 import { mapCommunityDtoToComunidad } from '../../../shared/mappers/community.mapper';
@@ -34,6 +34,8 @@ export class AdmincompanyTicketsComponent implements OnInit {
 
   selectedComunidadId = signal<string>('');
   private loadedCommunitiesForAdmin = signal<Comunidad[]>([]);
+  /** Lista de estados para resolver color del badge si la API no envía statusColor. */
+  statusList = signal<StatusTicketDto[]>([]);
   currentPage = signal(1);
   pageSize = signal(10);
   readonly pageSizeOptions = PAGE_SIZE_OPTIONS;
@@ -159,10 +161,24 @@ export class AdmincompanyTicketsComponent implements OnInit {
       }
     });
 
+    this.ticketsService.getStatusTickets().subscribe({
+      next: (list) => this.statusList.set(list),
+      error: () => {}
+    });
+
     const user = this.authService.currentUser();
     if (user?.selectedRole === RolesEnum.ADMIN_COMPANY && !user.communities?.length && user.id) {
       this.loadCommunitiesForAdmin(user.id);
     }
+  }
+
+  /** Color del badge del estado: usa statusColor del ticket o lo resuelve por statusId. */
+  getStatusColor(ticket: Ticket): string {
+    const t = ticket as Ticket & { StatusColor?: string };
+    const color = t.statusColor ?? t.StatusColor;
+    if (color) return color;
+    const status = this.statusList().find(s => s.id === ticket.statusId) as StatusTicketDto & { Color?: string } | undefined;
+    return status?.color ?? status?.Color ?? '#6b7280';
   }
 
   private loadCommunitiesForAdmin(userId: string): void {

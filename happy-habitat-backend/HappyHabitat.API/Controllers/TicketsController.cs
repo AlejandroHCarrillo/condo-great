@@ -59,12 +59,27 @@ public class TicketsController : ControllerBase
         Guid residentId;
         var role = User.FindFirst(ClaimTypes.Role)?.Value;
         var isAdmin = role == "ADMIN_COMPANY" || role == "SYSTEM_ADMIN";
-        if (isAdmin && dto.ResidentId.HasValue)
+        if (isAdmin)
         {
-            var resident = await _residentService.GetByIdAsync(dto.ResidentId.Value);
-            if (resident == null)
-                return BadRequest("Residente no encontrado.");
-            residentId = resident.Id;
+            if (dto.ResidentId.HasValue)
+            {
+                var resident = await _residentService.GetByIdAsync(dto.ResidentId.Value);
+                if (resident == null)
+                    return BadRequest("Residente no encontrado.");
+                residentId = resident.Id;
+            }
+            else if (dto.CommunityId.HasValue)
+            {
+                var residents = await _residentService.GetByCommunityIdAsync(dto.CommunityId.Value);
+                var first = residents.FirstOrDefault();
+                if (first == null)
+                    return BadRequest("La comunidad no tiene residentes registrados.");
+                residentId = first.Id;
+            }
+            else
+            {
+                return BadRequest("Debe indicar CommunityId o ResidentId.");
+            }
         }
         else
         {
@@ -87,6 +102,19 @@ public class TicketsController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<ActionResult<TicketDto>> Update(int id, [FromBody] UpdateTicketDto dto)
     {
+        var existing = await _service.GetByIdAsync(id);
+        if (existing == null)
+            return NotFound();
+
+        var role = User.FindFirst(ClaimTypes.Role)?.Value;
+        var isAdmin = role == "ADMIN_COMPANY" || role == "SYSTEM_ADMIN";
+        if (!isAdmin)
+        {
+            var resident = await GetResidentFromToken();
+            if (resident == null || existing.ResidentId != resident.Id)
+                return Forbid();
+        }
+
         var item = await _service.UpdateAsync(id, dto);
         if (item == null)
             return NotFound();

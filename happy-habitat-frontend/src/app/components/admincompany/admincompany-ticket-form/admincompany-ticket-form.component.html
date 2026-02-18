@@ -61,40 +61,49 @@
 
     <div>
       <div class="label flex flex-row justify-between items-center">
-        <span class="label-text font-semibold">Imágenes:</span>
-        <button
-          type="button"
-          class="btn btn-primary btn-sm text-white"
-          (click)="addImage()"
-        >
-          + Agregar imagen
+        <span class="label-text font-semibold">Imágenes</span>
+        <button type="button" class="btn btn-primary btn-sm" (click)="addImage()">
+          <i class="fa-solid fa-plus mr-1"></i> Agregar imagen
         </button>
       </div>
       <div
-        class="space-y-2 rounded-lg border-2 border-dashed transition-colors min-h-[80px] p-3"
+        class="rounded-xl border-2 border-dashed transition-all duration-200 min-h-[100px] p-4 space-y-3"
         [class.border-primary]="isDragOver()"
+        [class.border-base-300]="!isDragOver()"
         [class.bg-primary]="isDragOver()"
         [class.bg-opacity-10]="isDragOver()"
-        [class.border-base-300]="!isDragOver()"
+        [class.bg-base-200]="!isDragOver()"
+        [class.bg-opacity-30]="!isDragOver()"
         (dragover)="onDragOver($event)"
         (dragleave)="onDragLeave($event)"
         (drop)="onDrop($event)"
       >
         @if (isDragOver()) {
-          <p class="text-sm text-primary font-medium mb-2">Suelte aquí las imágenes</p>
+          <p class="text-sm text-primary font-medium flex items-center gap-2">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            Suelte aquí las imágenes
+          </p>
         }
         @for (label of imageLabels(); track $index) {
-          <div class="flex items-center gap-2 flex-wrap">
+          <div class="flex items-center gap-3 flex-wrap p-2 rounded-lg bg-base-100 border border-base-300/60">
             <input
+              [id]="'ticket-form-file-' + $index"
               type="file"
-              class="file-input file-input-bordered file-input-sm max-w-xs"
               accept="image/*"
+              class="absolute opacity-0 w-0 h-0 pointer-events-none"
               (change)="onImageSelect($index, $event)"
             />
-            <span class="text-sm text-base-content/70">{{ label }}</span>
+            <label
+              [for]="'ticket-form-file-' + $index"
+              class="btn btn-outline btn-sm btn-primary gap-1.5 cursor-pointer m-0"
+            >
+              <i class="fa-solid fa-image"></i>
+              Elegir archivo
+            </label>
+            <span class="text-sm text-base-content/80 truncate max-w-[200px]" [class.italic]="label === 'Sin archivos seleccionados'">{{ label }}</span>
             <button
               type="button"
-              class="btn btn-ghost btn-circle btn-xs text-base-content/70 hover:text-error"
+              class="btn btn-ghost btn-circle btn-sm text-base-content/50 hover:text-error hover:bg-error/10 ml-auto"
               title="Quitar"
               (click)="removeImageSlot($index)"
             >
@@ -103,7 +112,10 @@
           </div>
         }
       </div>
-      <p class="text-sm text-base-content/60 mt-1">Arrastre imágenes aquí o use el selector. La subida al servidor estará disponible en una próxima versión.</p>
+      <p class="text-sm text-base-content/50 mt-2 flex items-center gap-1.5">
+        <i class="fa-solid fa-info-circle"></i>
+        Arrastre imágenes aquí o haga clic en «Elegir archivo». Formatos: JPG, PNG, etc.
+      </p>
     </div>
 
     <div class="pt-2">

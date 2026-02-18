@@ -23,6 +23,8 @@ export interface Ticket {
   statusId: number;
   statusCode?: string | null;
   statusDescripcion?: string | null;
+  /** Color del estado (hex) para el badge. */
+  statusColor?: string | null;
   contenido?: string | null;
   /** Rutas relativas de imágenes (ej. uploads/tickets/1/photo.jpg). */
   imageUrls?: string[] | null;
@@ -36,11 +38,14 @@ export interface CreateTicketDto {
   contenido?: string;
   /** Cuando el usuario es ADMIN_COMPANY/SYSTEM_ADMIN, indica el residente a nombre del cual se crea el ticket. */
   residentId?: string;
+  /** Cuando el usuario es ADMIN_COMPANY/SYSTEM_ADMIN, indica la comunidad del ticket (se usa la comunidad seleccionada). */
+  communityId?: string;
 }
 
 export interface UpdateTicketDto {
   statusId?: number;
   contenido?: string;
+  imageUrls?: string[];
 }
 
 export interface ComentarioDto {
@@ -51,6 +56,8 @@ export interface ComentarioDto {
   idOrigen: string;
   idComment?: number | null;
   comentarioTexto: string;
+  /** Rutas relativas de imágenes del comentario. */
+  imageUrls?: string[] | null;
   createdAt?: string;
   updatedAt?: string | null;
 }
@@ -60,6 +67,8 @@ export interface CreateComentarioDto {
   idOrigen: string;
   idComment?: number | null;
   comentarioTexto: string;
+  /** Rutas relativas de imágenes (tras subirlas). */
+  imageUrls?: string[];
 }
 
 export interface UpdateComentarioDto {

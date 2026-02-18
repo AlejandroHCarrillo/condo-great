@@ -31,6 +31,7 @@ public class TicketService : ITicketService
             StatusId = t.StatusId,
             StatusCode = t.StatusTicket?.Code,
             StatusDescripcion = t.StatusTicket?.Descripcion,
+            StatusColor = t.StatusTicket?.Color,
             FechaReporte = t.FechaReporte,
             Contenido = t.Contenido,
             ImageUrls = TryParseImageUrlsJson(t.ImageUrlsJson),
@@ -155,6 +156,8 @@ public class TicketService : ITicketService
         }
         if (dto.Contenido != null)
             ticket.Contenido = dto.Contenido;
+        if (dto.ImageUrls != null)
+            ticket.ImageUrlsJson = dto.ImageUrls.Count > 0 ? JsonSerializer.Serialize(dto.ImageUrls) : null;
         ticket.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
         return MapToDto(ticket);

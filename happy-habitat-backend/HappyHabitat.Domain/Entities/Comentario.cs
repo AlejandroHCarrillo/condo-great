@@ -11,6 +11,8 @@ public class Comentario : AuditBase
     public string IdOrigen { get; set; } = string.Empty; // ID del origen (Ticket int, otros Guid, etc.)
     public int? IdComment { get; set; } // Relación a otro comentario (respuesta)
     public string ComentarioTexto { get; set; } = string.Empty;
+    /// <summary>JSON array de rutas relativas de imágenes (ej. ["uploads/comentarios/123/photo.jpg"]).</summary>
+    public string? ImageUrlsJson { get; set; }
 
     public Resident? Resident { get; set; }
     public Comentario? ParentComment { get; set; }

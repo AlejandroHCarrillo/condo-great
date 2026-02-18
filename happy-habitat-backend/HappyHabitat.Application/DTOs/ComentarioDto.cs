@@ -9,6 +9,8 @@ public class ComentarioDto
     public string IdOrigen { get; set; } = string.Empty;
     public int? IdComment { get; set; }
     public string ComentarioTexto { get; set; } = string.Empty;
+    /// <summary>Rutas relativas de imágenes del comentario.</summary>
+    public List<string>? ImageUrls { get; set; }
     public string CreatedAt { get; set; } = string.Empty;
     public string? UpdatedAt { get; set; }
 }
@@ -19,6 +21,8 @@ public class CreateComentarioDto
     public string IdOrigen { get; set; } = string.Empty;
     public int? IdComment { get; set; }
     public string ComentarioTexto { get; set; } = string.Empty;
+    /// <summary>Rutas relativas de imágenes (tras subirlas al servidor).</summary>
+    public List<string>? ImageUrls { get; set; }
 }
 
 public class UpdateComentarioDto

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using HappyHabitat.Application.DTOs;
 using HappyHabitat.Application.Interfaces;
@@ -15,6 +16,17 @@ public class ComentarioService : IComentarioService
         _context = context;
     }
 
+    private static List<string>? TryParseImageUrlsJson(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json)) return null;
+        try
+        {
+            var list = JsonSerializer.Deserialize<List<string>>(json);
+            return list?.Count > 0 ? list : null;
+        }
+        catch { return null; }
+    }
+
     private static ComentarioDto MapToDto(Comentario c)
     {
         return new ComentarioDto
@@ -26,6 +38,7 @@ public class ComentarioService : IComentarioService
             IdOrigen = c.IdOrigen,
             IdComment = c.IdComment,
             ComentarioTexto = c.ComentarioTexto,
+            ImageUrls = TryParseImageUrlsJson(c.ImageUrlsJson),
             CreatedAt = c.CreatedAt.ToString("O"),
             UpdatedAt = c.UpdatedAt?.ToString("O")
         };
@@ -62,6 +75,7 @@ public class ComentarioService : IComentarioService
             IdOrigen = dto.IdOrigen?.Trim() ?? string.Empty,
             IdComment = dto.IdComment,
             ComentarioTexto = dto.ComentarioTexto?.Trim() ?? string.Empty,
+            ImageUrlsJson = dto.ImageUrls != null && dto.ImageUrls.Count > 0 ? JsonSerializer.Serialize(dto.ImageUrls) : null,
             CreatedAt = DateTime.UtcNow
         };
         _context.Comentarios.Add(comentario);
