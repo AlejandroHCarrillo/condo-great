@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Residente } from '../../../shared/interfaces/residente.interface';
 import { VehicleDto } from '../../../shared/interfaces/vehicle.interface';
 import { PetDto } from '../../../shared/interfaces/pet.interface';
@@ -15,7 +15,7 @@ import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'hh-resident-info-detail',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './resident-info-detail.component.html'
 })
 export class ResidentInfoDetailComponent {

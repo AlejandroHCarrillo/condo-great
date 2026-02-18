@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using HappyHabitat.Application.DTOs;
 using HappyHabitat.Application.Interfaces;
@@ -24,15 +25,29 @@ public class TicketService : ITicketService
             CommunityName = t.Community?.Nombre,
             ResidentId = t.ResidentId,
             ResidentName = t.Resident?.FullName,
-            TipoReporteId = t.TipoReporteId,
-            TipoReporteNombre = t.TipoReporte?.Tipo,
+            ResidentNumber = t.Resident?.Number,
+            CategoriaTicketId = t.CategoriaTicketId,
+            CategoriaTicketNombre = t.CategoriaTicket?.Categoria,
             StatusId = t.StatusId,
             StatusCode = t.StatusTicket?.Code,
             StatusDescripcion = t.StatusTicket?.Descripcion,
             FechaReporte = t.FechaReporte,
+            Contenido = t.Contenido,
+            ImageUrls = TryParseImageUrlsJson(t.ImageUrlsJson),
             CreatedAt = t.CreatedAt.ToString("O"),
             UpdatedAt = t.UpdatedAt?.ToString("O")
         };
+    }
+
+    private static List<string>? TryParseImageUrlsJson(string? json)
+    {
+        if (string.IsNullOrWhiteSpace(json)) return null;
+        try
+        {
+            var list = JsonSerializer.Deserialize<List<string>>(json);
+            return list?.Count > 0 ? list : null;
+        }
+        catch { return null; }
     }
 
     public async Task<IEnumerable<TicketDto>> GetAllAsync()
@@ -40,7 +55,7 @@ public class TicketService : ITicketService
         var list = await _context.Tickets
             .Include(t => t.Community)
             .Include(t => t.Resident)
-            .Include(t => t.TipoReporte)
+            .Include(t => t.CategoriaTicket)
             .Include(t => t.StatusTicket)
             .OrderByDescending(t => t.FechaReporte)
             .ToListAsync();
@@ -52,7 +67,7 @@ public class TicketService : ITicketService
         var list = await _context.Tickets
             .Include(t => t.Community)
             .Include(t => t.Resident)
-            .Include(t => t.TipoReporte)
+            .Include(t => t.CategoriaTicket)
             .Include(t => t.StatusTicket)
             .Where(t => t.CommunityId == communityId)
             .OrderByDescending(t => t.FechaReporte)
@@ -65,7 +80,7 @@ public class TicketService : ITicketService
         var list = await _context.Tickets
             .Include(t => t.Community)
             .Include(t => t.Resident)
-            .Include(t => t.TipoReporte)
+            .Include(t => t.CategoriaTicket)
             .Include(t => t.StatusTicket)
             .Where(t => t.ResidentId == residentId)
             .OrderByDescending(t => t.FechaReporte)
@@ -78,7 +93,7 @@ public class TicketService : ITicketService
         var item = await _context.Tickets
             .Include(t => t.Community)
             .Include(t => t.Resident)
-            .Include(t => t.TipoReporte)
+            .Include(t => t.CategoriaTicket)
             .Include(t => t.StatusTicket)
             .FirstOrDefaultAsync(t => t.Id == id);
         return item == null ? null : MapToDto(item);
@@ -94,9 +109,9 @@ public class TicketService : ITicketService
         if (resident.CommunityId == null)
             throw new InvalidOperationException("El residente no tiene una comunidad asignada.");
 
-        var tipoReporte = await _context.TiposReporte.FindAsync(dto.TipoReporteId);
-        if (tipoReporte == null)
-            throw new InvalidOperationException("Tipo de reporte no válido.");
+        var categoriaTicket = await _context.CategoriasTicket.FindAsync(dto.CategoriaTicketId);
+        if (categoriaTicket == null)
+            throw new InvalidOperationException("Categoría de ticket no válida.");
 
         var statusNuevo = await _context.StatusTickets.FirstOrDefaultAsync(s => s.Code == "Nuevo");
         var statusId = statusNuevo?.Id ?? 1;
@@ -105,9 +120,10 @@ public class TicketService : ITicketService
         {
             CommunityId = resident.CommunityId.Value,
             ResidentId = residentId,
-            TipoReporteId = dto.TipoReporteId,
+            CategoriaTicketId = dto.CategoriaTicketId,
             StatusId = statusId,
             FechaReporte = DateTime.UtcNow,
+            Contenido = dto.Contenido,
             CreatedAt = DateTime.UtcNow
         };
         _context.Tickets.Add(ticket);
@@ -115,7 +131,7 @@ public class TicketService : ITicketService
 
         await _context.Entry(ticket).Reference(t => t.Community).LoadAsync();
         await _context.Entry(ticket).Reference(t => t.Resident).LoadAsync();
-        await _context.Entry(ticket).Reference(t => t.TipoReporte).LoadAsync();
+        await _context.Entry(ticket).Reference(t => t.CategoriaTicket).LoadAsync();
         await _context.Entry(ticket).Reference(t => t.StatusTicket).LoadAsync();
         return MapToDto(ticket);
     }
@@ -125,7 +141,7 @@ public class TicketService : ITicketService
         var ticket = await _context.Tickets
             .Include(t => t.Community)
             .Include(t => t.Resident)
-            .Include(t => t.TipoReporte)
+            .Include(t => t.CategoriaTicket)
             .Include(t => t.StatusTicket)
             .FirstOrDefaultAsync(t => t.Id == id);
         if (ticket == null)
@@ -137,6 +153,8 @@ public class TicketService : ITicketService
             if (status != null)
                 ticket.StatusId = dto.StatusId.Value;
         }
+        if (dto.Contenido != null)
+            ticket.Contenido = dto.Contenido;
         ticket.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
         return MapToDto(ticket);

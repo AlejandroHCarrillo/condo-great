@@ -1,12 +1,13 @@
-export interface TipoReporteDto {
+export interface CategoriaTicketDto {
   id: number;
-  tipo: string;
+  categoria: string;
 }
 
 export interface StatusTicketDto {
   id: number;
   code: string;
   descripcion: string;
+  color: string;
 }
 
 export interface Ticket {
@@ -15,22 +16,31 @@ export interface Ticket {
   communityName?: string | null;
   residentId: string;
   residentName?: string | null;
-  tipoReporteId: number;
-  tipoReporteNombre?: string | null;
+  /** Número de casa del residente. */
+  residentNumber?: string | null;
+  categoriaTicketId: number;
+  categoriaTicketNombre?: string | null;
   statusId: number;
   statusCode?: string | null;
   statusDescripcion?: string | null;
+  contenido?: string | null;
+  /** Rutas relativas de imágenes (ej. uploads/tickets/1/photo.jpg). */
+  imageUrls?: string[] | null;
   fechaReporte: string;
   createdAt?: string;
   updatedAt?: string | null;
 }
 
 export interface CreateTicketDto {
-  tipoReporteId: number;
+  categoriaTicketId: number;
+  contenido?: string;
+  /** Cuando el usuario es ADMIN_COMPANY/SYSTEM_ADMIN, indica el residente a nombre del cual se crea el ticket. */
+  residentId?: string;
 }
 
 export interface UpdateTicketDto {
   statusId?: number;
+  contenido?: string;
 }
 
 export interface ComentarioDto {

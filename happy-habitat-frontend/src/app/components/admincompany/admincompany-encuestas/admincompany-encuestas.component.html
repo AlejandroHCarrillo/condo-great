@@ -12,7 +12,7 @@
     />
     <a
       [routerLink]="selectedComunidadId() ? ['/admincompany/encuestas/nuevo', selectedComunidadId()] : null"
-      class="btn btn-primary btn-sm btn-square flex items-center justify-center"
+      class="btn btn-primary btn-sm btn-square flex items-center justify-center text-white"
       [class.btn-disabled]="!selectedComunidadId()"
       [attr.aria-disabled]="!selectedComunidadId()"
       (click)="!selectedComunidadId() && $event.preventDefault()"

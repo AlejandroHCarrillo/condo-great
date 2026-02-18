@@ -94,33 +94,39 @@ public class InitialSeeder : IDataSeeder
             await _context.SaveChangesAsync();
         }
 
-        // Seed TipoReporte and StatusTicket if tables exist (migration AddTicketsAndComentarios must be applied first)
+        // Seed CategoriaTicket and StatusTicket if tables exist (migration must be applied first)
         try
         {
-            if (!await _context.TiposReporte.AnyAsync())
+            if (!await _context.CategoriasTicket.AnyAsync())
             {
-                var tipos = new[]
+                var categorias = new[]
                 {
-                    new TipoReporte { Tipo = "Mascotas" },
-                    new TipoReporte { Tipo = "Amenidades" },
-                    new TipoReporte { Tipo = "Ruido" },
-                    new TipoReporte { Tipo = "Otro" }
+                    new CategoriaTicket { Categoria = "Areas comunes" },
+                    new CategoriaTicket { Categoria = "Amenidades" },
+                    new CategoriaTicket { Categoria = "Mantenimiento" },
+                    new CategoriaTicket { Categoria = "Mascotas" },
+                    new CategoriaTicket { Categoria = "Pregunta / comentario" },
+                    new CategoriaTicket { Categoria = "Ruido" },
+                    new CategoriaTicket { Categoria = "Servicios (Luz, Agua, Gas, Internet, etc.)" },
+                    new CategoriaTicket { Categoria = "Sugerencia" },
+                    new CategoriaTicket { Categoria = "Vigilancia" },
+                    new CategoriaTicket { Categoria = "Otro" }
                 };
-                await _context.TiposReporte.AddRangeAsync(tipos);
+                await _context.CategoriasTicket.AddRangeAsync(categorias);
                 await _context.SaveChangesAsync();
             }
 
             if (!await _context.StatusTickets.AnyAsync())
             {
                 var statuses = new[]
-            {
-                new StatusTicket { Code = "Nuevo", Descripcion = "Ticket recién creado" },
-                new StatusTicket { Code = "En revisión", Descripcion = "En revisión por el equipo" },
-                new StatusTicket { Code = "En investigación", Descripcion = "En proceso de investigación" },
-                new StatusTicket { Code = "En proceso", Descripcion = "Se está atendiendo" },
-                new StatusTicket { Code = "Cancelado", Descripcion = "Ticket cancelado" },
-                new StatusTicket { Code = "Resuelto", Descripcion = "Ticket resuelto" }
-            };
+                {
+                    new StatusTicket { Code = "Nuevo", Descripcion = "Ticket recién creado", Color = "#3b82f6" },
+                    new StatusTicket { Code = "En revisión", Descripcion = "En revisión por el equipo", Color = "#f59e0b" },
+                    new StatusTicket { Code = "En investigación", Descripcion = "En proceso de investigación", Color = "#8b5cf6" },
+                    new StatusTicket { Code = "En proceso", Descripcion = "Se está atendiendo", Color = "#06b6d4" },
+                    new StatusTicket { Code = "Cancelado", Descripcion = "Ticket cancelado", Color = "#6b7280" },
+                    new StatusTicket { Code = "Resuelto", Descripcion = "Ticket resuelto", Color = "#22c55e" }
+                };
                 await _context.StatusTickets.AddRangeAsync(statuses);
                 await _context.SaveChangesAsync();
             }

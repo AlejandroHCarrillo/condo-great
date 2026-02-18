@@ -5,12 +5,24 @@
       Gestión de Tickets
     </h1>
 
-    <hh-community-filter
-      [communities]="comunidadesAsociadas()"
-      [selectedId]="selectedComunidadId()"
-      [showAllOption]="true"
-      (selectedIdChange)="onComunidadChange($event)"
-    />
+    <div class="flex items-center gap-2 flex-wrap">
+      <hh-community-filter
+        [communities]="comunidadesAsociadas()"
+        [selectedId]="selectedComunidadId()"
+        [showAllOption]="true"
+        (selectedIdChange)="onComunidadChange($event)"
+      />
+      <a
+        [routerLink]="selectedComunidadId() && selectedComunidadId() !== 'all' ? ['/admincompany/residentes/tickets/nuevo', selectedComunidadId()] : null"
+        class="btn btn-primary btn-sm btn-square flex items-center justify-center text-white"
+        [class.btn-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
+        [attr.aria-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
+        (click)="(!selectedComunidadId() || selectedComunidadId() === 'all') && $event.preventDefault()"
+        title="Nuevo ticket"
+      >
+        <i class="fa-solid fa-plus"></i>
+      </a>
+    </div>
   </div>
 
   @if (comunidadesAsociadas().length === 0) {
@@ -58,10 +70,11 @@
                 }
               </span>
             </th>
-            <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('tipoReporteNombre')">
+            <th># Casa</th>
+            <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('categoriaTicketNombre')">
               <span class="flex items-center gap-1">
-                Tipo
-                @if (sortColumn() === 'tipoReporteNombre') {
+                Categoría
+                @if (sortColumn() === 'categoriaTicketNombre') {
                   <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
                 } @else {
                   <i class="fa-solid fa-sort text-white/70 text-xs"></i>
@@ -82,20 +95,24 @@
           </tr>
         </thead>
         <tbody>
-          @if (ticketsOrdenados().length === 0) {
+          @if (ticketsPaginados().length === 0) {
             <tr>
-              <td colspan="6" class="text-center py-8 text-gray-500">
+              <td colspan="7" class="text-center py-8 text-gray-500">
                 <i class="fa-solid fa-inbox mr-2"></i>
                 No hay tickets en esta comunidad
               </td>
             </tr>
           } @else {
-            @for (ticket of ticketsOrdenados(); track ticket.id; let i = $index) {
-              <tr class="hover:bg-base-200 transition-colors">
-                <td class="font-mono text-sm">{{ i + 1 }}</td>
+            @for (ticket of ticketsPaginados(); track ticket.id; let i = $index) {
+              <tr
+                class="cursor-pointer hover:bg-base-200 transition-colors"
+                (click)="viewTicket(ticket)"
+              >
+                <td class="font-mono text-sm">{{ (currentPage() - 1) * pageSize() + i + 1 }}</td>
                 <td>{{ formatDate(ticket.fechaReporte) }}</td>
                 <td class="font-medium">{{ ticket.residentName ?? '—' }}</td>
-                <td>{{ ticket.tipoReporteNombre ?? '—' }}</td>
+                <td>{{ ticket.residentNumber ?? '—' }}</td>
+                <td>{{ ticket.categoriaTicketNombre ?? '—' }}</td>
                 <td>
                   <span class="badge badge-ghost">{{ ticket.statusCode ?? ticket.statusDescripcion ?? '—' }}</span>
                 </td>
@@ -103,7 +120,8 @@
                   <button
                     type="button"
                     class="btn btn-ghost btn-sm"
-                    (click)="viewTicket(ticket)"
+                    (click)="viewTicket(ticket); $event.stopPropagation()"
+                    title="Ver detalle"
                   >
                     <i class="fa-solid fa-eye"></i>
                     Ver
@@ -115,10 +133,61 @@
         </tbody>
       </table>
     </div>
-    @if (ticketsOrdenados().length > 0) {
-      <p class="text-sm text-base-content/70 mt-2">
-        Mostrando {{ ticketsOrdenados().length }} ticket(s)
-      </p>
+
+    <!-- Paginador (como en Gestión de residentes) -->
+    @if (selectedComunidadId() && totalPages() > 0) {
+      <div class="flex items-center gap-4 mt-4">
+        <div class="flex-1 min-w-0">
+          <p class="text-sm text-base-content/70">
+            Mostrando {{ ticketsPaginados().length }} de {{ totalCount() }} ticket(s)
+          </p>
+        </div>
+        <div class="flex justify-center flex-shrink-0">
+          <div class="join">
+            <button
+              type="button"
+              class="join-item btn btn-sm"
+              [class.btn-disabled]="currentPage() <= 1"
+              (click)="goToPage(currentPage() - 1)"
+            >
+              « Anterior
+            </button>
+            @for (p of paginasVisibles(); track p) {
+              <button
+                type="button"
+                class="join-item btn btn-sm"
+                [class.btn-active]="p === currentPage()"
+                (click)="goToPage(p)"
+              >
+                {{ p }}
+              </button>
+            }
+            <button
+              type="button"
+              class="join-item btn btn-sm"
+              [class.btn-disabled]="currentPage() >= totalPages()"
+              (click)="goToPage(currentPage() + 1)"
+            >
+              Siguiente »
+            </button>
+          </div>
+        </div>
+        <div class="flex justify-end flex-1 min-w-0">
+          <label class="flex items-center gap-2 text-sm">
+            <span class="text-base-content/70 whitespace-nowrap">Mostrar por página:</span>
+            <select
+              class="select select-bordered select-sm w-20"
+              [ngModel]="pageSize()"
+              (ngModelChange)="onPageSizeChange($event)"
+            >
+              @for (opt of pageSizeOptions; track opt) {
+                <option [value]="opt">{{ opt }}</option>
+              }
+            </select>
+          </label>
+        </div>
+      </div>
     }
   }
+
 </div>

@@ -1,28 +1,20 @@
 <div class="p-4">
-  <!-- Subnavegación: Gestión de residentes (Listado | Tickets) -->
-  <div class="mb-4 flex flex-wrap items-center gap-2 border-b border-base-300 pb-3">
-    <span class="text-sm font-semibold text-base-content/80 mr-2">Gestión de residentes:</span>
-    <a
-      routerLink="/admincompany/residentes"
-      [queryParams]="ticket()?.communityId ? { comunidad: ticket()?.communityId } : {}"
-      class="btn btn-ghost btn-sm gap-2"
-    >
-      <i class="fa-solid fa-list"></i>
-      Listado
-    </a>
-    <a
-      routerLink="/admincompany/residentes/tickets"
-      [queryParams]="ticket()?.communityId ? { comunidad: ticket()?.communityId } : {}"
-      class="btn btn-primary btn-sm gap-2"
-    >
-      <i class="fa-solid fa-ticket"></i>
-      Tickets
-    </a>
-    <span class="flex-1"></span>
-    <button type="button" (click)="goBack()" class="btn btn-ghost btn-sm gap-2">
-      <i class="fa-solid fa-arrow-left"></i>
-      Volver a lista
+  <div class="mb-4 flex justify-between items-center">
+    <button type="button" (click)="goBack()" class="btn btn-sm btn-ghost btn-secondary">
+      <i class="fa-solid fa-arrow-left mr-2"></i>
+      Volver a la lista
     </button>
+    @if (ticket()) {
+      <button
+        type="button"
+        class="btn btn-sm btn-ghost bg-yellow-500"
+        title="Editar"
+        (click)="scrollToEditar()"
+      >
+        <i class="fa-solid fa-pen mr-2"></i>
+        Editar
+      </button>
+    }
   </div>
 
   @if (isLoading()) {
@@ -31,7 +23,7 @@
       <span class="ml-4">Cargando ticket...</span>
     </div>
   } @else if (ticket()) {
-    <div class="card bg-base-100 shadow-xl mb-6">
+    <div id="ticket-editar" class="card bg-base-100 shadow-xl mb-6">
       <div class="card-body">
         <h2 class="card-title text-xl flex items-center gap-2">
           <i class="fa-solid fa-ticket text-primary"></i>
@@ -54,8 +46,8 @@
             <p>{{ ticket()!.residentName ?? '—' }}</p>
           </div>
           <div>
-            <label class="label"><span class="label-text font-semibold">Tipo</span></label>
-            <p>{{ ticket()!.tipoReporteNombre ?? '—' }}</p>
+            <label class="label"><span class="label-text font-semibold">Categoría</span></label>
+            <p>{{ ticket()!.categoriaTicketNombre ?? '—' }}</p>
           </div>
           <div>
             <label class="label"><span class="label-text font-semibold">Estado</span></label>
@@ -73,14 +65,42 @@
               @if (isSavingStatus()) {
                 <span class="loading loading-spinner loading-sm"></span>
               }
+              @if (statusSavedMessage()) {
+                <span class="text-sm text-success">{{ statusSavedMessage() }}</span>
+              }
             </div>
           </div>
         </div>
 
-        @if (ticket()!.createdAt) {
-          <div>
-            <label class="label"><span class="label-text font-semibold">Creado</span></label>
-            <p class="text-sm text-base-content/70">{{ formatDate(ticket()!.createdAt) }}</p>
+        @if (ticket()!.contenido) {
+          <div class="md:col-span-2">
+            <label class="label"><span class="label-text font-semibold">Contenido</span></label>
+            <p class="whitespace-pre-wrap bg-base-200 rounded-lg p-3">{{ ticket()!.contenido }}</p>
+          </div>
+        }
+        @if (ticket()!.imageUrls && ticket()!.imageUrls!.length > 0) {
+          <div class="md:col-span-2">
+            <label class="label"><span class="label-text font-semibold">Fotos</span></label>
+            <p class="text-sm text-base-content/70 mb-2">Haz clic en una imagen para verla en tamaño completo.</p>
+            <div class="flex flex-wrap gap-3">
+              @for (url of ticket()!.imageUrls; track url) {
+                <a
+                  [href]="getImageUrl(url)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="block rounded-lg overflow-hidden border border-base-300 hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary"
+                  title="Ver imagen"
+                >
+                  <img
+                    [src]="getImageUrl(url)"
+                    alt="Foto del ticket"
+                    class="object-cover w-32 h-32 md:w-40 md:h-40 bg-base-200"
+                    loading="lazy"
+                    (error)="onImageError($event)"
+                  />
+                </a>
+              }
+            </div>
           </div>
         }
       </div>

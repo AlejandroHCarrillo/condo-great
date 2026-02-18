@@ -36,7 +36,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<PreguntaEncuesta> PreguntasEncuesta { get; set; }
     public DbSet<OpcionRespuesta> OpcionesRespuesta { get; set; }
     public DbSet<RespuestaResidente> RespuestasResidente { get; set; }
-    public DbSet<TipoReporte> TiposReporte { get; set; }
+    public DbSet<CategoriaTicket> CategoriasTicket { get; set; }
     public DbSet<StatusTicket> StatusTickets { get; set; }
     public DbSet<Ticket> Tickets { get; set; }
     public DbSet<Comentario> Comentarios { get; set; }
@@ -845,11 +845,11 @@ public class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
-        modelBuilder.Entity<TipoReporte>(entity =>
+        modelBuilder.Entity<CategoriaTicket>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).UseIdentityColumn();
-            entity.Property(e => e.Tipo).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Categoria).IsRequired().HasMaxLength(100);
         });
 
         modelBuilder.Entity<StatusTicket>(entity =>
@@ -858,6 +858,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Id).UseIdentityColumn();
             entity.Property(e => e.Code).IsRequired().HasMaxLength(50);
             entity.Property(e => e.Descripcion).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Color).IsRequired().HasMaxLength(50);
         });
 
         modelBuilder.Entity<Ticket>(entity =>
@@ -865,6 +866,8 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).UseIdentityColumn();
             entity.Property(e => e.FechaReporte).IsRequired();
+            entity.Property(e => e.Contenido).HasMaxLength(4000);
+            entity.Property(e => e.ImageUrlsJson).HasMaxLength(2000);
             entity.Property(e => e.CreatedAt).IsRequired().HasColumnType("datetime2");
             entity.Property(e => e.UpdatedAt).HasColumnType("datetime2");
             entity.HasOne(e => e.Community)
@@ -875,9 +878,9 @@ public class ApplicationDbContext : DbContext
                 .WithMany(r => r.Tickets)
                 .HasForeignKey(e => e.ResidentId)
                 .OnDelete(DeleteBehavior.Restrict);
-            entity.HasOne(e => e.TipoReporte)
-                .WithMany(t => t.Tickets)
-                .HasForeignKey(e => e.TipoReporteId)
+            entity.HasOne(e => e.CategoriaTicket)
+                .WithMany(c => c.Tickets)
+                .HasForeignKey(e => e.CategoriaTicketId)
                 .OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(e => e.StatusTicket)
                 .WithMany(s => s.Tickets)

@@ -1,7 +1,8 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { environment } from '../../../../environments/environment';
 import { TicketsService } from '../../../services/tickets.service';
 import { Ticket } from '../../../shared/interfaces/ticket.interface';
 import { StatusTicketDto } from '../../../shared/interfaces/ticket.interface';
@@ -10,7 +11,7 @@ import { ComentarioDto } from '../../../shared/interfaces/ticket.interface';
 @Component({
   selector: 'hh-admincompany-ticket-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './admincompany-ticket-detail.component.html'
 })
 export class AdmincompanyTicketDetailComponent implements OnInit {
@@ -25,6 +26,7 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
   isSavingStatus = signal(false);
   isSavingComment = signal(false);
   errorMessage = signal<string | null>(null);
+  statusSavedMessage = signal<string | null>(null);
   nuevoComentario = signal('');
 
   ticketId = computed(() => {
@@ -67,17 +69,21 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
 
   onStatusChange(newStatusId: number): void {
     const id = this.ticketId();
-    if (id == null) return;
+    const current = this.ticket();
+    if (id == null || !current) return;
+    if (current.statusId === newStatusId) return;
     this.isSavingStatus.set(true);
     this.errorMessage.set(null);
     this.ticketsService.updateTicket(id, { statusId: newStatusId }).subscribe({
       next: (updated) => {
         this.ticket.set(updated);
         this.isSavingStatus.set(false);
+        this.statusSavedMessage.set('Guardado');
+        setTimeout(() => this.statusSavedMessage.set(null), 2000);
       },
       error: () => {
         this.isSavingStatus.set(false);
-        this.errorMessage.set('No se pudo actualizar el estado.');
+        this.errorMessage.set('No se pudo guardar el estado. Intente de nuevo.');
       }
     });
   }
@@ -121,5 +127,33 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
     this.router.navigate(['/admincompany/residentes/tickets'], {
       queryParams: comunidadId ? { comunidad: comunidadId } : {}
     });
+  }
+
+  scrollToEditar(): void {
+    document.getElementById('ticket-editar')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /** URL para mostrar imágenes del ticket (rutas relativas o absolutas). */
+  getImageUrl(relativePath: string): string {
+    const path = (relativePath || '').trim();
+    if (!path) return '';
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    const base = (environment.apiUrl || '').replace(/\/api\/?$/, '');
+    const pathNorm = path.replace(/^\/+/, '');
+    return pathNorm ? `${base}/${pathNorm}` : '';
+  }
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img) {
+      img.style.display = 'none';
+      const parent = img.parentElement;
+      if (parent && !parent.querySelector('.image-error-msg')) {
+        const msg = document.createElement('span');
+        msg.className = 'image-error-msg text-sm text-base-content/60 italic';
+        msg.textContent = 'No se pudo cargar la imagen';
+        parent.appendChild(msg);
+      }
+    }
   }
 }

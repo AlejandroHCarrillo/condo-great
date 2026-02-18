@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
@@ -14,11 +15,12 @@ import { Ticket } from '../../../shared/interfaces/ticket.interface';
 import { Comunidad } from '../../../interfaces/comunidad.interface';
 import { RolesEnum } from '../../../enums/roles.enum';
 import { mapCommunityDtoToComunidad } from '../../../shared/mappers/community.mapper';
+import { PAGE_SIZE_OPTIONS, isPageSizeOption } from '../../../constants/pagination.constants';
 
 @Component({
   selector: 'hh-admincompany-tickets',
   standalone: true,
-  imports: [CommonModule, RouterLink, CommunityFilterComponent],
+  imports: [CommonModule, FormsModule, RouterLink, CommunityFilterComponent],
   templateUrl: './admincompany-tickets.component.html'
 })
 export class AdmincompanyTicketsComponent implements OnInit {
@@ -32,6 +34,10 @@ export class AdmincompanyTicketsComponent implements OnInit {
 
   selectedComunidadId = signal<string>('');
   private loadedCommunitiesForAdmin = signal<Comunidad[]>([]);
+  currentPage = signal(1);
+  pageSize = signal(10);
+  readonly pageSizeOptions = PAGE_SIZE_OPTIONS;
+  private refreshTrigger = signal(0);
 
   comunidadesAsociadas = computed(() => {
     const user = this.authService.currentUser();
@@ -42,7 +48,8 @@ export class AdmincompanyTicketsComponent implements OnInit {
 
   private ticketsResource = rxResource({
     request: () => ({
-      comunidadId: this.selectedComunidadId()
+      comunidadId: this.selectedComunidadId(),
+      refresh: this.refreshTrigger()
     }),
     loader: ({ request }) => {
       if (!request.comunidadId) return of([]);
@@ -70,8 +77,8 @@ export class AdmincompanyTicketsComponent implements OnInit {
         case 'residentName':
           cmp = (a.residentName ?? '').localeCompare(b.residentName ?? '');
           break;
-        case 'tipoReporteNombre':
-          cmp = (a.tipoReporteNombre ?? '').localeCompare(b.tipoReporteNombre ?? '');
+        case 'categoriaTicketNombre':
+          cmp = (a.categoriaTicketNombre ?? '').localeCompare(b.categoriaTicketNombre ?? '');
           break;
         case 'statusCode':
           cmp = (a.statusCode ?? '').localeCompare(b.statusCode ?? '');
@@ -81,6 +88,31 @@ export class AdmincompanyTicketsComponent implements OnInit {
       }
       return dir === 'asc' ? cmp : -cmp;
     });
+  });
+
+  totalCount = computed(() => this.ticketsOrdenados().length);
+  totalPages = computed(() => {
+    const total = this.totalCount();
+    const size = this.pageSize();
+    return size > 0 ? Math.max(1, Math.ceil(total / size)) : 0;
+  });
+  ticketsPaginados = computed(() => {
+    const list = this.ticketsOrdenados();
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const start = (page - 1) * size;
+    return list.slice(start, start + size);
+  });
+  paginasVisibles = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    if (total <= 0) return [];
+    const delta = 2;
+    const start = Math.max(1, current - delta);
+    const end = Math.min(total, current + delta);
+    const pages: number[] = [];
+    for (let i = start; i <= end; i++) pages.push(i);
+    return pages;
   });
 
   setSort(column: string): void {
@@ -115,6 +147,16 @@ export class AdmincompanyTicketsComponent implements OnInit {
           this.router.navigate([], { relativeTo: this.route, queryParams: { comunidad: stored }, queryParamsHandling: 'merge' });
         }
       }
+      const page = params['page'];
+      if (page != null) {
+        const p = Number(page);
+        if (p >= 1) this.currentPage.set(p);
+      }
+      const pageSizeParam = params['pageSize'];
+      if (pageSizeParam != null) {
+        const ps = Number(pageSizeParam);
+        if (isPageSizeOption(ps)) this.pageSize.set(ps);
+      }
     });
 
     const user = this.authService.currentUser();
@@ -141,9 +183,33 @@ export class AdmincompanyTicketsComponent implements OnInit {
     const comunidadId = typeof value === 'string' ? value : (value.target as HTMLSelectElement).value;
     this.adminContext.setSelectedCommunityId(comunidadId);
     this.selectedComunidadId.set(comunidadId);
+    this.currentPage.set(1);
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { comunidad: comunidadId || null },
+      queryParams: { comunidad: comunidadId || null, page: null },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  goToPage(page: number): void {
+    const total = this.totalPages();
+    if (page < 1 || page > total) return;
+    this.currentPage.set(page);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { page: page === 1 ? null : page },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  onPageSizeChange(value: string | number): void {
+    const n = typeof value === 'string' ? Number(value) : value;
+    if (!isPageSizeOption(n)) return;
+    this.pageSize.set(n);
+    this.currentPage.set(1);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { page: null, pageSize: n },
       queryParamsHandling: 'merge'
     });
   }

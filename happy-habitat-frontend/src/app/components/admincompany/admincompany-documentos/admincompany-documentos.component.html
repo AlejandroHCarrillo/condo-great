@@ -13,7 +13,7 @@
         />
         <a
             [routerLink]="selectedComunidadId() && selectedComunidadId() !== 'all' ? ['/admincompany/documentos/nuevo', selectedComunidadId()] : null"
-            class="btn btn-primary btn-sm btn-square flex items-center justify-center"
+            class="btn btn-primary btn-sm btn-square flex items-center justify-center text-white"
             [class.btn-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
             [attr.aria-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
             (click)="(!selectedComunidadId() || selectedComunidadId() === 'all') && $event.preventDefault()"

@@ -1,5 +1,5 @@
 import { Component, inject, computed, signal, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, NavigationEnd, ActivatedRoute } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
@@ -18,6 +18,7 @@ const GESTIONAR_ROUTES = ['comunicados', 'residentes', 'amenidades', 'proveedore
 })
 export class AdmincompanyTopMenuComponent implements OnInit, OnDestroy {
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
   private navSubscription?: Subscription;
 
@@ -39,42 +40,40 @@ export class AdmincompanyTopMenuComponent implements OnInit, OnDestroy {
     { route: 'documentos', label: 'Documentos', icon: 'fa-solid fa-file-lines' },
   ];
 
-  private readonly currentUrl = signal(this.router.url);
+  /** Primer segmento de la ruta activa (hijo del layout): desde ActivatedRoute para que siempre coincida con la navegación. */
+  private readonly firstSegment = signal<string | null>(null);
 
-  /** Primer segmento después de admincompany, o 'residentes/tickets' cuando estamos en esa ruta. */
+  /** Clave activa en la barra secundaria: primer segmento o 'residentes/tickets' cuando aplica. */
   readonly activeSecondaryKey = computed(() => {
-    const url = this.currentUrl();
-    const segments = url.split('/').filter(Boolean);
-    const idx = segments.indexOf('admincompany');
-    if (idx < 0 || idx + 1 >= segments.length) return null;
-    const first = segments[idx + 1];
-    const second = idx + 2 < segments.length ? segments[idx + 2] : null;
-    if (first === 'residentes' && second === 'tickets') return 'residentes/tickets';
+    const first = this.firstSegment();
+    if (first === null) return null;
+    const child = this.route.snapshot.firstChild;
+    const secondPath = child?.url?.[1]?.path;
+    if (first === 'residentes' && secondPath === 'tickets') return 'residentes/tickets';
     return first;
   });
 
-  /** Mostrar barra secundaria cuando la ruta actual es una de gestionar (primer segmento = comunicados, residentes, amenidades, proveedores). */
+  /** Mostrar barra secundaria cuando la ruta actual es una de Gestionar. */
   readonly showSecondaryBar = computed(() => {
-    const url = this.currentUrl();
-    const segments = url.split('/').filter(Boolean);
-    const idx = segments.indexOf('admincompany');
-    const firstChild = idx >= 0 && idx + 1 < segments.length ? segments[idx + 1] : null;
-    return firstChild != null && (GESTIONAR_ROUTES as readonly string[]).includes(firstChild);
+    const first = this.firstSegment();
+    return first != null && (GESTIONAR_ROUTES as readonly string[]).includes(first);
   });
 
   ngOnInit(): void {
-    this.updateUrlFromRouter();
+    this.updateFromRoute();
     this.cdr.markForCheck();
     this.navSubscription = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(() => {
-        this.updateUrlFromRouter();
+        this.updateFromRoute();
         this.cdr.markForCheck();
       });
   }
 
-  private updateUrlFromRouter(): void {
-    this.currentUrl.set(this.router.url);
+  private updateFromRoute(): void {
+    const child = this.route.snapshot.firstChild;
+    const first = child?.url?.[0]?.path ?? child?.routeConfig?.path?.split('/')[0] ?? null;
+    this.firstSegment.set(first ?? null);
   }
 
   ngOnDestroy(): void {

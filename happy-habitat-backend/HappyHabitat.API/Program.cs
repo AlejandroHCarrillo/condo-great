@@ -72,7 +72,7 @@ builder.Services.AddScoped<IAmenityService, AmenityService>();
 builder.Services.AddScoped<ICommunityProviderService, CommunityProviderService>();
 builder.Services.AddScoped<ICommunityConfigurationService, CommunityConfigurationService>();
 builder.Services.AddScoped<IEncuestaService, EncuestaService>();
-builder.Services.AddScoped<ITipoReporteService, TipoReporteService>();
+builder.Services.AddScoped<ICategoriaTicketService, CategoriaTicketService>();
 builder.Services.AddScoped<IStatusTicketService, StatusTicketService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IComentarioService, ComentarioService>();

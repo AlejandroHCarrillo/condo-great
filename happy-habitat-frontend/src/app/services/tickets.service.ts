@@ -4,9 +4,10 @@ import { Observable, catchError, throwError, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
   Ticket,
-  TipoReporteDto,
+  CategoriaTicketDto,
   StatusTicketDto,
   ComentarioDto,
+  CreateTicketDto,
   UpdateTicketDto,
   CreateComentarioDto,
   UpdateComentarioDto
@@ -23,14 +24,14 @@ export class TicketsService {
   private errorService = inject(ErrorService);
 
   private readonly API = `${environment.apiUrl}/tickets`;
-  private readonly TIPOS = `${environment.apiUrl}/tiporeporte`;
+  private readonly CATEGORIAS = `${environment.apiUrl}/categoriaticket`;
   private readonly STATUS = `${environment.apiUrl}/statusticket`;
   private readonly COMENTARIOS = `${environment.apiUrl}/comentarios`;
 
-  getTiposReporte(): Observable<TipoReporteDto[]> {
-    return this.http.get<TipoReporteDto[]>(this.TIPOS).pipe(
+  getCategoriasTicket(): Observable<CategoriaTicketDto[]> {
+    return this.http.get<CategoriaTicketDto[]>(this.CATEGORIAS).pipe(
       catchError((err) => {
-        this.logger.error('Error fetching tipos reporte', err, 'TicketsService');
+        this.logger.error('Error fetching categorías ticket', err, 'TicketsService');
         this.errorService.handleError(err);
         return throwError(() => err);
       })
@@ -68,10 +69,30 @@ export class TicketsService {
     );
   }
 
+  createTicket(dto: CreateTicketDto): Observable<Ticket> {
+    return this.http.post<Ticket>(this.API, dto).pipe(
+      catchError((err) => {
+        this.logger.error('Error creating ticket', err, 'TicketsService');
+        this.errorService.handleError(err);
+        return throwError(() => err);
+      })
+    );
+  }
+
   updateTicket(id: number, dto: UpdateTicketDto): Observable<Ticket> {
     return this.http.put<Ticket>(`${this.API}/${id}`, dto).pipe(
       catchError((err) => {
         this.logger.error(`Error updating ticket ${id}`, err, 'TicketsService');
+        this.errorService.handleError(err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  deleteTicket(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.API}/${id}`).pipe(
+      catchError((err) => {
+        this.logger.error(`Error deleting ticket ${id}`, err, 'TicketsService');
         this.errorService.handleError(err);
         return throwError(() => err);
       })

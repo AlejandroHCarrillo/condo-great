@@ -24,6 +24,7 @@ import { AdmincompanyEncuestaFormComponent } from './admincompany-encuesta-form/
 import { EncuestaDetailComponent } from './encuesta-detail/encuesta-detail.component';
 import { AdmincompanyTicketsComponent } from './admincompany-tickets/admincompany-tickets.component';
 import { AdmincompanyTicketDetailComponent } from './admincompany-ticket-detail/admincompany-ticket-detail.component';
+import { AdmincompanyTicketFormComponent } from './admincompany-ticket-form/admincompany-ticket-form.component';
 
 export const admincompanyRoutes: Routes = [
     {
@@ -61,6 +62,10 @@ export const admincompanyRoutes: Routes = [
             {
                 path: 'residentes/tickets',
                 component: AdmincompanyTicketsComponent
+            },
+            {
+                path: 'residentes/tickets/nuevo/:communityId',
+                component: AdmincompanyTicketFormComponent
             },
             {
                 path: 'residentes/tickets/:id',

@@ -8,24 +8,24 @@ namespace HappyHabitat.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class TipoReporteController : ControllerBase
+public class CategoriaTicketController : ControllerBase
 {
-    private readonly ITipoReporteService _service;
+    private readonly ICategoriaTicketService _service;
 
-    public TipoReporteController(ITipoReporteService service)
+    public CategoriaTicketController(ICategoriaTicketService service)
     {
         _service = service;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TipoReporteDto>>> GetAll()
+    public async Task<ActionResult<IEnumerable<CategoriaTicketDto>>> GetAll()
     {
         var list = await _service.GetAllAsync();
         return Ok(list);
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<TipoReporteDto>> GetById(int id)
+    public async Task<ActionResult<CategoriaTicketDto>> GetById(int id)
     {
         var item = await _service.GetByIdAsync(id);
         if (item == null)

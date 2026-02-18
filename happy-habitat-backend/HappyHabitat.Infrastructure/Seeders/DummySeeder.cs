@@ -1896,6 +1896,37 @@ public class DummySeeder : IDataSeeder
             await _context.SaveChangesAsync();
         }
 
+        // Seed un reporte (ticket) de cada categoría para la comunidad "Residencial El Pueblito"
+        var pueblitoCommunity = await _context.Communities.FirstOrDefaultAsync(c => c.Nombre == "Residencial El Pueblito");
+        if (pueblitoCommunity != null)
+        {
+            var pueblitoResident = await _context.Residents
+                .FirstOrDefaultAsync(r => r.CommunityId == pueblitoCommunity.Id);
+            var categorias = await _context.CategoriasTicket.OrderBy(c => c.Id).ToListAsync();
+            var statusNuevo = await _context.StatusTickets.FirstOrDefaultAsync(s => s.Code == "Nuevo");
+            if (pueblitoResident != null && categorias.Any() && statusNuevo != null)
+            {
+                foreach (var categoria in categorias)
+                {
+                    var alreadyHasTicket = await _context.Tickets
+                        .AnyAsync(t => t.CommunityId == pueblitoCommunity.Id && t.ResidentId == pueblitoResident.Id && t.CategoriaTicketId == categoria.Id);
+                    if (!alreadyHasTicket)
+                    {
+                        _context.Tickets.Add(new Ticket
+                        {
+                            CommunityId = pueblitoCommunity.Id,
+                            ResidentId = pueblitoResident.Id,
+                            CategoriaTicketId = categoria.Id,
+                            StatusId = statusNuevo.Id,
+                            FechaReporte = DateTime.UtcNow.AddDays(-categorias.IndexOf(categoria)),
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                }
+                await _context.SaveChangesAsync();
+            }
+        }
+
         // Add vehicles, pets, and visits for all residents
         Console.WriteLine("=== Starting AddVehiclesPetsAndVisitsToAllResidents ===");
         await AddVehiclesPetsAndVisitsToAllResidents();

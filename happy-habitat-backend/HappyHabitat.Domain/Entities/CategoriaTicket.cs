@@ -1,12 +1,12 @@
 namespace HappyHabitat.Domain.Entities;
 
 /// <summary>
-/// Tipo de reporte para tickets (Mascotas, Amenidades, Ruido, Otro, etc.).
+/// Categoría de ticket (Areas comunes, Amenidades, Mantenimiento, etc.).
 /// </summary>
-public class TipoReporte
+public class CategoriaTicket
 {
     public int Id { get; set; }
-    public string Tipo { get; set; } = string.Empty;
+    public string Categoria { get; set; } = string.Empty;
 
     public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 }
