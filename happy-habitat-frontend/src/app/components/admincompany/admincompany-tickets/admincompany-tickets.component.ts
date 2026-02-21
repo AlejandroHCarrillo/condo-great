@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit, DestroyRef } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, DestroyRef, input } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,6 +18,9 @@ import { RolesEnum } from '../../../enums/roles.enum';
 import { mapCommunityDtoToComunidad } from '../../../shared/mappers/community.mapper';
 import { PAGE_SIZE_OPTIONS, isPageSizeOption } from '../../../constants/pagination.constants';
 
+/** 'admin' = gestión por comunidad (admin company); 'resident' = solo tickets del residente logueado. */
+export type TicketsViewMode = 'admin' | 'resident';
+
 @Component({
   selector: 'hh-admincompany-tickets',
   standalone: true,
@@ -25,6 +28,9 @@ import { PAGE_SIZE_OPTIONS, isPageSizeOption } from '../../../constants/paginati
   templateUrl: './admincompany-tickets.component.html'
 })
 export class AdmincompanyTicketsComponent implements OnInit {
+  /** Cuando es 'resident' se muestran solo los tickets del residente logueado y se oculta el filtro de comunidad. Por defecto se infiere desde la URL (/resident/tickets). */
+  mode = input<TicketsViewMode | undefined>(undefined);
+
   private authService = inject(AuthService);
   private adminContext = inject(AdminCompanyContextService);
   private usersService = inject(UsersService);
@@ -43,6 +49,14 @@ export class AdmincompanyTicketsComponent implements OnInit {
   readonly pageSizeOptions = PAGE_SIZE_OPTIONS;
   private refreshTrigger = signal(0);
 
+  /** true si la ruta es /resident/tickets (o se pasó mode='resident'). */
+  isResidentView = computed(() => {
+    const m = this.mode();
+    if (m !== undefined) return m === 'resident';
+    const url = this.router.url;
+    return url.startsWith('/resident/tickets');
+  });
+
   comunidadesAsociadas = computed(() => {
     const user = this.authService.currentUser();
     if (!user) return [];
@@ -52,10 +66,14 @@ export class AdmincompanyTicketsComponent implements OnInit {
 
   private ticketsResource = rxResource({
     request: () => ({
+      residentView: this.isResidentView(),
       comunidadId: this.selectedComunidadId(),
       refresh: this.refreshTrigger()
     }),
     loader: ({ request }) => {
+      if (request.residentView) {
+        return this.ticketsService.getMy().pipe(catchError(() => of([])));
+      }
       if (!request.comunidadId) return of([]);
       return this.ticketsService.getByCommunityId(request.comunidadId).pipe(catchError(() => of([])));
     }
@@ -144,7 +162,7 @@ export class AdmincompanyTicketsComponent implements OnInit {
       if (comunidadId) {
         this.selectedComunidadId.set(comunidadId);
         this.adminContext.setSelectedCommunityId(comunidadId);
-      } else {
+      } else if (!this.isResidentView()) {
         const stored = this.adminContext.getSelectedCommunityId();
         if (stored) {
           this.selectedComunidadId.set(stored);
@@ -173,6 +191,11 @@ export class AdmincompanyTicketsComponent implements OnInit {
       this.loadCommunitiesForAdmin(user.id);
     }
   }
+
+  /** Ruta base para ver detalle (según modo admin o resident). */
+  detailPath = computed(() => (this.isResidentView() ? '/resident/tickets' : '/admincompany/residentes/tickets'));
+  /** Ruta para crear ticket (solo en modo resident; en admin el link lleva communityId). */
+  newTicketPath = computed(() => (this.isResidentView() ? '/resident/tickets/nuevo' : null));
 
   /** Color del badge del estado: usa statusColor del ticket o lo resuelve por statusId. */
   getStatusColor(ticket: Ticket): string {
@@ -234,8 +257,9 @@ export class AdmincompanyTicketsComponent implements OnInit {
   }
 
   viewTicket(ticket: Ticket): void {
-    this.router.navigate(['/admincompany/residentes/tickets', ticket.id], {
-      queryParams: { comunidad: this.selectedComunidadId() || null }
+    const base = this.detailPath();
+    this.router.navigate([base, ticket.id], {
+      queryParams: this.isResidentView() ? {} : { comunidad: this.selectedComunidadId() || null }
     });
   }
 }

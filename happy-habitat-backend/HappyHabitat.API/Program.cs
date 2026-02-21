@@ -74,7 +74,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Configure JWT Authentication (in production, key must be set explicitly)
 const string defaultInsecureJwtKey = "YourSuperSecretKeyThatShouldBeAtLeast32CharactersLong!";
 var jwtKeyConfig = builder.Configuration["Jwt:Key"];
-var isProduction = builder.Environment.IsProduction();
+// var isProduction = builder.Environment.IsProduction();
 
 if (string.IsNullOrWhiteSpace(jwtKeyConfig))
 {

@@ -58,6 +58,17 @@ export class TicketsService {
     );
   }
 
+  /** Tickets creados por el residente asociado al usuario logueado. */
+  getMy(): Observable<Ticket[]> {
+    return this.http.get<Ticket[]>(`${this.API}/my`).pipe(
+      catchError((err) => {
+        this.logger.error('Error fetching my tickets', err, 'TicketsService');
+        this.errorService.handleError(err);
+        return throwError(() => err);
+      })
+    );
+  }
+
   getById(id: number): Observable<Ticket | null> {
     return this.http.get<Ticket>(`${this.API}/${id}`).pipe(
       catchError((err) => {

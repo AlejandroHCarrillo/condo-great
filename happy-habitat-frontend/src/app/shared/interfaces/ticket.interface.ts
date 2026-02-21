@@ -26,7 +26,7 @@ export interface Ticket {
   /** Color del estado (hex) para el badge. */
   statusColor?: string | null;
   contenido?: string | null;
-  /** Rutas relativas de imágenes (ej. uploads/tickets/1/photo.jpg). */
+  /** Rutas relativas de imágenes/videos (ej. uploads/{communityId}/tickets/{ticketId}/photo.jpg). */
   imageUrls?: string[] | null;
   fechaReporte: string;
   createdAt?: string;

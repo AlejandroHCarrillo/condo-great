@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, DestroyRef } from '@angular/core';
+import { Component, inject, OnInit, signal, DestroyRef, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
@@ -10,11 +10,21 @@ import { FileService } from '../../../services/file.service';
 import { ImageUrlService } from '../../../services/image-url.service';
 import { AdminCompanyContextService } from '../../../services/admin-company-context.service';
 import { CategoriaTicketDto } from '../../../shared/interfaces/ticket.interface';
+import {
+  FileUploadComponent,
+  type AllowedFileType,
+  type MaxSizesByType
+} from '../../../shared/components/file-upload/file-upload.component';
+import { ticketBasePath, ticketBasePathFallback, ticketUploadPath } from '../../../constants/upload-paths';
+
+const MAX_TICKET_ATTACHMENTS = 5;
+const MAX_IMAGE_MB = 5;
+const MAX_VIDEO_MB = 10;
 
 @Component({
   selector: 'hh-admincompany-ticket-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, FileUploadComponent],
   templateUrl: './admincompany-ticket-form.component.html'
 })
 export class AdmincompanyTicketFormComponent implements OnInit {
@@ -27,6 +37,23 @@ export class AdmincompanyTicketFormComponent implements OnInit {
   private adminContext = inject(AdminCompanyContextService);
   private destroyRef = inject(DestroyRef);
 
+  /** Parámetros para el componente de archivos: imágenes y videos, máx 5, 5 MB imágenes y 10 MB videos. */
+  readonly fileUploadMaxFiles = MAX_TICKET_ATTACHMENTS;
+  readonly fileUploadAllowedTypes: AllowedFileType[] = ['image', 'video'];
+  readonly fileUploadMaxSizes: MaxSizesByType = {
+    image: MAX_IMAGE_MB * 1024 * 1024,
+    video: MAX_VIDEO_MB * 1024 * 1024
+  };
+  /** Ruta base donde se guardarán los archivos (se completa con communityId y ticketId al subir). */
+  fileUploadSavePath = computed(() => {
+    const cid = this.communityId;
+    if (cid && cid !== 'all') return ticketBasePath(cid);
+    return ticketBasePathFallback();
+  });
+
+  /** Archivos seleccionados en el componente compartido (actualizado por filesChange). */
+  selectedFiles = signal<File[]>([]);
+
   /** Comunidad para el ticket: parámetro de ruta o la seleccionada en el filtro (admin company). */
   get communityId(): string {
     return this.route.snapshot.paramMap.get('communityId') ?? this.adminContext.getSelectedCommunityId() ?? '';
@@ -34,11 +61,6 @@ export class AdmincompanyTicketFormComponent implements OnInit {
   categorias = signal<CategoriaTicketDto[]>([]);
   isSubmitting = signal(false);
   errorMessage = signal<string | null>(null);
-
-  imageLabels = signal<string[]>(['Sin archivos seleccionados']);
-  /** Archivos por slot (mismo orden que imageLabels), para futura subida. */
-  imageFiles = signal<(File | null)[]>([null]);
-  isDragOver = signal(false);
 
   form = this.fb.nonNullable.group({
     categoriaTicketId: [0, [Validators.required, Validators.min(1)]],
@@ -52,67 +74,8 @@ export class AdmincompanyTicketFormComponent implements OnInit {
     });
   }
 
-  onImageSelect(index: number, event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input?.files?.[0];
-    if (file) {
-      const labels = [...this.imageLabels()];
-      const files = [...this.imageFiles()];
-      while (labels.length <= index) {
-        labels.push('Sin archivos seleccionados');
-        files.push(null);
-      }
-      labels[index] = file.name;
-      files[index] = file;
-      this.imageLabels.set(labels);
-      this.imageFiles.set(files);
-    }
-  }
-
-  addImage(): void {
-    this.imageLabels.update(l => [...l, 'Sin archivos seleccionados']);
-    this.imageFiles.update(f => [...f, null]);
-  }
-
-  removeImageSlot(index: number): void {
-    this.imageLabels.update(labels => {
-      const next = labels.filter((_, i) => i !== index);
-      return next.length > 0 ? next : ['Sin archivos seleccionados'];
-    });
-    this.imageFiles.update(files => {
-      const next = files.filter((_, i) => i !== index);
-      return next.length > 0 ? next : [null];
-    });
-  }
-
-  onDragOver(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver.set(true);
-  }
-
-  onDragLeave(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver.set(false);
-  }
-
-  onDrop(event: DragEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.isDragOver.set(false);
-    const items = event.dataTransfer?.files;
-    if (!items?.length) return;
-    const imageFilesList = Array.from(items).filter(f => f.type.startsWith('image/'));
-    if (imageFilesList.length === 0) return;
-    const labels = [...this.imageLabels()];
-    const files = [...this.imageFiles()];
-    for (const file of imageFilesList) {
-      labels.push(file.name);
-      files.push(file);
-    }
-    this.imageLabels.set(labels);
-    this.imageFiles.set(files);
+  onFilesChange(files: File[]): void {
+    this.selectedFiles.set(files);
   }
 
   submit(): void {
@@ -120,7 +83,7 @@ export class AdmincompanyTicketFormComponent implements OnInit {
     if (this.form.invalid) return;
 
     const v = this.form.getRawValue();
-    const filesToUpload = this.imageFiles().filter((f): f is File => f != null && f.size > 0);
+    const filesToUpload = this.selectedFiles();
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
@@ -132,9 +95,10 @@ export class AdmincompanyTicketFormComponent implements OnInit {
     }).pipe(
       switchMap((ticket) => {
         if (filesToUpload.length === 0) return of(ticket);
+        const communityIdRes = ticket.communityId ?? this.communityId ?? '';
         const uploads = filesToUpload.map((file) => {
           const fileName = this.imageUrlService.uniqueFileName(file.name);
-          const path = `uploads/tickets/${ticket.id}/${fileName}`;
+          const path = `${ticketUploadPath(communityIdRes, ticket.id)}/${fileName}`;
           return this.fileService.uploadFile(file, path);
         });
         return forkJoin(uploads).pipe(
@@ -148,13 +112,15 @@ export class AdmincompanyTicketFormComponent implements OnInit {
     ).subscribe({
       next: (ticket) => {
         this.isSubmitting.set(false);
-        this.router.navigate(['/admincompany/residentes/tickets', ticket.id], {
-          queryParams: this.communityId ? { comunidad: this.communityId } : {}
+        const isResidentSection = this.router.url.includes('/resident/tickets');
+        const listPath = isResidentSection ? '/resident/tickets' : '/admincompany/residentes/tickets';
+        this.router.navigate([listPath, ticket.id], {
+          queryParams: isResidentSection ? {} : (this.communityId ? { comunidad: this.communityId } : {})
         });
       },
       error: () => {
         this.isSubmitting.set(false);
-        this.errorMessage.set('No se pudo crear el ticket o subir las imágenes. Intente de nuevo.');
+        this.errorMessage.set('No se pudo crear el ticket o subir los archivos. Intente de nuevo.');
       }
     });
   }

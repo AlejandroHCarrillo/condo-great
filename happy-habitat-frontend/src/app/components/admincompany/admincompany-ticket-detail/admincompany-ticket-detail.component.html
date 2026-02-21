@@ -25,11 +25,10 @@
   } @else if (ticket()) {
     <div id="ticket-editar" class="card bg-base-100 shadow-xl mb-6">
       <div class="card-body">
-        <h2 class="card-title text-xl flex items-center gap-2">
+        <h2 class="card-title text-xl flex items-center gap-2 text-bold bg-base-200 p-2">
           <i class="fa-solid fa-ticket text-primary"></i>
           Ticket #{{ ticket()!.id }}
         </h2>
-
         @if (errorMessage()) {
           <div class="alert alert-error text-sm">
             {{ errorMessage() }}
@@ -74,7 +73,7 @@
           <div class="md:col-span-2">
             <label class="label"><span class="label-text font-semibold">Contenido</span></label>
             <textarea
-              class="textarea textarea-bordered w-full min-h-[120px] bg-base-200"
+              class="textarea textarea-bordered w-full min-h-[520px] bg-base-200"
               [value]="editContenido()"
               (input)="editContenido.set($any($event.target).value)"
               [disabled]="isSavingEdit()"
@@ -195,7 +194,7 @@
     <div class="card bg-base-100 shadow-xl">
       <div class="card-body">
         <h3 class="card-title text-lg">
-          <i class="fa-solid fa-comments mr-2"></i>
+          <i class="fa-solid fa-comments mr-2 text-primary"></i>
           Comentarios ({{ comentarios().length }})
         </h3>
 
@@ -244,42 +243,16 @@
             (input)="nuevoComentario.set($any($event.target).value)"
             [disabled]="isSavingComment()"
           ></textarea>
-          <div class="mb-3">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="label-text font-medium text-base-content/80">Imágenes</span>
-              <button type="button" class="btn btn-primary btn-sm" (click)="addCommentImage()" [disabled]="isSavingComment()">
-                <i class="fa-solid fa-plus mr-1"></i> Otra imagen
-              </button>
-            </div>
-            <div class="flex flex-wrap gap-3">
-              @for (label of commentImageLabels(); track $index) {
-                <div class="flex items-center gap-2 flex-wrap p-2 rounded-lg bg-base-200/80 border border-base-300/60">
-                  <input
-                    [id]="'comment-file-' + $index"
-                    type="file"
-                    accept="image/*"
-                    class="absolute opacity-0 w-0 h-0 pointer-events-none"
-                    [attr.aria-label]="'Imagen del comentario ' + ($index + 1)"
-                    (change)="onCommentImageSelect($index, $event)"
-                    [disabled]="isSavingComment()"
-                  />
-                  <label
-                    [for]="'comment-file-' + $index"
-                    class="btn btn-outline btn-sm btn-primary gap-1.5 cursor-pointer m-0"
-                    [class.btn-disabled]="isSavingComment()"
-                  >
-                    <i class="fa-solid fa-image"></i>
-                    Elegir
-                  </label>
-                  <span class="text-sm text-base-content/80 truncate max-w-[120px]" [class.italic]="label === 'Sin archivos seleccionados'">{{ label }}</span>
-                  @if (commentImageLabels().length > 1) {
-                    <button type="button" class="btn btn-ghost btn-circle btn-sm text-base-content/50 hover:text-error" (click)="removeCommentImageSlot($index)" title="Quitar" [disabled]="isSavingComment()">
-                      <i class="fa-solid fa-times"></i>
-                    </button>
-                  }
-                </div>
-              }
-            </div>
+          <div class="mb-3" [class.pointer-events-none]="isSavingComment()" [class.opacity-70]="isSavingComment()">
+            <hh-file-upload
+              #commentFileUpload
+              [maxFiles]="commentUploadMaxFiles"
+              [allowedTypes]="commentUploadAllowedTypes"
+              [savePath]="commentUploadSavePath()"
+              [maxSizesByType]="commentUploadMaxSizes"
+              componentId="ticket-detail-comment-files"
+              (filesChange)="onCommentFilesChange($event)"
+            />
           </div>
           <div class="flex gap-2 flex-wrap">
             <button

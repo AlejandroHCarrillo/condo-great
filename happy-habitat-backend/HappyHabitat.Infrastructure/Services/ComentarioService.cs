@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using HappyHabitat.Application.DTOs;
 using HappyHabitat.Application.Interfaces;
 using HappyHabitat.Domain.Entities;
@@ -10,10 +11,12 @@ namespace HappyHabitat.Infrastructure.Services;
 public class ComentarioService : IComentarioService
 {
     private readonly ApplicationDbContext _context;
+    private readonly ILogger<ComentarioService> _logger;
 
-    public ComentarioService(ApplicationDbContext context)
+    public ComentarioService(ApplicationDbContext context, ILogger<ComentarioService> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     private static List<string>? TryParseImageUrlsJson(string? json)
@@ -46,12 +49,20 @@ public class ComentarioService : IComentarioService
 
     public async Task<IEnumerable<ComentarioDto>> GetByOrigenAsync(string origen, string idOrigen)
     {
-        var list = await _context.Comentarios
-            .Include(c => c.Resident)
-            .Where(c => c.Origen == origen && c.IdOrigen == idOrigen)
-            .OrderBy(c => c.CreatedAt)
-            .ToListAsync();
-        return list.Select(MapToDto);
+        try
+        {
+            var list = await _context.Comentarios
+                .Include(c => c.Resident)
+                .Where(c => c.Origen == origen && c.IdOrigen == idOrigen)
+                .OrderBy(c => c.CreatedAt)
+                .ToListAsync();
+            return list.Select(MapToDto);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "GetByOrigenAsync failed for Origen={Origen}, IdOrigen={IdOrigen}. Ensure migration AddComentarioImageUrls is applied.", origen, idOrigen);
+            return Array.Empty<ComentarioDto>();
+        }
     }
 
     public async Task<ComentarioDto?> GetByIdAsync(int id)

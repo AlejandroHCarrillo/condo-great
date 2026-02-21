@@ -7,6 +7,9 @@ import { RegistroPreferenciasComponent } from './registro-preferencias/registro-
 import { ReservacionesComponent } from '../reservaciones/reservaciones.component';
 import { ResidentEncuestasComponent } from './resident-encuestas/resident-encuestas.component';
 import { ResidentEncuestaResponderComponent } from './resident-encuesta-responder/resident-encuesta-responder.component';
+import { AdmincompanyTicketsComponent } from '../admincompany/admincompany-tickets/admincompany-tickets.component';
+import { AdmincompanyTicketFormComponent } from '../admincompany/admincompany-ticket-form/admincompany-ticket-form.component';
+import { AdmincompanyTicketDetailComponent } from '../admincompany/admincompany-ticket-detail/admincompany-ticket-detail.component';
 
 export const residentRoutes: Routes = [
     {
@@ -41,22 +44,18 @@ export const residentRoutes: Routes = [
             path: 'encuestas/:id',
             component: ResidentEncuestaResponderComponent
         },
-        /*
-        {
-            path: 'pagos',
-            component: PagosComponent
-        },
-        
-        /* 
         {
             path: 'tickets',
-            component: TicketsComponent
-        }, 
-        */
-        // {
-        //     path: 'by/:code',
-        //     component: CountryPageComponent
-        // }
+            component: AdmincompanyTicketsComponent
+        },
+        {
+            path: 'tickets/nuevo',
+            component: AdmincompanyTicketFormComponent
+        },
+        {
+            path: 'tickets/:id',
+            component: AdmincompanyTicketDetailComponent
+        },
         {
             path: '**',
             redirectTo: 'visitantes'

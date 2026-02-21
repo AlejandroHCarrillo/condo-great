@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit, DestroyRef } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, DestroyRef, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,11 +12,21 @@ import { UsersService } from '../../../services/users.service';
 import { Ticket } from '../../../shared/interfaces/ticket.interface';
 import { StatusTicketDto } from '../../../shared/interfaces/ticket.interface';
 import { ComentarioDto } from '../../../shared/interfaces/ticket.interface';
+import {
+  FileUploadComponent,
+  type AllowedFileType,
+  type MaxSizesByType
+} from '../../../shared/components/file-upload/file-upload.component';
+import {
+  ticketCommentsUploadPath,
+  ticketUploadPath,
+  ticketUploadPathFallback
+} from '../../../constants/upload-paths';
 
 @Component({
   selector: 'hh-admincompany-ticket-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FileUploadComponent],
   templateUrl: './admincompany-ticket-detail.component.html'
 })
 export class AdmincompanyTicketDetailComponent implements OnInit {
@@ -52,14 +62,38 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
   newImageLabels = signal<string[]>(['Sin archivos seleccionados']);
   isSavingEdit = signal(false);
 
-  /** Imágenes para el nuevo comentario. */
-  commentImageFiles = signal<(File | null)[]>([null]);
-  commentImageLabels = signal<string[]>(['Sin archivos seleccionados']);
+  /** Archivos seleccionados para el nuevo comentario (máx. 2 imágenes o videos). */
+  commentFiles = signal<File[]>([]);
+
+  @ViewChild('commentFileUpload') commentFileUploadRef?: FileUploadComponent;
+
+  /** Parámetros para el file-upload de comentarios: 2 archivos, imagen o video, 5 MB / 10 MB. */
+  readonly commentUploadMaxFiles = 2;
+  readonly commentUploadAllowedTypes: AllowedFileType[] = ['image', 'video'];
+  readonly commentUploadMaxSizes: MaxSizesByType = {
+    image: 5 * 1024 * 1024,
+    video: 10 * 1024 * 1024
+  };
+  /** Ruta donde se guardan las imágenes de comentarios: uploads/{communityId}/tickets/{ticketId}/comentarios */
+  commentUploadSavePath = computed(() => {
+    const cid = this.ticketCommunityId;
+    const id = this.ticketId();
+    if (!cid || id == null) return '';
+    return ticketCommentsUploadPath(cid, id);
+  });
 
   ticketId = computed(() => {
     const id = this.route.snapshot.paramMap.get('id');
     return id ? parseInt(id, 10) : null;
   });
+
+  /** communityId del ticket actual (camelCase o PascalCase desde API). */
+  private get ticketCommunityId(): string {
+    const t = this.ticket();
+    if (!t) return '';
+    return (t as { communityId?: string; CommunityId?: string }).communityId
+      ?? (t as { CommunityId?: string }).CommunityId ?? '';
+  }
 
   ngOnInit(): void {
     this.usersService.getCurrentUserResidentId().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
@@ -86,7 +120,8 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
       },
       error: () => {
         this.isLoading.set(false);
-        this.router.navigate(['/admincompany/residentes/tickets']);
+        const listPath = this.router.url.includes('/resident/tickets') ? '/resident/tickets' : '/admincompany/residentes/tickets';
+        this.router.navigate([listPath]);
       }
     });
   }
@@ -119,16 +154,26 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
     });
   }
 
+  onCommentFilesChange(files: File[]): void {
+    this.commentFiles.set(files);
+  }
+
   submitComentario(): void {
     const texto = this.nuevoComentario().trim();
     if (!texto) return;
     const id = this.ticketId();
     if (id == null) return;
-    const filesToUpload = this.commentImageFiles().filter((f): f is File => f != null && f.size > 0);
+    const filesToUpload = this.commentFiles();
     this.isSavingComment.set(true);
     this.errorMessage.set(null);
 
-    const basePath = `uploads/tickets/${id}/comentarios`;
+    const basePath = this.commentUploadSavePath();
+    if (basePath === '') {
+      this.errorMessage.set('No se pudo determinar la ruta de guardado del comentario.');
+      this.isSavingComment.set(false);
+      return;
+    }
+
     if (filesToUpload.length === 0) {
       this.ticketsService.createComentario({
         origen: 'Ticket',
@@ -137,8 +182,8 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
       }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: () => {
           this.nuevoComentario.set('');
-          this.commentImageFiles.set([null]);
-          this.commentImageLabels.set(['Sin archivos seleccionados']);
+          this.commentFileUploadRef?.reset();
+          this.commentFiles.set([]);
           this.loadComentarios(id);
           this.isSavingComment.set(false);
         },
@@ -168,49 +213,16 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
     ).subscribe({
       next: () => {
         this.nuevoComentario.set('');
-        this.commentImageFiles.set([null]);
-        this.commentImageLabels.set(['Sin archivos seleccionados']);
+        this.commentFileUploadRef?.reset();
+        this.commentFiles.set([]);
         this.loadComentarios(id);
         this.isSavingComment.set(false);
       },
       error: () => {
         this.isSavingComment.set(false);
-        this.errorMessage.set('No se pudo agregar el comentario o subir las imágenes.');
+        this.errorMessage.set('No se pudo agregar el comentario o subir los archivos.');
       }
     });
-  }
-
-  addCommentImage(): void {
-    this.commentImageLabels.update((l) => [...l, 'Sin archivos seleccionados']);
-    this.commentImageFiles.update((f) => [...f, null]);
-  }
-
-  removeCommentImageSlot(index: number): void {
-    this.commentImageLabels.update((labels) => {
-      const next = labels.filter((_, i) => i !== index);
-      return next.length > 0 ? next : ['Sin archivos seleccionados'];
-    });
-    this.commentImageFiles.update((files) => {
-      const next = files.filter((_, i) => i !== index);
-      return next.length > 0 ? next : [null];
-    });
-  }
-
-  onCommentImageSelect(index: number, event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input?.files?.[0];
-    if (file) {
-      const labels = [...this.commentImageLabels()];
-      const files = [...this.commentImageFiles()];
-      while (labels.length <= index) {
-        labels.push('Sin archivos seleccionados');
-        files.push(null);
-      }
-      labels[index] = file.name;
-      files[index] = file;
-      this.commentImageLabels.set(labels);
-      this.commentImageFiles.set(files);
-    }
   }
 
   formatDate(value: string | undefined): string {
@@ -224,9 +236,11 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
   }
 
   goBack(): void {
+    const isResidentSection = this.router.url.includes('/resident/tickets');
+    const listPath = isResidentSection ? '/resident/tickets' : '/admincompany/residentes/tickets';
     const comunidadId = this.route.snapshot.queryParams['comunidad'];
-    this.router.navigate(['/admincompany/residentes/tickets'], {
-      queryParams: comunidadId ? { comunidad: comunidadId } : {}
+    this.router.navigate([listPath], {
+      queryParams: isResidentSection ? {} : (comunidadId ? { comunidad: comunidadId } : {})
     });
   }
 
@@ -271,8 +285,10 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
       });
       return;
     }
+    const communityId = this.ticketCommunityId;
+    const basePath = communityId ? ticketUploadPath(communityId, id) : ticketUploadPathFallback(id);
     const uploads = newFiles.map((file) => {
-      const path = `uploads/tickets/${id}/${this.imageUrlService.uniqueFileName(file.name)}`;
+      const path = `${basePath}/${this.imageUrlService.uniqueFileName(file.name)}`;
       return this.fileService.uploadFile(file, path);
     });
     forkJoin(uploads).pipe(

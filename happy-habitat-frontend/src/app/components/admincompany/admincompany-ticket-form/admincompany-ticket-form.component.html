@@ -1,5 +1,5 @@
-<div class="p-4">
-  <div class="mb-4 flex justify-end">
+<div class="p-4 flex flex-col items-center">
+  <div class="w-full max-w-2xl mb-4 flex justify-end">
     <a
       routerLink="/admincompany/residentes/tickets"
       [queryParams]="communityId ? { comunidad: communityId } : {}"
@@ -10,19 +10,19 @@
     </a>
   </div>
 
-  <h1 class="text-2xl font-bold flex items-center gap-2 mb-6">
+  <h1 class="w-full max-w-2xl text-2xl font-bold flex items-center gap-2 mb-6">
     <i class="fa-solid fa-ticket text-primary"></i>
     Nuevo Ticket
   </h1>
 
   @if (errorMessage()) {
-    <div class="alert alert-error mb-4">
+    <div class="w-full max-w-2xl alert alert-error mb-4">
       <i class="fa-solid fa-exclamation-circle"></i>
       <span>{{ errorMessage() }}</span>
     </div>
   }
 
-  <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-6 max-w-2xl bg-base-200 rounded-lg p-6">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="w-full max-w-2xl space-y-6 bg-base-200 rounded-lg p-6">
     <div>
       <label class="label" for="categoria">
         <span class="label-text font-semibold">Categoría: <span class="text-red-600">*</span></span>
@@ -59,65 +59,14 @@
       }
     </div>
 
-    <div>
-      <div class="label flex flex-row justify-between items-center">
-        <span class="label-text font-semibold">Imágenes</span>
-        <button type="button" class="btn btn-primary btn-sm" (click)="addImage()">
-          <i class="fa-solid fa-plus mr-1"></i> Agregar imagen
-        </button>
-      </div>
-      <div
-        class="rounded-xl border-2 border-dashed transition-all duration-200 min-h-[100px] p-4 space-y-3"
-        [class.border-primary]="isDragOver()"
-        [class.border-base-300]="!isDragOver()"
-        [class.bg-primary]="isDragOver()"
-        [class.bg-opacity-10]="isDragOver()"
-        [class.bg-base-200]="!isDragOver()"
-        [class.bg-opacity-30]="!isDragOver()"
-        (dragover)="onDragOver($event)"
-        (dragleave)="onDragLeave($event)"
-        (drop)="onDrop($event)"
-      >
-        @if (isDragOver()) {
-          <p class="text-sm text-primary font-medium flex items-center gap-2">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            Suelte aquí las imágenes
-          </p>
-        }
-        @for (label of imageLabels(); track $index) {
-          <div class="flex items-center gap-3 flex-wrap p-2 rounded-lg bg-base-100 border border-base-300/60">
-            <input
-              [id]="'ticket-form-file-' + $index"
-              type="file"
-              accept="image/*"
-              class="absolute opacity-0 w-0 h-0 pointer-events-none"
-              [attr.aria-label]="'Imagen del ticket ' + ($index + 1)"
-              (change)="onImageSelect($index, $event)"
-            />
-            <label
-              [for]="'ticket-form-file-' + $index"
-              class="btn btn-outline btn-sm btn-primary gap-1.5 cursor-pointer m-0"
-            >
-              <i class="fa-solid fa-image"></i>
-              Elegir archivo
-            </label>
-            <span class="text-sm text-base-content/80 truncate max-w-[200px]" [class.italic]="label === 'Sin archivos seleccionados'">{{ label }}</span>
-            <button
-              type="button"
-              class="btn btn-ghost btn-circle btn-sm text-base-content/50 hover:text-error hover:bg-error/10 ml-auto"
-              title="Quitar"
-              (click)="removeImageSlot($index)"
-            >
-              <i class="fa-solid fa-times"></i>
-            </button>
-          </div>
-        }
-      </div>
-      <p class="text-sm text-base-content/50 mt-2 flex items-center gap-1.5">
-        <i class="fa-solid fa-info-circle"></i>
-        Arrastre imágenes aquí o haga clic en «Elegir archivo». Formatos: JPG, PNG, etc.
-      </p>
-    </div>
+    <hh-file-upload
+      [maxFiles]="fileUploadMaxFiles"
+      [allowedTypes]="fileUploadAllowedTypes"
+      [savePath]="fileUploadSavePath()"
+      [maxSizesByType]="fileUploadMaxSizes"
+      componentId="ticket-form-files"
+      (filesChange)="onFilesChange($event)"
+    />
 
     <div class="pt-2">
       <button

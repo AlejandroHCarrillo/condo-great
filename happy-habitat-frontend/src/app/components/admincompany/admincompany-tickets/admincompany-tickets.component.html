@@ -2,49 +2,66 @@
   <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
     <h1 class="text-2xl font-bold flex items-center gap-2">
       <i class="fa-solid fa-ticket text-primary"></i>
-      Gestión de Tickets
+      @if (isResidentView()) {
+        Mis tickets
+      } @else {
+        Gestión de Tickets
+      }
     </h1>
 
     <div class="flex items-center gap-2 flex-wrap">
-      <hh-community-filter
-        [communities]="comunidadesAsociadas()"
-        [selectedId]="selectedComunidadId()"
-        [showAllOption]="true"
-        (selectedIdChange)="onComunidadChange($event)"
-      />
-      <a
-        [routerLink]="selectedComunidadId() && selectedComunidadId() !== 'all' ? ['/admincompany/residentes/tickets/nuevo', selectedComunidadId()] : null"
-        class="btn btn-primary btn-sm btn-square flex items-center justify-center text-white"
-        [class.btn-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
-        [attr.aria-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
-        (click)="(!selectedComunidadId() || selectedComunidadId() === 'all') && $event.preventDefault()"
-        title="Nuevo ticket"
-      >
-        <i class="fa-solid fa-plus"></i>
-      </a>
+      @if (!isResidentView()) {
+        <hh-community-filter
+          [communities]="comunidadesAsociadas()"
+          [selectedId]="selectedComunidadId()"
+          [showAllOption]="true"
+          (selectedIdChange)="onComunidadChange($event)"
+        />
+      }
+      @if (isResidentView() && newTicketPath()) {
+        <a
+          [routerLink]="newTicketPath()!"
+          class="btn btn-primary btn-sm btn-square flex items-center justify-center text-white"
+          title="Nuevo ticket"
+        >
+          <i class="fa-solid fa-plus"></i>
+        </a>
+      }
+      @if (!isResidentView()) {
+        <a
+          [routerLink]="selectedComunidadId() && selectedComunidadId() !== 'all' ? ['/admincompany/residentes/tickets/nuevo', selectedComunidadId()] : null"
+          class="btn btn-primary btn-sm btn-square flex items-center justify-center text-white"
+          [class.btn-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
+          [attr.aria-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
+          (click)="(!selectedComunidadId() || selectedComunidadId() === 'all') && $event.preventDefault()"
+          title="Nuevo ticket"
+        >
+          <i class="fa-solid fa-plus"></i>
+        </a>
+      }
     </div>
   </div>
 
-  @if (comunidadesAsociadas().length === 0) {
+  @if (!isResidentView() && comunidadesAsociadas().length === 0) {
     <div class="alert alert-warning mb-6">
       <i class="fa-solid fa-triangle-exclamation mr-2"></i>
       <span>No tienes comunidades asociadas. Contacta al administrador del sistema.</span>
     </div>
   }
 
-  @if (!selectedComunidadId()) {
+  @if (!isResidentView() && !selectedComunidadId()) {
     <div class="alert alert-info mb-6">
       <i class="fa-solid fa-info-circle mr-2"></i>
       <span>Selecciona una comunidad para ver los tickets.</span>
     </div>
   }
 
-  @if (selectedComunidadId() && isLoading()) {
+  @if ((isResidentView() || selectedComunidadId()) && isLoading()) {
     <div class="flex justify-center items-center py-8">
       <span class="loading loading-spinner loading-lg"></span>
       <span class="ml-4">Cargando tickets...</span>
     </div>
-  } @else if (selectedComunidadId()) {
+  } @else if (isResidentView() || selectedComunidadId()) {
     <div class="overflow-x-auto">
       <table class="table table-zebra w-full">
         <thead class="bg-secondary text-white [&_th]:rounded-none [&_th]:text-white">
@@ -99,7 +116,11 @@
             <tr>
               <td colspan="7" class="text-center py-8 text-gray-500">
                 <i class="fa-solid fa-inbox mr-2"></i>
-                No hay tickets en esta comunidad
+                @if (isResidentView()) {
+                  No has creado ningún ticket
+                } @else {
+                  No hay tickets en esta comunidad
+                }
               </td>
             </tr>
           } @else {
@@ -138,7 +159,7 @@
     </div>
 
     <!-- Paginador (como en Gestión de residentes) -->
-    @if (selectedComunidadId() && totalPages() > 0) {
+    @if ((isResidentView() || selectedComunidadId()) && totalPages() > 0) {
       <div class="flex items-center gap-4 mt-4">
         <div class="flex-1 min-w-0">
           <p class="text-sm text-base-content/70">
