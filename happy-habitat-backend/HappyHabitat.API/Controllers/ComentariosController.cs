@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using HappyHabitat.Application.DTOs;
 using HappyHabitat.Application.Interfaces;
+using HappyHabitat.API.Extensions;
 
 namespace HappyHabitat.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
+[RequestSizeLimit(1_048_576)] // 1 MB for JSON payloads
 public class ComentariosController : ControllerBase
 {
     private readonly IComentarioService _service;
@@ -41,7 +43,7 @@ public class ComentariosController : ControllerBase
     {
         var resident = await GetResidentFromToken();
         if (resident == null)
-            return BadRequest("Usuario no está registrado como residente.");
+            return this.BadRequestApiError("BAD_REQUEST", "Usuario no está registrado como residente.");
         try
         {
             var item = await _service.CreateAsync(resident.Id, dto);
@@ -49,7 +51,7 @@ public class ComentariosController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(ex.Message);
+            return this.BadRequestApiError("INVALID_OPERATION", ex.Message);
         }
     }
 

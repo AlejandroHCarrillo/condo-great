@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -6,6 +7,7 @@ import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { TicketsService } from '../../../services/tickets.service';
 import { FileService } from '../../../services/file.service';
+import { ImageUrlService } from '../../../services/image-url.service';
 import { AdminCompanyContextService } from '../../../services/admin-company-context.service';
 import { CategoriaTicketDto } from '../../../shared/interfaces/ticket.interface';
 
@@ -21,7 +23,9 @@ export class AdmincompanyTicketFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private ticketsService = inject(TicketsService);
   private fileService = inject(FileService);
+  private imageUrlService = inject(ImageUrlService);
   private adminContext = inject(AdminCompanyContextService);
+  private destroyRef = inject(DestroyRef);
 
   /** Comunidad para el ticket: parámetro de ruta o la seleccionada en el filtro (admin company). */
   get communityId(): string {
@@ -42,7 +46,7 @@ export class AdmincompanyTicketFormComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.ticketsService.getCategoriasTicket().subscribe({
+    this.ticketsService.getCategoriasTicket().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (list) => this.categorias.set(list),
       error: () => this.errorMessage.set('No se pudieron cargar las categorías.')
     });
@@ -111,13 +115,6 @@ export class AdmincompanyTicketFormComponent implements OnInit {
     this.imageFiles.set(files);
   }
 
-  /** Genera un nombre único para un archivo (guid + extensión original). */
-  private uniqueFileName(originalName: string): string {
-    const ext = originalName.includes('.') ? originalName.slice(originalName.lastIndexOf('.')) : '.jpg';
-    const guid = crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-    return `${guid}${ext}`;
-  }
-
   submit(): void {
     this.form.markAllAsTouched();
     if (this.form.invalid) return;
@@ -136,7 +133,7 @@ export class AdmincompanyTicketFormComponent implements OnInit {
       switchMap((ticket) => {
         if (filesToUpload.length === 0) return of(ticket);
         const uploads = filesToUpload.map((file) => {
-          const fileName = this.uniqueFileName(file.name);
+          const fileName = this.imageUrlService.uniqueFileName(file.name);
           const path = `uploads/tickets/${ticket.id}/${fileName}`;
           return this.fileService.uploadFile(file, path);
         });
@@ -146,7 +143,8 @@ export class AdmincompanyTicketFormComponent implements OnInit {
             return this.ticketsService.updateTicket(ticket.id, { imageUrls });
           })
         );
-      })
+      }),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (ticket) => {
         this.isSubmitting.set(false);

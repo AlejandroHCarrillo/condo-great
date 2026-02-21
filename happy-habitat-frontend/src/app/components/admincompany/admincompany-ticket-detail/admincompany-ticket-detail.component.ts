@@ -1,12 +1,13 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
 import { TicketsService } from '../../../services/tickets.service';
 import { FileService } from '../../../services/file.service';
+import { ImageUrlService } from '../../../services/image-url.service';
 import { UsersService } from '../../../services/users.service';
 import { Ticket } from '../../../shared/interfaces/ticket.interface';
 import { StatusTicketDto } from '../../../shared/interfaces/ticket.interface';
@@ -23,7 +24,9 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
   private router = inject(Router);
   private ticketsService = inject(TicketsService);
   private fileService = inject(FileService);
+  private imageUrlService = inject(ImageUrlService);
   private usersService = inject(UsersService);
+  private destroyRef = inject(DestroyRef);
 
   ticket = signal<Ticket | null>(null);
   statusList = signal<StatusTicketDto[]>([]);
@@ -59,7 +62,7 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.usersService.getCurrentUserResidentId().subscribe({
+    this.usersService.getCurrentUserResidentId().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (id) => this.currentResidentId.set(id),
       error: () => this.currentResidentId.set(null)
     });
@@ -68,7 +71,7 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
       this.loadTicket(id);
       this.loadComentarios(id);
     }
-    this.ticketsService.getStatusTickets().subscribe({
+    this.ticketsService.getStatusTickets().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (list) => this.statusList.set(list),
       error: () => {}
     });
@@ -76,7 +79,7 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
 
   loadTicket(id: number): void {
     this.isLoading.set(true);
-    this.ticketsService.getById(id).subscribe({
+    this.ticketsService.getById(id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (item) => {
         this.ticket.set(item ?? null);
         this.isLoading.set(false);
@@ -89,7 +92,7 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
   }
 
   loadComentarios(ticketId: number): void {
-    this.ticketsService.getComentariosByOrigen('Ticket', String(ticketId)).subscribe({
+    this.ticketsService.getComentariosByOrigen('Ticket', String(ticketId)).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (list) => this.comentarios.set(list),
       error: () => this.comentarios.set([])
     });
@@ -102,7 +105,7 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
     if (current.statusId === newStatusId) return;
     this.isSavingStatus.set(true);
     this.errorMessage.set(null);
-    this.ticketsService.updateTicket(id, { statusId: newStatusId }).subscribe({
+    this.ticketsService.updateTicket(id, { statusId: newStatusId }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (updated) => {
         this.ticket.set(updated);
         this.isSavingStatus.set(false);
@@ -131,7 +134,7 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
         origen: 'Ticket',
         idOrigen: String(id),
         comentarioTexto: texto
-      }).subscribe({
+      }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: () => {
           this.nuevoComentario.set('');
           this.commentImageFiles.set([null]);
@@ -148,7 +151,7 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
     }
 
     const uploads = filesToUpload.map((file) => {
-      const path = `${basePath}/${this.uniqueFileName(file.name)}`;
+      const path = `${basePath}/${this.imageUrlService.uniqueFileName(file.name)}`;
       return this.fileService.uploadFile(file, path);
     });
     forkJoin(uploads).pipe(
@@ -160,7 +163,8 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
           comentarioTexto: texto,
           imageUrls
         });
-      })
+      }),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: () => {
         this.nuevoComentario.set('');
@@ -244,12 +248,6 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
     this.isEditingMode.set(false);
   }
 
-  private uniqueFileName(originalName: string): string {
-    const ext = originalName.includes('.') ? originalName.slice(originalName.lastIndexOf('.')) : '.jpg';
-    const guid = crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-    return `${guid}${ext}`;
-  }
-
   saveEdit(): void {
     const id = this.ticketId();
     const t = this.ticket();
@@ -260,7 +258,7 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
     const newContenido = this.editContenido().trim() || undefined;
     const existingUrls = t.imageUrls ?? [];
     if (newFiles.length === 0) {
-      this.ticketsService.updateTicket(id, { contenido: newContenido }).subscribe({
+      this.ticketsService.updateTicket(id, { contenido: newContenido }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
         next: (updated) => {
           this.ticket.set(updated);
           this.isEditingMode.set(false);
@@ -274,7 +272,7 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
       return;
     }
     const uploads = newFiles.map((file) => {
-      const path = `uploads/tickets/${id}/${this.uniqueFileName(file.name)}`;
+      const path = `uploads/tickets/${id}/${this.imageUrlService.uniqueFileName(file.name)}`;
       return this.fileService.uploadFile(file, path);
     });
     forkJoin(uploads).pipe(
@@ -282,7 +280,8 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
         const newUrls = responses.map((r) => r.relativePath);
         const allUrls = [...existingUrls, ...newUrls];
         return this.ticketsService.updateTicket(id, { contenido: newContenido, imageUrls: allUrls });
-      })
+      }),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (updated) => {
         this.ticket.set(updated);
@@ -331,19 +330,12 @@ export class AdmincompanyTicketDetailComponent implements OnInit {
 
   /** Devuelve las URLs de imágenes del comentario (compatibles con API en camelCase o PascalCase). */
   getCommentImageUrls(c: ComentarioDto): string[] {
-    const urls = (c as { imageUrls?: string[] | null; ImageUrls?: string[] }).imageUrls
-      ?? (c as { ImageUrls?: string[] }).ImageUrls;
-    return Array.isArray(urls) ? urls : [];
+    return this.imageUrlService.getCommentImageUrls(c);
   }
 
   /** URL para mostrar imágenes del ticket o comentarios (rutas relativas o absolutas). */
   getImageUrl(relativePath: string): string {
-    const path = (relativePath || '').trim().replace(/\\/g, '/');
-    if (!path) return '';
-    if (path.startsWith('http://') || path.startsWith('https://')) return path;
-    const base = (environment.apiUrl || '').replace(/\/api\/?$/, '');
-    const pathNorm = path.replace(/^\/+/, '');
-    return pathNorm ? `${base}/${pathNorm}` : '';
+    return this.imageUrlService.getImageUrl(relativePath);
   }
 
   onImageError(event: Event): void {

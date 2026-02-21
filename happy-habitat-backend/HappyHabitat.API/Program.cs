@@ -8,19 +8,58 @@ using HappyHabitat.Infrastructure.Services;
 using HappyHabitat.Infrastructure.Seeders;
 using HappyHabitat.Application.Interfaces;
 using System.Reflection;
+using HappyHabitat.API.Middleware;
+using HappyHabitat.API.Models;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllers();
+// Global request body size limit (10 MB) to mitigate large-payload attacks. Controllers can set lower [RequestSizeLimit] per endpoint.
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10 MB
+});
 
-// Configure CORS
+// Add services to the container.
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        // Return unified ApiErrorResponse format for model validation errors (400).
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(e => e.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray());
+            var response = new ApiErrorResponse
+            {
+                Code = "VALIDATION_ERROR",
+                Message = "Uno o más campos tienen errores de validación.",
+                Errors = errors,
+                TraceId = context.HttpContext.TraceIdentifier
+            };
+            return new BadRequestObjectResult(response);
+        };
+    });
+
+// Configure CORS: in production use Cors:Origins from config (semicolon-separated); in development allow localhost
+var isProduction = builder.Environment.IsProduction();
+var originsStr = builder.Configuration["Cors:Origins"];
+var corsOrigins = string.IsNullOrWhiteSpace(originsStr)
+    ? Array.Empty<string>()
+    : originsStr.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+if (corsOrigins.Length == 0)
+{
+    if (isProduction)
+        throw new InvalidOperationException("En producción debe configurarse Cors:Origins con los orígenes permitidos del frontend (ej. Cors:Origins=https://app.ejemplo.com).");
+    corsOrigins = new[] { "http://localhost:4200", "https://localhost:4200", "http://localhost:5080", "https://localhost:7177" };
+}
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:4200", "https://localhost:4200", 
-                          "http://localhost:5080", "https://localhost:7177")
+        policy.WithOrigins(corsOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -32,8 +71,23 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// Configure JWT Authentication
-var jwtKey = builder.Configuration["Jwt:Key"] ?? "YourSuperSecretKeyThatShouldBeAtLeast32CharactersLong!";
+// Configure JWT Authentication (in production, key must be set explicitly)
+const string defaultInsecureJwtKey = "YourSuperSecretKeyThatShouldBeAtLeast32CharactersLong!";
+var jwtKeyConfig = builder.Configuration["Jwt:Key"];
+var isProduction = builder.Environment.IsProduction();
+
+if (string.IsNullOrWhiteSpace(jwtKeyConfig))
+{
+    if (isProduction)
+        throw new InvalidOperationException("Jwt:Key es obligatorio en producción. Configure el valor en appsettings o variables de entorno.");
+    jwtKeyConfig = defaultInsecureJwtKey;
+}
+else if (isProduction && string.Equals(jwtKeyConfig.Trim(), defaultInsecureJwtKey, StringComparison.Ordinal))
+{
+    throw new InvalidOperationException("No use la clave JWT por defecto en producción. Configure Jwt:Key con un valor seguro.");
+}
+
+var jwtKey = jwtKeyConfig;
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "HappyHabitat";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "HappyHabitatUsers";
 
@@ -56,7 +110,13 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminCompanyOrSystemAdmin", policy =>
+        policy.RequireRole("ADMIN_COMPANY", "SYSTEM_ADMIN"));
+    options.AddPolicy("SystemAdminOnly", policy =>
+        policy.RequireRole("SYSTEM_ADMIN"));
+});
 
 // Register application services
 builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
@@ -145,6 +205,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// Global exception handling (first so it wraps the whole pipeline)
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 // CORS must be before UseHttpsRedirection and Authentication
 app.UseCors("AllowFrontend");
 
@@ -177,8 +240,11 @@ using (var scope = app.Services.CreateScope())
     var logger = services.GetRequiredService<ILogger<Program>>();
     var configuration = services.GetRequiredService<IConfiguration>();
 
+    // Database:RecreateOnStartup — ONLY for development. In production must be false to avoid data loss.
     var recreateDatabase = configuration.GetValue<bool>("Database:RecreateOnStartup", false);
     logger.LogInformation("Database:RecreateOnStartup = {RecreateOnStartup}", recreateDatabase);
+    if (isProduction && recreateDatabase)
+        throw new InvalidOperationException("Database:RecreateOnStartup no puede estar activado en producción. Configure Database:RecreateOnStartup=false.");
 
     if (recreateDatabase)
     {

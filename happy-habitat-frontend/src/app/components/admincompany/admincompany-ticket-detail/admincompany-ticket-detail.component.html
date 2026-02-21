@@ -120,6 +120,7 @@
                     type="file"
                     accept="image/*"
                     class="absolute opacity-0 w-0 h-0 pointer-events-none"
+                    [attr.aria-label]="'Añadir imagen al ticket ' + ($index + 1)"
                     (change)="onNewImageSelect($index, $event)"
                     [disabled]="isSavingEdit()"
                   />
@@ -258,6 +259,7 @@
                     type="file"
                     accept="image/*"
                     class="absolute opacity-0 w-0 h-0 pointer-events-none"
+                    [attr.aria-label]="'Imagen del comentario ' + ($index + 1)"
                     (change)="onCommentImageSelect($index, $event)"
                     [disabled]="isSavingComment()"
                   />

@@ -77,8 +77,8 @@ public class AuthServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal("test-token", result.Token);
-        Assert.NotNull(result.User);
-        Assert.Equal("testuser", result.User.Username);
+        Assert.Equal("testuser", result.Username);
+        Assert.Equal("RESIDENT", result.Role);
     }
 
     [Fact]

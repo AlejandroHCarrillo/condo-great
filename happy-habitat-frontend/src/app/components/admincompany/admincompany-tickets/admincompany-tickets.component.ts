@@ -1,4 +1,5 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
@@ -31,6 +32,7 @@ export class AdmincompanyTicketsComponent implements OnInit {
   private communitiesService = inject(CommunitiesService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
 
   selectedComunidadId = signal<string>('');
   private loadedCommunitiesForAdmin = signal<Comunidad[]>([]);
@@ -137,7 +139,7 @@ export class AdmincompanyTicketsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const comunidadId = params['comunidad'];
       if (comunidadId) {
         this.selectedComunidadId.set(comunidadId);
@@ -161,7 +163,7 @@ export class AdmincompanyTicketsComponent implements OnInit {
       }
     });
 
-    this.ticketsService.getStatusTickets().subscribe({
+    this.ticketsService.getStatusTickets().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (list) => this.statusList.set(list),
       error: () => {}
     });
@@ -188,7 +190,8 @@ export class AdmincompanyTicketsComponent implements OnInit {
         if (!ids?.length) return of([]);
         return forkJoin(ids.map(id => this.communitiesService.getCommunityById(id)));
       }),
-      catchError(() => of([]))
+      catchError(() => of([])),
+      takeUntilDestroyed(this.destroyRef)
     ).subscribe(communityDtos => {
       const comunidades = communityDtos.map(dto => mapCommunityDtoToComunidad(dto));
       this.loadedCommunitiesForAdmin.set(comunidades);

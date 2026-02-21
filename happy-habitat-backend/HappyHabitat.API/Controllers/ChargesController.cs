@@ -7,7 +7,7 @@ namespace HappyHabitat.API.Controllers;
 
 [ApiController]
 [Route("api/charges")]
-[Authorize]
+[Authorize(Roles = "ADMIN_COMPANY,SYSTEM_ADMIN")]
 public class ChargesController : ControllerBase
 {
     private readonly IChargesService _chargesService;

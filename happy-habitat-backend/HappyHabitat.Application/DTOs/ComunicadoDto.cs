@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace HappyHabitat.Application.DTOs;
 
 public class ComunicadoDto
@@ -16,20 +18,40 @@ public class ComunicadoDto
 public class CreateComunicadoDto
 {
     public Guid? CommunityId { get; set; }
+
+    [Required(ErrorMessage = "El título es obligatorio.")]
+    [MaxLength(200)]
     public string Titulo { get; set; } = string.Empty;
+
+    [MaxLength(300)]
     public string Subtitulo { get; set; } = string.Empty;
+
+    [MaxLength(4000)]
     public string Descripcion { get; set; } = string.Empty;
+
     public DateTime Fecha { get; set; } // Fecha del comunicado
+
+    [MaxLength(500)]
     public string? Imagen { get; set; }
 }
 
 public class UpdateComunicadoDto
 {
     public Guid? CommunityId { get; set; }
+
+    [Required(ErrorMessage = "El título es obligatorio.")]
+    [MaxLength(200)]
     public string Titulo { get; set; } = string.Empty;
+
+    [MaxLength(300)]
     public string Subtitulo { get; set; } = string.Empty;
+
+    [MaxLength(4000)]
     public string Descripcion { get; set; } = string.Empty;
+
     public DateTime Fecha { get; set; } // Fecha del comunicado
+
+    [MaxLength(500)]
     public string? Imagen { get; set; }
 }
 

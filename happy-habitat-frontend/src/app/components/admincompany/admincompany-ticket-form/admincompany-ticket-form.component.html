@@ -91,6 +91,7 @@
               type="file"
               accept="image/*"
               class="absolute opacity-0 w-0 h-0 pointer-events-none"
+              [attr.aria-label]="'Imagen del ticket ' + ($index + 1)"
               (change)="onImageSelect($index, $event)"
             />
             <label

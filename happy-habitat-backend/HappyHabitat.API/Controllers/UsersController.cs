@@ -7,7 +7,8 @@ namespace HappyHabitat.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Roles = "SYSTEM_ADMIN")]
+[RequestSizeLimit(1_048_576)] // 1 MB for JSON payloads
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
