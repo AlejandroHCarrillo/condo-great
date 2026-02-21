@@ -131,6 +131,7 @@ builder.Services.AddScoped<IComunicadoService, ComunicadoService>();
 builder.Services.AddScoped<IAmenityService, AmenityService>();
 builder.Services.AddScoped<ICommunityProviderService, CommunityProviderService>();
 builder.Services.AddScoped<ICommunityConfigurationService, CommunityConfigurationService>();
+builder.Services.AddScoped<ICommunityPriceService, CommunityPriceService>();
 builder.Services.AddScoped<IEncuestaService, EncuestaService>();
 builder.Services.AddScoped<ICategoriaTicketService, CategoriaTicketService>();
 builder.Services.AddScoped<IStatusTicketService, StatusTicketService>();

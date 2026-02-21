@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="SeedData\CommunityConfigurationBase.json" />
+    <EmbeddedResource Include="SeedData\CommunityPrices.json" />
   </ItemGroup>
 
 </Project>

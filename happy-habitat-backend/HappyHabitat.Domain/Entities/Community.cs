@@ -28,5 +28,6 @@ public class Community
     public ICollection<CommunityConfiguration> CommunityConfigurations { get; set; } = new List<CommunityConfiguration>();
     public ICollection<Encuesta> Encuestas { get; set; } = new List<Encuesta>();
     public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+    public ICollection<CommunityPrice> CommunityPrices { get; set; } = new List<CommunityPrice>();
 }
 

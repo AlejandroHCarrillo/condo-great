@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AdmincompanyTopMenuComponent } from "../../components/admincompany/admincompany-top-menu/admincompany-top-menu.component";
+import { TopMenuComponent } from '../../components/admincompany/top-menu/top-menu.component';
 
 @Component({
   selector: 'hh-admincompany-actividades-layout',
-  imports: [RouterOutlet, AdmincompanyTopMenuComponent],
+  imports: [RouterOutlet, TopMenuComponent],
   templateUrl: './admincompany-actividades-layout.html',
 })
 export class AdmincompanyActividadesLayoutComponent { }

@@ -7,9 +7,9 @@ import { RegistroPreferenciasComponent } from './registro-preferencias/registro-
 import { ReservacionesComponent } from '../reservaciones/reservaciones.component';
 import { ResidentEncuestasComponent } from './resident-encuestas/resident-encuestas.component';
 import { ResidentEncuestaResponderComponent } from './resident-encuesta-responder/resident-encuesta-responder.component';
-import { AdmincompanyTicketsComponent } from '../admincompany/admincompany-tickets/admincompany-tickets.component';
-import { AdmincompanyTicketFormComponent } from '../admincompany/admincompany-ticket-form/admincompany-ticket-form.component';
-import { AdmincompanyTicketDetailComponent } from '../admincompany/admincompany-ticket-detail/admincompany-ticket-detail.component';
+import { TicketsComponent } from '../tickets/tickets/tickets.component';
+import { TicketFormComponent } from '../tickets/ticket-form/ticket-form.component';
+import { TicketDetailComponent } from '../tickets/ticket-detail/ticket-detail.component';
 
 export const residentRoutes: Routes = [
     {
@@ -46,15 +46,15 @@ export const residentRoutes: Routes = [
         },
         {
             path: 'tickets',
-            component: AdmincompanyTicketsComponent
+            component: TicketsComponent
         },
         {
             path: 'tickets/nuevo',
-            component: AdmincompanyTicketFormComponent
+            component: TicketFormComponent
         },
         {
             path: 'tickets/:id',
-            component: AdmincompanyTicketDetailComponent
+            component: TicketDetailComponent
         },
         {
             path: '**',

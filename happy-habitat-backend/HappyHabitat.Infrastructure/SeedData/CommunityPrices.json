@@ -1,0 +1,9 @@
+[
+  { "concepto": "Mantenimiento", "monto": 1000, "isActive": true },
+  { "concepto": "Renta Casa Club", "monto": 1500, "isActive": true },
+  { "concepto": "Multa leve", "monto": 200, "isActive": true },
+  { "concepto": "Multa media", "monto": 300, "isActive": true },
+  { "concepto": "Multa Grave", "monto": 500, "isActive": true },
+  { "concepto": "Multa Extraordinaria", "monto": 2000, "isActive": true },
+  { "concepto": "Otro", "monto": 0, "isActive": true }
+]

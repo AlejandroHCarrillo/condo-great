@@ -31,6 +31,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<CommunityProvider> CommunityProviders { get; set; }
     public DbSet<Document> Documents { get; set; }
     public DbSet<CommunityConfiguration> CommunityConfigurations { get; set; }
+    public DbSet<CommunityPrice> CommunityPrices { get; set; }
     public DbSet<ResidentConfiguration> ResidentConfigurations { get; set; }
     public DbSet<Encuesta> Encuestas { get; set; }
     public DbSet<PreguntaEncuesta> PreguntasEncuesta { get; set; }
@@ -733,6 +734,25 @@ public class ApplicationDbContext : DbContext
                 .HasForeignKey(e => e.CommunityId)
                 .OnDelete(DeleteBehavior.Cascade);
             // CreatedByUserId / UpdatedByUserId sin FK: solo informativos; al eliminar el usuario el valor se conserva.
+        });
+
+        modelBuilder.Entity<CommunityPrice>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Concepto)
+                .IsRequired()
+                .HasMaxLength(200);
+            entity.Property(e => e.Monto)
+                .HasPrecision(10, 2);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired()
+                .HasColumnType("datetime2");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime2");
+            entity.HasOne(e => e.Community)
+                .WithMany(c => c.CommunityPrices)
+                .HasForeignKey(e => e.CommunityId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<ResidentConfiguration>(entity =>

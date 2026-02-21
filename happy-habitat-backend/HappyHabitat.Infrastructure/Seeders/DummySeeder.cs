@@ -385,6 +385,9 @@ public class DummySeeder : IDataSeeder
         // Seed default community configurations from CommunityConfigurationBase.json for all communities
         await SeedCommunityConfigurationsFromBaseAsync();
 
+        // Seed default community prices from CommunityPrices.json for all communities
+        await SeedCommunityPricesFromBaseAsync();
+
         // Seed 10 residents per community (for all communities in the database)
         var firstNames = new[] { "María", "José", "Ana", "Carlos", "Laura", "Pedro", "Isabel", "Miguel", "Carmen", "Francisco", "Elena", "Roberto", "Patricia", "Jorge", "Sofía", "Luis", "Gabriela", "Ricardo", "Daniela", "Alejandro" };
         var lastNames = new[] { "González", "Martínez", "López", "Hernández", "García", "Rodríguez", "Pérez", "Sánchez", "Ramírez", "Torres", "Flores", "Rivera", "Gómez", "Díaz", "Morales", "Reyes", "Jiménez", "Ruiz", "Mendoza", "Vázquez" };
@@ -2223,12 +2226,69 @@ public class DummySeeder : IDataSeeder
         }
     }
 
+    /// <summary>
+    /// Loads CommunityPrices.json (embedded resource) and creates one CommunityPrice per template for each community that does not have any prices yet.
+    /// </summary>
+    private async Task SeedCommunityPricesFromBaseAsync()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var resourceName = assembly.GetManifestResourceNames()
+            .FirstOrDefault(n => n.EndsWith("CommunityPrices.json", StringComparison.OrdinalIgnoreCase));
+        if (string.IsNullOrEmpty(resourceName))
+            return;
+
+        await using var stream = assembly.GetManifestResourceStream(resourceName);
+        if (stream == null)
+            return;
+
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var templates = await JsonSerializer.DeserializeAsync<List<CommunityPriceBaseItem>>(stream, options);
+        if (templates == null || templates.Count == 0)
+            return;
+
+        var communityIds = await _context.Communities.Select(c => c.Id).ToListAsync();
+        var pricesToAdd = new List<CommunityPrice>();
+
+        foreach (var communityId in communityIds)
+        {
+            var existingCount = await _context.CommunityPrices.CountAsync(cp => cp.CommunityId == communityId);
+            if (existingCount > 0)
+                continue;
+
+            foreach (var t in templates)
+            {
+                pricesToAdd.Add(new CommunityPrice
+                {
+                    Id = Guid.NewGuid(),
+                    CommunityId = communityId,
+                    Concepto = t.Concepto ?? string.Empty,
+                    Monto = t.Monto,
+                    IsActive = t.IsActive,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+        }
+
+        if (pricesToAdd.Count > 0)
+        {
+            await _context.CommunityPrices.AddRangeAsync(pricesToAdd);
+            await _context.SaveChangesAsync();
+        }
+    }
+
     private sealed class CommunityConfigurationBaseItem
     {
         public string? Titulo { get; set; }
         public string? Descripcion { get; set; }
         public string? Valor { get; set; }
         public string? TipoDato { get; set; }
+    }
+
+    private sealed class CommunityPriceBaseItem
+    {
+        public string? Concepto { get; set; }
+        public decimal Monto { get; set; }
+        public bool IsActive { get; set; } = true;
     }
 }
 

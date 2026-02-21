@@ -1,0 +1,271 @@
+<div class="p-4">
+    <!-- Título y Selector de Comunidad en la misma línea -->
+    <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+        <h1 class="text-2xl font-bold flex items-center gap-2">
+            <i class="fa-solid fa-address-book text-primary"></i>
+            Gestión de Residentes
+        </h1>
+
+        <hh-community-filter
+            [communities]="comunidadesAsociadas()"
+            [selectedId]="selectedComunidadId()"
+            [showAllOption]="true"
+            (selectedIdChange)="onComunidadChange($event)"
+        />
+        <a
+            [routerLink]="selectedComunidadId() && selectedComunidadId() !== 'all' ? ['/admincompany/residentes/nuevo', selectedComunidadId()] : null"
+            class="btn btn-primary btn-sm btn-square flex items-center justify-center text-white"
+            [class.btn-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
+            [attr.aria-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
+            (click)="(!selectedComunidadId() || selectedComunidadId() === 'all') && $event.preventDefault()"
+        >
+            <i class="fa-solid fa-plus"></i>
+        </a>
+    </div>
+    
+    @if (comunidadesAsociadas().length === 0) {
+        <div class="alert alert-warning mb-6">
+            <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+            <span>No tienes comunidades asociadas. Contacta al administrador del sistema.</span>
+        </div>
+    }
+
+    @if (isLoading()) {
+        <div class="flex justify-center items-center py-8">
+            <span class="loading loading-spinner loading-lg"></span>
+            <span class="ml-4">Cargando residentes...</span>
+        </div>
+    } @else {
+        <!-- Tabla de Residentes -->
+        <div class="overflow-x-auto">
+        <table class="table table-zebra w-full">
+            <thead class="bg-secondary text-white [&_th]:rounded-none [&_th]:text-white">
+                <tr>
+                    <th class="w-12">#</th>
+                    <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('comunidad')">
+                        <span class="flex items-center gap-1">
+                            Comunidad
+                            @if (sortColumn() === 'comunidad') {
+                                <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
+                            } @else {
+                                <i class="fa-solid fa-sort text-white/70 text-xs"></i>
+                            }
+                        </span>
+                    </th>
+                    <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('number')">
+                        <span class="flex items-center gap-1">
+                            # Casa
+                            @if (sortColumn() === 'number') {
+                                <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
+                            } @else {
+                                <i class="fa-solid fa-sort text-white/70 text-xs"></i>
+                            }
+                        </span>
+                    </th>
+                    <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('fullname')">
+                        <span class="flex items-center gap-1">
+                            Residente
+                            @if (sortColumn() === 'fullname') {
+                                <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
+                            } @else {
+                                <i class="fa-solid fa-sort text-white/70 text-xs"></i>
+                            }
+                        </span>
+                    </th>
+                    <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('email')">
+                        <span class="flex items-center gap-1">
+                            Email
+                            @if (sortColumn() === 'email') {
+                                <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
+                            } @else {
+                                <i class="fa-solid fa-sort text-white/70 text-xs"></i>
+                            }
+                        </span>
+                    </th>
+                    <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('phone')">
+                        <span class="flex items-center gap-1">
+                            Teléfono
+                            @if (sortColumn() === 'phone') {
+                                <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
+                            } @else {
+                                <i class="fa-solid fa-sort text-white/70 text-xs"></i>
+                            }
+                        </span>
+                    </th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (residentesOrdenados().length === 0) {
+                    <tr>
+                        <td colspan="7" class="text-center py-8 text-gray-500">
+                            <i class="fa-solid fa-inbox mr-2"></i>
+                            No se encontraron residentes
+                        </td>
+                    </tr>
+                } @else {
+                    @for (residente of residentesOrdenados(); track residente.id; let index = $index) {
+                        <tr class="cursor-pointer hover:bg-base-200 transition-colors" (click)="viewResidentDetail(residente)">
+                            <td><span class="text-sm">{{ (currentPage() - 1) * pageSize() + index + 1 }}</span></td>
+                            <td>
+                                @if (residente.comunidades && residente.comunidades.length > 0) {
+                                    <div class="flex flex-wrap gap-1">
+                                        @for (comunidadId of residente.comunidades; track comunidadId) {
+                                         <span class="text-[10px]"> {{ getComunidadNombre(comunidadId) }} </span>
+                                        }
+                                    </div>
+                                } @else {
+                                    <span class="text-gray-400">-</span>
+                                }
+                            </td>
+                            <td>
+                                @if (residente.number) {
+                                    <span class="text-xsm">{{ residente.number }}</span>
+                                } @else {
+                                    <span class="text-gray-400">-</span>
+                                }
+                            </td>
+                            <td class="font-medium">{{ residente.fullname }}</td>
+                            <td>
+                                @if (residente.email) {
+                                    <a [href]="'mailto:' + residente.email" class="link link-primary">
+                                        {{ residente.email }}
+                                    </a>
+                                } @else {
+                                    <span class="text-gray-400">-</span>
+                                }
+                            </td>
+                            <td>
+                                @if (residente.phone) {
+                                    <a [href]="'tel:' + residente.phone" class="link link-primary">
+                                        {{ residente.phone }}
+                                    </a>
+                                } @else {
+                                    <span class="text-gray-400">-</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="flex gap-1 items-center">
+                                    @if (residente.residentId) {
+                                        <a
+                                            [routerLink]="['/admincompany/residentes/editar', residente.residentId]"
+                                            class="btn btn-square btn-ghost bg-yellow-500"
+                                            (click)="$event.stopPropagation()"
+                                            title="Editar"
+                                        >
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+                                        <button
+                                            type="button"
+                                            class="btn btn-square btn-ghost bg-red-500 text-white"
+                                            (click)="openDeleteModal(residente); $event.stopPropagation()"
+                                            title="Eliminar"
+                                        >
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        </div>
+
+        <!-- Paginador: centro = botones, final = select por página -->
+        @if (selectedComunidadId() && totalPages() > 0) {
+            <div class="flex items-center gap-4 mt-4">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm text-base-content/70">
+                        Mostrando {{ residentesOrdenados().length }} de {{ totalCount() }} residente(s)
+                    </p>
+                </div>
+                <div class="flex justify-center flex-shrink-0">
+                    <div class="join">
+                        <button
+                            type="button"
+                            class="join-item btn btn-sm"
+                            [class.btn-disabled]="currentPage() <= 1"
+                            (click)="goToPage(currentPage() - 1)"
+                        >
+                            « Anterior
+                        </button>
+                        @for (p of paginasVisibles(); track p) {
+                            <button
+                                type="button"
+                                class="join-item btn btn-sm"
+                                [class.btn-active]="p === currentPage()"
+                                (click)="goToPage(p)"
+                            >
+                                {{ p }}
+                            </button>
+                        }
+                        <button
+                            type="button"
+                            class="join-item btn btn-sm"
+                            [class.btn-disabled]="currentPage() >= totalPages()"
+                            (click)="goToPage(currentPage() + 1)"
+                        >
+                            Siguiente »
+                        </button>
+                    </div>
+                </div>
+                <div class="flex justify-end flex-1 min-w-0">
+                    <label class="flex items-center gap-2 text-sm">
+                        <span class="text-base-content/70 whitespace-nowrap">Mostrar por página:</span>
+                        <select
+                            class="select select-bordered select-sm w-20"
+                            [ngModel]="pageSize()"
+                            (ngModelChange)="onPageSizeChange($event)"
+                        >
+                            @for (opt of pageSizeOptions; track opt) {
+                                <option [value]="opt">{{ opt }}</option>
+                            }
+                        </select>
+                    </label>
+                </div>
+            </div>
+        }
+    }
+
+    <!-- Modal de confirmación de eliminación -->
+    <dialog id="deleteResidentModal" class="modal modal-bottom sm:modal-middle">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-triangle-exclamation text-error"></i>
+                <span>Confirmar Eliminación</span>
+            </h3>
+
+            @if (residentToDelete()) {
+                <p class="py-4">
+                    ¿Está seguro de que desea eliminar al residente <strong>{{ residentToDelete()!.fullname }}</strong>?
+                </p>
+                <p class="text-sm text-base-content/70 mb-4">
+                    Esta acción no se puede deshacer.
+                </p>
+            }
+
+            <div class="modal-action">
+                <button
+                    class="btn btn-ghost"
+                    (click)="closeDeleteModal()"
+                >
+                    Cancelar
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-ghost bg-red-500 text-white min-w-28"
+                    (click)="confirmDeleteResident()"
+                >
+                    <i class="fa-solid fa-trash mr-2"></i>
+                    Eliminar
+                </button>
+            </div>
+        </div>
+
+        <form method="dialog" class="modal-backdrop">
+            <button type="button" (click)="closeDeleteModal()">Cerrar</button>
+        </form>
+    </dialog>
+</div>

@@ -1,30 +1,33 @@
 import { Routes } from '@angular/router';
 import { AdmincompanyActividadesLayoutComponent } from '../../layouts/admincompany/admincompany-actividades-layout';
-import { AdmincompanyComunicadosComponent } from './admincompany-comunicados/admincompany-comunicados.component';
-import { AdmincompanyResidentesComponent } from './admincompany-residentes/admincompany-residentes.component';
-import { AdmincompanyAmenidadesComponent } from './admincompany-amenidades/admincompany-amenidades.component';
-import { AdmincompanyProveedoresComponent } from './admincompany-proveedores/admincompany-proveedores.component';
-import { AdmincompanyDocumentosComponent } from './admincompany-documentos/admincompany-documentos.component';
-import { AdmincompanyReportesComponent } from './admincompany-reportes/admincompany-reportes.component';
-import { DocumentDetailComponent } from './document-detail/document-detail.component';
-import { AdmincompanyDocumentoFormComponent } from './admincompany-documento-form/admincompany-documento-form.component';
-import { ResidentInfoDetailComponent } from './resident-info-detail/resident-info-detail.component';
-import { AdmincompanyResidenteFormComponent } from './admincompany-residente-form/admincompany-residente-form.component';
-import { AdmincompanyComunicadoFormComponent } from './admincompany-comunicado-form/admincompany-comunicado-form.component';
-import { AdmincompanyAmenidadFormComponent } from './admincompany-amenidad-form/admincompany-amenidad-form.component';
-import { ComunicadoDetailComponent } from './comunicado-detail/comunicado-detail.component';
-import { AmenidadDetailComponent } from './amenidad-detail/amenidad-detail.component';
-import { AdmincompanyProveedorFormComponent } from './admincompany-proveedor-form/admincompany-proveedor-form.component';
-import { ProveedorDetailComponent } from './proveedor-detail/proveedor-detail.component';
-import { AdmincompanyConfiguracionesComponent } from './admincompany-configuraciones/admincompany-configuraciones.component';
-import { AdmincompanyConfiguracionFormComponent } from './admincompany-configuracion-form/admincompany-configuracion-form.component';
-import { ConfiguracionDetailComponent } from './configuracion-detail/configuracion-detail.component';
-import { AdmincompanyEncuestasComponent } from './admincompany-encuestas/admincompany-encuestas.component';
-import { AdmincompanyEncuestaFormComponent } from './admincompany-encuesta-form/admincompany-encuesta-form.component';
-import { EncuestaDetailComponent } from './encuesta-detail/encuesta-detail.component';
-import { AdmincompanyTicketsComponent } from './admincompany-tickets/admincompany-tickets.component';
-import { AdmincompanyTicketDetailComponent } from './admincompany-ticket-detail/admincompany-ticket-detail.component';
-import { AdmincompanyTicketFormComponent } from './admincompany-ticket-form/admincompany-ticket-form.component';
+import { NotFoundPageComponent } from '../../pages/not-found-page/not-found-page.component';
+import { AmenidadesComponent } from '../amenidad/amenidades/amenidades.component';
+import { AmenidadFormComponent } from '../amenidad/amenidad-form/amenidad-form.component';
+import { AmenidadDetailComponent } from '../amenidad/amenidad-detail/amenidad-detail.component';
+import { ComunicadosComponent } from '../comunicado/comunicados/comunicados.component';
+import { ComunicadoFormComponent } from '../comunicado/comunicado-form/comunicado-form.component';
+import { ComunicadoDetailComponent } from '../comunicado/comunicado-detail/comunicado-detail.component';
+import { ResidentesComponent } from '../residentes/residentes/residentes.component';
+import { ResidenteFormComponent } from '../residentes/residente-form/residente-form.component';
+import { ResidentInfoDetailComponent } from '../residentes/resident-info-detail/resident-info-detail.component';
+import { ProveedoresComponent } from '../proveedor/proveedores/proveedores.component';
+import { ProveedorFormComponent } from '../proveedor/proveedor-form/proveedor-form.component';
+import { ProveedorDetailComponent } from '../proveedor/proveedor-detail/proveedor-detail.component';
+import { DocumentosComponent } from '../documento/documentos/documentos.component';
+import { DocumentoFormComponent } from '../documento/documento-form/documento-form.component';
+import { DocumentDetailComponent } from '../documento/document-detail/document-detail.component';
+import { ConfiguracionesComponent } from '../configuracion/configuraciones/configuraciones.component';
+import { ConfiguracionFormComponent } from '../configuracion/configuracion-form/configuracion-form.component';
+import { ConfiguracionDetailComponent } from '../configuracion/configuracion-detail/configuracion-detail.component';
+import { PreciosComponent } from '../precios/precios/precios.component';
+import { PrecioFormComponent } from '../precios/precio-form/precio-form.component';
+import { PrecioDetailComponent } from '../precios/precio-detail/precio-detail.component';
+import { EncuestasComponent } from '../encuesta/encuestas/encuestas.component';
+import { EncuestaFormComponent } from '../encuesta/encuesta-form/encuesta-form.component';
+import { EncuestaDetailComponent } from '../encuesta/encuesta-detail/encuesta-detail.component';
+import { TicketsComponent } from '../tickets/tickets/tickets.component';
+import { TicketDetailComponent } from '../tickets/ticket-detail/ticket-detail.component';
+import { TicketFormComponent } from '../tickets/ticket-form/ticket-form.component';
 
 export const admincompanyRoutes: Routes = [
     {
@@ -33,15 +36,15 @@ export const admincompanyRoutes: Routes = [
         children: [
             {
                 path: 'comunicados',
-                component: AdmincompanyComunicadosComponent
+                component: ComunicadosComponent
             },
             {
                 path: 'comunicados/nuevo/:communityId',
-                component: AdmincompanyComunicadoFormComponent
+                component: ComunicadoFormComponent
             },
             {
                 path: 'comunicados/editar/:id',
-                component: AdmincompanyComunicadoFormComponent
+                component: ComunicadoFormComponent
             },
             {
                 path: 'comunicados/:id',
@@ -49,27 +52,27 @@ export const admincompanyRoutes: Routes = [
             },
             {
                 path: 'residentes',
-                component: AdmincompanyResidentesComponent
+                component: ResidentesComponent
             },
             {
                 path: 'residentes/nuevo/:communityId',
-                component: AdmincompanyResidenteFormComponent
+                component: ResidenteFormComponent
             },
             {
                 path: 'residentes/editar/:id',
-                component: AdmincompanyResidenteFormComponent
+                component: ResidenteFormComponent
             },
             {
                 path: 'residentes/tickets',
-                component: AdmincompanyTicketsComponent
+                component: TicketsComponent
             },
             {
                 path: 'residentes/tickets/nuevo/:communityId',
-                component: AdmincompanyTicketFormComponent
+                component: TicketFormComponent
             },
             {
                 path: 'residentes/tickets/:id',
-                component: AdmincompanyTicketDetailComponent
+                component: TicketDetailComponent
             },
             {
                 path: 'residentes/:id',
@@ -77,15 +80,15 @@ export const admincompanyRoutes: Routes = [
             },
             {
                 path: 'amenidades',
-                component: AdmincompanyAmenidadesComponent
+                component: AmenidadesComponent
             },
             {
                 path: 'amenidades/nuevo/:communityId',
-                component: AdmincompanyAmenidadFormComponent
+                component: AmenidadFormComponent
             },
             {
                 path: 'amenidades/editar/:id',
-                component: AdmincompanyAmenidadFormComponent
+                component: AmenidadFormComponent
             },
             {
                 path: 'amenidades/:id',
@@ -93,11 +96,11 @@ export const admincompanyRoutes: Routes = [
             },
             {
                 path: 'proveedores/nuevo/:communityId',
-                component: AdmincompanyProveedorFormComponent
+                component: ProveedorFormComponent
             },
             {
                 path: 'proveedores/editar/:id',
-                component: AdmincompanyProveedorFormComponent
+                component: ProveedorFormComponent
             },
             {
                 path: 'proveedores/:id',
@@ -105,19 +108,19 @@ export const admincompanyRoutes: Routes = [
             },
             {
                 path: 'proveedores',
-                component: AdmincompanyProveedoresComponent
+                component: ProveedoresComponent
             },
             {
                 path: 'documentos',
-                component: AdmincompanyDocumentosComponent
+                component: DocumentosComponent
             },
             {
                 path: 'documentos/nuevo/:communityId',
-                component: AdmincompanyDocumentoFormComponent
+                component: DocumentoFormComponent
             },
             {
                 path: 'documentos/editar/:id',
-                component: AdmincompanyDocumentoFormComponent
+                component: DocumentoFormComponent
             },
             {
                 path: 'documentos/:id',
@@ -125,39 +128,79 @@ export const admincompanyRoutes: Routes = [
             },
             {
                 path: 'configuracion',
-                component: AdmincompanyConfiguracionesComponent
+                component: ConfiguracionesComponent
             },
             {
                 path: 'configuracion/nuevo/:communityId',
-                component: AdmincompanyConfiguracionFormComponent
+                component: ConfiguracionFormComponent
             },
             {
                 path: 'configuracion/editar/:id',
-                component: AdmincompanyConfiguracionFormComponent
+                component: ConfiguracionFormComponent
             },
             {
                 path: 'configuracion/:id',
                 component: ConfiguracionDetailComponent
             },
             {
+                path: 'precios',
+                component: PreciosComponent
+            },
+            {
+                path: 'precios/nuevo/:communityId',
+                component: PrecioFormComponent
+            },
+            {
+                path: 'precios/editar/:id',
+                component: PrecioFormComponent
+            },
+            {
+                path: 'precios/:id',
+                component: PrecioDetailComponent
+            },
+            {
                 path: 'encuestas',
-                component: AdmincompanyEncuestasComponent
+                component: EncuestasComponent
             },
             {
                 path: 'encuestas/nuevo/:communityId',
-                component: AdmincompanyEncuestaFormComponent
+                component: EncuestaFormComponent
             },
             {
                 path: 'encuestas/editar/:id',
-                component: AdmincompanyEncuestaFormComponent
+                component: EncuestaFormComponent
             },
             {
                 path: 'encuestas/:id',
                 component: EncuestaDetailComponent
             },
             {
-                path: 'reportes',
-                component: AdmincompanyReportesComponent
+                path: 'reportes/morosos',
+                component: NotFoundPageComponent
+            },
+            {
+                path: 'reportes/finanzas',
+                component: NotFoundPageComponent
+            },
+            {
+                path: 'reportes/tickets',
+                component: NotFoundPageComponent
+            },
+            {
+                path: 'reportes/pago-proveedores',
+                component: NotFoundPageComponent
+            },
+            {
+                path: 'reportes/ingresos',
+                component: NotFoundPageComponent
+            },
+            {
+                path: 'reportes/gastos',
+                component: NotFoundPageComponent
+            },
+            {
+                path: 'reportes/resumen',
+                component: NotFoundPageComponent
             },
             {
                 path: '**',
@@ -168,4 +211,3 @@ export const admincompanyRoutes: Routes = [
 ];
 
 export default admincompanyRoutes;
-
