@@ -22,6 +22,7 @@ public class CommunityConfigurationService : ICommunityConfigurationService
         Id = c.Id,
         CommunityId = c.CommunityId,
         CommunityName = c.Community?.Nombre,
+        Codigo = c.Codigo,
         Titulo = c.Titulo,
         Descripcion = c.Descripcion,
         Valor = c.Valor,
@@ -71,6 +72,7 @@ public class CommunityConfigurationService : ICommunityConfigurationService
             Id = Guid.NewGuid(),
             CommunityId = dto.CommunityId,
             Community = community,
+            Codigo = dto.Codigo,
             Titulo = dto.Titulo,
             Descripcion = dto.Descripcion,
             Valor = dto.Valor,
@@ -99,6 +101,7 @@ public class CommunityConfigurationService : ICommunityConfigurationService
 
         config.CommunityId = dto.CommunityId;
         config.Community = community;
+        config.Codigo = dto.Codigo;
         config.Titulo = dto.Titulo;
         config.Descripcion = dto.Descripcion;
         config.Valor = dto.Valor;

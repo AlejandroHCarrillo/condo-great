@@ -41,6 +41,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<StatusTicket> StatusTickets { get; set; }
     public DbSet<Ticket> Tickets { get; set; }
     public DbSet<Comentario> Comentarios { get; set; }
+    public DbSet<CargoResidente> CargosResidente { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -713,6 +714,9 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<CommunityConfiguration>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.Property(e => e.Codigo)
+                .IsRequired()
+                .HasMaxLength(10);
             entity.Property(e => e.Titulo)
                 .IsRequired()
                 .HasMaxLength(200);
@@ -753,6 +757,28 @@ public class ApplicationDbContext : DbContext
                 .WithMany(c => c.CommunityPrices)
                 .HasForeignKey(e => e.CommunityId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<CargoResidente>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Descripcion)
+                .IsRequired()
+                .HasMaxLength(500);
+            entity.Property(e => e.Monto)
+                .HasPrecision(10, 2);
+            entity.Property(e => e.Estatus)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired()
+                .HasColumnType("datetime2");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime2");
+            entity.HasOne(e => e.Resident)
+                .WithMany(r => r.CargosResidente)
+                .HasForeignKey(e => e.ResidentId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<ResidentConfiguration>(entity =>

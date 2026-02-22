@@ -35,6 +35,11 @@
             <p class="text-lg">{{ getComunidadNombre(config()!) }}</p>
           </div>
 
+          <div>
+            <label class="label"><span class="label-text font-semibold">Código</span></label>
+            <p class="text-lg font-mono">{{ config()!.codigo || '—' }}</p>
+          </div>
+
           @if (config()!.descripcion) {
             <div>
               <label class="label"><span class="label-text font-semibold">Descripción</span></label>

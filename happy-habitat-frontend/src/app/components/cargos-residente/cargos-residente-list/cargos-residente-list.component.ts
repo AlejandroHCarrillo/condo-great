@@ -8,37 +8,42 @@ import { rxResource } from '../../../utils/rx-resource.util';
 import { AuthService } from '../../../services/auth.service';
 import { AdminCompanyContextService } from '../../../services/admin-company-context.service';
 import { UsersService } from '../../../services/users.service';
-import { CommunityConfigurationsService } from '../../../services/community-configurations.service';
 import { CommunitiesService } from '../../../services/communities.service';
+import { ResidentsService } from '../../../services/residents.service';
+import { CargosResidenteService } from '../../../services/cargos-residente.service';
 import { CommunityFilterComponent } from '../../../shared/components/community-filter/community-filter.component';
-import { CommunityConfiguration } from '../../../shared/interfaces/community-configuration.interface';
+import { CargoResidente } from '../../../shared/interfaces/cargo-residente.interface';
 import { Comunidad } from '../../../interfaces/comunidad.interface';
+import { Residente } from '../../../shared/interfaces/residente.interface';
 import { RolesEnum } from '../../../enums/roles.enum';
 import { mapCommunityDtoToComunidad } from '../../../shared/mappers/community.mapper';
 import { PAGE_SIZE_OPTIONS, isPageSizeOption } from '../../../constants/pagination.constants';
 
 @Component({
-  selector: 'hh-configuraciones',
+  selector: 'hh-cargos-residente-list',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, CommunityFilterComponent],
-  templateUrl: './configuraciones.component.html'
+  templateUrl: './cargos-residente-list.component.html'
 })
-export class ConfiguracionesComponent implements OnInit {
+export class CargosResidenteListComponent implements OnInit {
   private authService = inject(AuthService);
   private adminContext = inject(AdminCompanyContextService);
   private usersService = inject(UsersService);
-  private configsService = inject(CommunityConfigurationsService);
   private communitiesService = inject(CommunitiesService);
+  private residentsService = inject(ResidentsService);
+  private cargosService = inject(CargosResidenteService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
   selectedComunidadId = signal<string>('');
+  selectedResidentId = signal<string>('');
   private loadedCommunitiesForAdmin = signal<Comunidad[]>([]);
+  private residentsForCommunity = signal<Residente[]>([]);
   currentPage = signal(1);
   pageSize = signal(10);
   readonly pageSizeOptions = PAGE_SIZE_OPTIONS;
   private refreshTrigger = signal(0);
-  configToDelete = signal<CommunityConfiguration | null>(null);
+  cargoToDelete = signal<CargoResidente | null>(null);
 
   comunidadesAsociadas = computed(() => {
     const user = this.authService.currentUser();
@@ -47,41 +52,50 @@ export class ConfiguracionesComponent implements OnInit {
     return this.loadedCommunitiesForAdmin().length ? this.loadedCommunitiesForAdmin() : [];
   });
 
-  private configsResource = rxResource({
+  private cargosResource = rxResource({
     request: () => ({
-      comunidadId: this.selectedComunidadId(),
+      residentId: this.selectedResidentId(),
+      communityId: this.selectedComunidadId(),
       refresh: this.refreshTrigger()
     }),
     loader: ({ request }) => {
-      if (!request.comunidadId) return of([]);
-      return this.configsService.getByCommunityId(request.comunidadId).pipe(catchError(() => of([])));
+      if (request.residentId === 'all' && request.communityId) {
+        return this.cargosService.getByCommunityId(request.communityId).pipe(catchError(() => of([])));
+      }
+      if (request.residentId && request.residentId !== 'all') {
+        return this.cargosService.getByResidentId(request.residentId).pipe(catchError(() => of([])));
+      }
+      return of([]);
     }
   });
 
-  private allConfigs = computed(() => this.configsResource.value() ?? []);
+  private allCargos = computed(() => this.cargosResource.value() ?? []);
 
   sortColumn = signal<string>('');
   sortDirection = signal<'asc' | 'desc'>('asc');
 
-  configsOrdenados = computed(() => {
-    const list = this.allConfigs();
+  cargosOrdenados = computed(() => {
+    const list = this.allCargos();
     const col = this.sortColumn();
     const dir = this.sortDirection();
     if (!col) return list;
     return [...list].sort((a, b) => {
       let cmp = 0;
       switch (col) {
-        case 'codigo':
-          cmp = (a.codigo ?? '').localeCompare(b.codigo ?? '');
+        case 'residente':
+          cmp = (a.residentName ?? '').localeCompare(b.residentName ?? '');
           break;
-        case 'titulo':
-          cmp = (a.titulo ?? '').localeCompare(b.titulo ?? '');
+        case 'fecha':
+          cmp = new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
           break;
-        case 'tipoDato':
-          cmp = (a.tipoDato ?? '').localeCompare(b.tipoDato ?? '');
+        case 'descripcion':
+          cmp = (a.descripcion ?? '').localeCompare(b.descripcion ?? '');
           break;
-        case 'valor':
-          cmp = (a.valor ?? '').localeCompare(b.valor ?? '');
+        case 'monto':
+          cmp = (a.monto ?? 0) - (b.monto ?? 0);
+          break;
+        case 'estatus':
+          cmp = (a.estatus ?? '').localeCompare(b.estatus ?? '');
           break;
         default:
           return 0;
@@ -90,20 +104,20 @@ export class ConfiguracionesComponent implements OnInit {
     });
   });
 
-  totalCount = computed(() => this.configsOrdenados().length);
+  totalCount = computed(() => this.cargosOrdenados().length);
   totalPages = computed(() => {
     const total = this.totalCount();
     const size = this.pageSize();
     return size > 0 ? Math.max(1, Math.ceil(total / size)) : 0;
   });
-  configsPaginados = computed(() => {
-    const list = this.configsOrdenados();
+  cargosPaginados = computed(() => {
+    const list = this.cargosOrdenados();
     const page = this.currentPage();
     const size = this.pageSize();
     const start = (page - 1) * size;
     return list.slice(start, start + size);
   });
-  isLoading = computed(() => this.configsResource.isLoading());
+  isLoading = computed(() => this.cargosResource.isLoading());
 
   paginasVisibles = computed(() => {
     const total = this.totalPages();
@@ -116,6 +130,8 @@ export class ConfiguracionesComponent implements OnInit {
     for (let i = start; i <= end; i++) pages.push(i);
     return pages;
   });
+
+  residentsOptions = computed(() => this.residentsForCommunity());
 
   setSort(column: string): void {
     if (this.sortColumn() === column) {
@@ -132,13 +148,17 @@ export class ConfiguracionesComponent implements OnInit {
       if (comunidadId) {
         this.selectedComunidadId.set(comunidadId);
         this.adminContext.setSelectedCommunityId(comunidadId);
+        this.loadResidents(comunidadId);
       } else {
         const stored = this.adminContext.getSelectedCommunityId();
         if (stored) {
           this.selectedComunidadId.set(stored);
+          this.loadResidents(stored);
           this.router.navigate([], { relativeTo: this.route, queryParams: { comunidad: stored }, queryParamsHandling: 'merge' });
         }
       }
+      const residentId = params['residente'];
+      if (residentId !== undefined && residentId !== null) this.selectedResidentId.set(residentId === 'all' ? 'all' : residentId);
       const page = params['page'];
       if (page != null) {
         const p = Number(page);
@@ -173,13 +193,42 @@ export class ConfiguracionesComponent implements OnInit {
       });
   }
 
+  private loadResidents(communityId: string): void {
+    if (!communityId) {
+      this.residentsForCommunity.set([]);
+      this.selectedResidentId.set('');
+      return;
+    }
+    this.residentsService.getResidentsByCommunityId(communityId).subscribe({
+      next: (list) => {
+        this.residentsForCommunity.set(list);
+        const current = this.selectedResidentId();
+        if (current && current !== 'all' && !list.some((r) => r.id === current)) this.selectedResidentId.set('');
+      },
+      error: () => this.residentsForCommunity.set([])
+    });
+  }
+
   onComunidadChange(value: string): void {
     this.adminContext.setSelectedCommunityId(value);
     this.selectedComunidadId.set(value);
+    this.selectedResidentId.set('');
+    this.residentsForCommunity.set([]);
+    if (value) this.loadResidents(value);
     this.currentPage.set(1);
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { comunidad: value || null, page: null },
+      queryParams: { comunidad: value || null, residente: null, page: null },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  onResidentChange(value: string): void {
+    this.selectedResidentId.set(value || '');
+    this.currentPage.set(1);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { residente: value || null, page: null },
       queryParamsHandling: 'merge'
     });
   }
@@ -207,32 +256,38 @@ export class ConfiguracionesComponent implements OnInit {
     });
   }
 
-  viewConfigDetail(config: CommunityConfiguration): void {
-    if (config.id) {
-      this.router.navigate(['/admincompany/configuracion', config.id], {
-        queryParams: { comunidad: this.selectedComunidadId() || null }
+  formatDate(fecha: string): string {
+    if (!fecha) return '—';
+    const d = new Date(fecha);
+    return isNaN(d.getTime()) ? fecha : d.toLocaleDateString('es-MX', { dateStyle: 'short' });
+  }
+
+  viewCargoDetail(cargo: CargoResidente): void {
+    if (cargo.id) {
+      this.router.navigate(['/admincompany/cargos-residente', cargo.id], {
+        queryParams: { comunidad: this.selectedComunidadId() || null, residente: this.selectedResidentId() || null }
       });
     }
   }
 
-  openDeleteModal(config: CommunityConfiguration): void {
-    this.configToDelete.set(config);
+  openDeleteModal(cargo: CargoResidente): void {
+    this.cargoToDelete.set(cargo);
     setTimeout(() => {
-      const modal = document.getElementById('deleteConfigModal') as HTMLDialogElement;
+      const modal = document.getElementById('deleteCargoModal') as HTMLDialogElement;
       if (modal) modal.showModal();
     }, 0);
   }
 
   closeDeleteModal(): void {
-    const modal = document.getElementById('deleteConfigModal') as HTMLDialogElement;
+    const modal = document.getElementById('deleteCargoModal') as HTMLDialogElement;
     if (modal) modal.close();
-    this.configToDelete.set(null);
+    this.cargoToDelete.set(null);
   }
 
-  confirmDeleteConfig(): void {
-    const config = this.configToDelete();
-    if (!config?.id) return;
-    this.configsService.delete(config.id).subscribe({
+  confirmDeleteCargo(): void {
+    const cargo = this.cargoToDelete();
+    if (!cargo?.id) return;
+    this.cargosService.delete(cargo.id).subscribe({
       next: () => {
         this.closeDeleteModal();
         this.refreshTrigger.update((v) => v + 1);

@@ -2210,6 +2210,7 @@ public class DummySeeder : IDataSeeder
                 {
                     Id = Guid.NewGuid(),
                     CommunityId = communityId,
+                    Codigo = (t.Codigo ?? string.Empty).Length > 10 ? (t.Codigo ?? string.Empty)[..10] : (t.Codigo ?? string.Empty),
                     Titulo = t.Titulo ?? string.Empty,
                     Descripcion = t.Descripcion ?? string.Empty,
                     Valor = t.Valor ?? string.Empty,
@@ -2222,6 +2223,25 @@ public class DummySeeder : IDataSeeder
         if (configsToAdd.Count > 0)
         {
             await _context.CommunityConfigurations.AddRangeAsync(configsToAdd);
+            await _context.SaveChangesAsync();
+        }
+
+        // Actualizar Codigo en configuraciones existentes que lo tengan vacío (por Titulo contra las plantillas del JSON).
+        var configsSinCodigo = await _context.CommunityConfigurations
+            .Where(cc => string.IsNullOrWhiteSpace(cc.Codigo))
+            .ToListAsync();
+        foreach (var config in configsSinCodigo)
+        {
+            var tituloConfig = (config.Titulo ?? string.Empty).Trim();
+            var template = templates.FirstOrDefault(t =>
+                string.Equals((t.Titulo ?? string.Empty).Trim(), tituloConfig, StringComparison.OrdinalIgnoreCase));
+            if (template != null && !string.IsNullOrWhiteSpace(template.Codigo))
+            {
+                config.Codigo = template.Codigo!.Length > 10 ? template.Codigo[..10] : template.Codigo;
+            }
+        }
+        if (configsSinCodigo.Count > 0)
+        {
             await _context.SaveChangesAsync();
         }
     }
@@ -2278,6 +2298,7 @@ public class DummySeeder : IDataSeeder
 
     private sealed class CommunityConfigurationBaseItem
     {
+        public string? Codigo { get; set; }
         public string? Titulo { get; set; }
         public string? Descripcion { get; set; }
         public string? Valor { get; set; }

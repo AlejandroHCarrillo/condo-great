@@ -59,6 +59,7 @@ export class ConfiguracionFormComponent implements OnInit, OnDestroy {
 
   form = {
     communityId: '' as string,
+    codigo: '',
     titulo: '',
     descripcion: '',
     valor: '',
@@ -94,6 +95,7 @@ export class ConfiguracionFormComponent implements OnInit, OnDestroy {
   }
 
   private resetFormExceptCommunity(): void {
+    this.form.codigo = '';
     this.form.titulo = '';
     this.form.descripcion = '';
     this.form.valor = '';
@@ -124,6 +126,7 @@ export class ConfiguracionFormComponent implements OnInit, OnDestroy {
       next: (config) => {
         if (config) {
           this.form.communityId = config.communityId ?? '';
+          this.form.codigo = config.codigo ?? '';
           this.form.titulo = config.titulo ?? '';
           this.form.descripcion = config.descripcion ?? '';
           this.form.valor = config.valor ?? '';
@@ -153,6 +156,14 @@ export class ConfiguracionFormComponent implements OnInit, OnDestroy {
       this.errorMessage.set('Debe seleccionar una comunidad.');
       return;
     }
+    if (!this.form.codigo?.trim()) {
+      this.errorMessage.set('El código es obligatorio (máx. 10 caracteres).');
+      return;
+    }
+    if (this.form.codigo.trim().length > 10) {
+      this.errorMessage.set('El código no puede superar 10 caracteres.');
+      return;
+    }
     if (!this.form.titulo?.trim()) {
       this.errorMessage.set('El título es obligatorio.');
       return;
@@ -171,6 +182,7 @@ export class ConfiguracionFormComponent implements OnInit, OnDestroy {
       }
       const dto: UpdateCommunityConfigurationDto = {
         communityId,
+        codigo: this.form.codigo.trim().slice(0, 10),
         titulo: this.form.titulo.trim(),
         descripcion: this.form.descripcion?.trim() ?? '',
         valor: this.form.valor?.trim() ?? '',
@@ -189,6 +201,7 @@ export class ConfiguracionFormComponent implements OnInit, OnDestroy {
     } else {
       const dto: CreateCommunityConfigurationDto = {
         communityId,
+        codigo: this.form.codigo.trim().slice(0, 10),
         titulo: this.form.titulo.trim(),
         descripcion: this.form.descripcion?.trim() ?? '',
         valor: this.form.valor?.trim() ?? '',

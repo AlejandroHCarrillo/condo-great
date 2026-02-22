@@ -28,12 +28,19 @@
     </div>
   }
 
-  @if (isLoading()) {
+  @if (!selectedComunidadId()) {
+    <div class="alert alert-info mb-6">
+      <i class="fa-solid fa-info-circle mr-2"></i>
+      <span>Selecciona una comunidad para ver las encuestas.</span>
+    </div>
+  }
+
+  @if (selectedComunidadId() && isLoading()) {
     <div class="flex justify-center items-center py-8">
       <span class="loading loading-spinner loading-lg"></span>
       <span class="ml-4">Cargando encuestas...</span>
     </div>
-  } @else {
+  } @else if (selectedComunidadId()) {
     <div class="overflow-x-auto">
       <table class="table table-zebra w-full">
         <thead class="bg-secondary text-white [&_th]:rounded-none [&_th]:text-white">

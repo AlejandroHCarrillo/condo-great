@@ -31,6 +31,9 @@
             <p class="mt-1"><span class="label-text font-medium text-base-content/60">Comunidad:</span> {{ displayedCommunityName() }}</p>
           </div>
           <div>
+            <p class="mt-1"><span class="label-text font-medium text-base-content/60">Código:</span> {{ form.codigo || '—' }}</p>
+          </div>
+          <div>
             <p class="mt-1"><span class="label-text font-medium text-base-content/60">Parametro:</span> 
               {{ form.titulo || '—' }}</p>
           </div>
@@ -41,7 +44,12 @@
           <div>
             <p class="mt-1"><span class="label-text font-medium text-base-content/60">Valor:</span> 
               {{ (form.valor || '—') }}</p>
-          </div>        
+          </div>
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label" for="codigoEdit"><span class="label-text font-medium">Código</span></label>
+          <input id="codigoEdit" type="text" class="input input-bordered w-full" [(ngModel)]="form.codigo" name="codigoEdit" required maxlength="10" placeholder="Máx. 10 caracteres" />
         </div>
       } @else {
         <div class="form-control w-full">
@@ -59,6 +67,11 @@
               <option [value]="c.id">{{ c.nombre }}</option>
             }
           </select>
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label" for="codigo"><span class="label-text font-medium">Código</span></label>
+          <input id="codigo" type="text" class="input input-bordered w-full" [(ngModel)]="form.codigo" name="codigo" required maxlength="10" placeholder="Máx. 10 caracteres" />
         </div>
 
         <div class="form-control w-full">

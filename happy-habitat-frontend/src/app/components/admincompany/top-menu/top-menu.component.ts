@@ -9,7 +9,7 @@ export interface AdmincompanyMenuItem {
   icon: string;
 }
 
-const GESTIONAR_ROUTES = ['comunicados', 'residentes', 'amenidades', 'proveedores', 'documentos'] as const;
+const GESTIONAR_ROUTES = ['comunicados', 'residentes', 'amenidades', 'proveedores', 'documentos', 'cargos-residente'] as const;
 
 @Component({
   selector: 'hh-top-menu',
@@ -47,6 +47,7 @@ export class TopMenuComponent implements OnInit, OnDestroy {
     { route: 'comunicados', label: 'Comunicados', icon: 'fa-solid fa-bullhorn' },
     { route: 'residentes', label: 'Residentes', icon: 'fa-solid fa-address-book' },
     { route: 'residentes/tickets', label: 'Tickets', icon: 'fa-solid fa-ticket' },
+    { route: 'cargos-residente', label: 'Cargos', icon: 'fa-solid fa-receipt' },
     { route: 'amenidades', label: 'Amenidades', icon: 'fa-solid fa-people-roof' },
     { route: 'proveedores', label: 'Proveedores', icon: 'fa-solid fa-phone-volume' }, 
     { route: 'documentos', label: 'Documentos', icon: 'fa-solid fa-file-lines' },

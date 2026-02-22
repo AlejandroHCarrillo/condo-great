@@ -28,17 +28,34 @@
     </div>
   }
 
-  @if (isLoading()) {
+  @if (!selectedComunidadId()) {
+    <div class="alert alert-info mb-6">
+      <i class="fa-solid fa-info-circle mr-2"></i>
+      <span>Selecciona una comunidad para ver las configuraciones.</span>
+    </div>
+  }
+
+  @if (selectedComunidadId() && isLoading()) {
     <div class="flex justify-center items-center py-8">
       <span class="loading loading-spinner loading-lg"></span>
       <span class="ml-4">Cargando configuraciones...</span>
     </div>
-  } @else {
+  } @else if (selectedComunidadId()) {
     <div class="overflow-x-auto">
       <table class="table table-zebra w-full">
         <thead class="bg-secondary text-white [&_th]:rounded-none [&_th]:text-white">
           <tr>
             <th class="w-12">#</th>
+            <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('codigo')">
+              <span class="flex items-center gap-1">
+                Código
+                @if (sortColumn() === 'codigo') {
+                  <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
+                } @else {
+                  <i class="fa-solid fa-sort text-white/70 text-xs"></i>
+                }
+              </span>
+            </th>
             <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('titulo')">
               <span class="flex items-center gap-1">
                 Título
@@ -75,7 +92,7 @@
         <tbody>
           @if (configsPaginados().length === 0) {
             <tr>
-              <td colspan="4" class="text-center py-8 text-gray-500">
+              <td colspan="5" class="text-center py-8 text-gray-500">
                 <i class="fa-solid fa-inbox mr-2"></i>
                 No se encontraron configuraciones
               </td>
@@ -84,6 +101,7 @@
             @for (config of configsPaginados(); track config.id; let index = $index) {
               <tr class="cursor-pointer hover:bg-base-200 transition-colors" (click)="viewConfigDetail(config)">
                 <td><span class="text-sm">{{ (currentPage() - 1) * pageSize() + index + 1 }}</span></td>
+                <td class="font-mono text-sm max-w-[100px] truncate" [title]="config.codigo">{{ config.codigo || '—' }}</td>
                 <td class="font-medium max-w-[200px] truncate" [title]="config.titulo">{{ config.titulo }}</td>
                 <td class="max-w-[120px] truncate" [title]="config.tipoDato">{{ config.tipoDato || '-' }}</td>
                 <td class="max-w-[200px] truncate" [title]="config.valor">{{ config.valor || '-' }}</td>

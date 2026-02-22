@@ -28,6 +28,9 @@ import { EncuestaDetailComponent } from '../encuesta/encuesta-detail/encuesta-de
 import { TicketsComponent } from '../tickets/tickets/tickets.component';
 import { TicketDetailComponent } from '../tickets/ticket-detail/ticket-detail.component';
 import { TicketFormComponent } from '../tickets/ticket-form/ticket-form.component';
+import { CargosResidenteListComponent } from '../cargos-residente/cargos-residente-list/cargos-residente-list.component';
+import { CargoResidenteFormComponent } from '../cargos-residente/cargo-residente-form/cargo-residente-form.component';
+import { CargoResidenteDetailComponent } from '../cargos-residente/cargo-residente-detail/cargo-residente-detail.component';
 
 export const admincompanyRoutes: Routes = [
     {
@@ -173,6 +176,26 @@ export const admincompanyRoutes: Routes = [
             {
                 path: 'encuestas/:id',
                 component: EncuestaDetailComponent
+            },
+            {
+                path: 'cargos-residente',
+                component: CargosResidenteListComponent
+            },
+            {
+                path: 'cargos-residente/nuevo',
+                component: CargoResidenteFormComponent
+            },
+            {
+                path: 'cargos-residente/nuevo/:residentId',
+                component: CargoResidenteFormComponent
+            },
+            {
+                path: 'cargos-residente/editar/:id',
+                component: CargoResidenteFormComponent
+            },
+            {
+                path: 'cargos-residente/:id',
+                component: CargoResidenteDetailComponent
             },
             {
                 path: 'reportes/morosos',

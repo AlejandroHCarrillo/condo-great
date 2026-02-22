@@ -12,15 +12,30 @@
             [showAllOption]="true"
             (selectedIdChange)="onComunidadChange($event)"
         />
-        <a
-            [routerLink]="selectedComunidadId() && selectedComunidadId() !== 'all' ? ['/admincompany/residentes/nuevo', selectedComunidadId()] : null"
-            class="btn btn-primary btn-sm btn-square flex items-center justify-center text-white"
-            [class.btn-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
-            [attr.aria-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
-            (click)="(!selectedComunidadId() || selectedComunidadId() === 'all') && $event.preventDefault()"
-        >
+        <div class="flex items-center gap-2">
+          <a
+              [routerLink]="'/admincompany/cargos-residente/nuevo'"
+              [queryParams]="{ comunidad: selectedComunidadId(), residente: 'all' }"
+              class="btn btn-secondary btn-sm text-white gap-1"
+              [class.btn-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
+              [attr.aria-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
+              (click)="(!selectedComunidadId() || selectedComunidadId() === 'all') && $event.preventDefault()"
+              title="Agregar cargo para todos los residentes de la comunidad"
+          >
+            <i class="fa-solid fa-receipt"></i>
+            Cargos
+          </a>
+          <a
+              [routerLink]="selectedComunidadId() && selectedComunidadId() !== 'all' ? ['/admincompany/residentes/nuevo', selectedComunidadId()] : null"
+              class="btn btn-primary btn-sm btn-square flex items-center justify-center text-white"
+              [class.btn-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
+              [attr.aria-disabled]="!selectedComunidadId() || selectedComunidadId() === 'all'"
+              (click)="(!selectedComunidadId() || selectedComunidadId() === 'all') && $event.preventDefault()"
+              title="Nuevo residente"
+          >
             <i class="fa-solid fa-plus"></i>
-        </a>
+          </a>
+        </div>
     </div>
     
     @if (comunidadesAsociadas().length === 0) {
@@ -30,12 +45,19 @@
         </div>
     }
 
-    @if (isLoading()) {
+    @if (!selectedComunidadId()) {
+        <div class="alert alert-info mb-6">
+            <i class="fa-solid fa-info-circle mr-2"></i>
+            <span>Selecciona una comunidad para ver los residentes.</span>
+        </div>
+    }
+
+    @if (selectedComunidadId() && isLoading()) {
         <div class="flex justify-center items-center py-8">
             <span class="loading loading-spinner loading-lg"></span>
             <span class="ml-4">Cargando residentes...</span>
         </div>
-    } @else {
+    } @else if (selectedComunidadId()) {
         <!-- Tabla de Residentes -->
         <div class="overflow-x-auto">
         <table class="table table-zebra w-full">
