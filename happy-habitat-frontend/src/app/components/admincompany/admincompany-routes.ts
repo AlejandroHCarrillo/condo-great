@@ -34,6 +34,8 @@ import { CargoResidenteDetailComponent } from '../cargos-residente/cargo-residen
 import { PagosResidenteListComponent } from '../pagos-residente/pagos-residente-list/pagos-residente-list.component';
 import { PagoResidenteFormComponent } from '../pagos-residente/pago-residente-form/pago-residente-form.component';
 import { PagoResidenteDetailComponent } from '../pagos-residente/pago-residente-detail/pago-residente-detail.component';
+import { MorososListComponent } from './morosos/morosos-list.component';
+import { HistorialPagosResidenteComponent } from './historial-pagos-residente/historial-pagos-residente.component';
 
 export const admincompanyRoutes: Routes = [
     {
@@ -83,6 +85,10 @@ export const admincompanyRoutes: Routes = [
             {
                 path: 'residentes/:id',
                 component: ResidentInfoDetailComponent
+            },
+            {
+                path: 'historial-pagos-residente/:residentId',
+                component: HistorialPagosResidenteComponent
             },
             {
                 path: 'amenidades',
@@ -222,7 +228,7 @@ export const admincompanyRoutes: Routes = [
             },
             {
                 path: 'reportes/morosos',
-                component: NotFoundPageComponent
+                component: MorososListComponent
             },
             {
                 path: 'reportes/finanzas',

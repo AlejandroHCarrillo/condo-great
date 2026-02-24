@@ -1,8 +1,14 @@
 <div class="p-4">
-  <h1 class="text-2xl font-bold mb-6 flex items-center gap-2">
-    <i class="fa-solid fa-money-bill-1-wave text-primary"></i>
-    Mis pagos
-  </h1>
+  <div class="flex items-center justify-between gap-4 mb-6 flex-wrap">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-money-bill-1-wave text-primary"></i>
+      Mis pagos
+    </h1>
+    <a [routerLink]="['/resident', 'pagos', 'nuevo']" class="btn btn-primary btn-sm text-white">
+      <i class="fa-solid fa-plus mr-2"></i>
+      Registrar pago
+    </a>
+  </div>
 
   @if (isLoading()) {
     <div class="flex justify-center items-center py-12">
@@ -37,7 +43,7 @@
               <td class="max-w-[160px] truncate" [title]="pago.concepto || ''">{{ pago.concepto || '—' }}</td>
               <td>
                 @if (pago.urlComprobante) {
-                  <a [href]="pago.urlComprobante" target="_blank" rel="noopener noreferrer" class="link link-primary text-sm" (click)="$event.stopPropagation()" title="Abrir comprobante">Ver</a>
+                  <a [href]="getComprobanteUrl(pago.urlComprobante)" target="_blank" rel="noopener noreferrer" class="link link-primary text-sm" (click)="$event.stopPropagation()" title="Abrir comprobante">Ver</a>
                 } @else {
                   <span class="text-base-content/50">—</span>
                 }

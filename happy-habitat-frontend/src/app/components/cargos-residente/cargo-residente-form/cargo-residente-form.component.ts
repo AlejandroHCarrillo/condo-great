@@ -336,6 +336,12 @@ export class CargoResidenteFormComponent implements OnInit, OnDestroy {
       this.errorMessage.set('El monto no puede ser negativo.');
       return;
     }
+    if (Number(this.form.monto) === 0) {
+      const confirmarCero = window.confirm(
+        'El monto es $0. ¿Confirma que desea guardar este cargo con monto cero?'
+      );
+      if (!confirmarCero) return;
+    }
     const modal = document.getElementById('confirmSaveCargoModal') as HTMLDialogElement;
     if (modal) modal.showModal();
   }

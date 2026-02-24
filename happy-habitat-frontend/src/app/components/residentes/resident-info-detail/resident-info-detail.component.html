@@ -5,14 +5,24 @@
       Volver a la lista
     </button>
     @if (residentDbId()) {
-      <a
-        [routerLink]="['/admincompany/residentes/editar', residentDbId()]"
-        class="btn btn-sm btn-ghost bg-yellow-500"
-        title="Editar"
-      >
-        <i class="fa-solid fa-pen mr-2"></i>
-        Editar
-      </a>
+      <div class="flex gap-2">
+        <a
+          [routerLink]="['/admincompany/historial-pagos-residente', residentDbId()]"
+          class="btn btn-sm btn-ghost bg-primary text-primary-content"
+          title="Ver historial de pagos y cargos"
+        >
+          <i class="fa-solid fa-history mr-2"></i>
+          Historial de pagos
+        </a>
+        <a
+          [routerLink]="['/admincompany/residentes/editar', residentDbId()]"
+          class="btn btn-sm btn-ghost bg-yellow-500"
+          title="Editar"
+        >
+          <i class="fa-solid fa-pen mr-2"></i>
+          Editar
+        </a>
+      </div>
     }
   </div>
 

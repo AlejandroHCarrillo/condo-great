@@ -40,13 +40,23 @@ export function ticketUploadPathFallback(ticketId: number): string {
  * Ejemplo: uploads/{communityId}/amenidades/unique-name.jpg
  */
 export function amenidadImageUploadPath(communityId: string, filename: string): string {
-  return `uploads/${communityId}/amenidades/${filename}`;
+  return `${UPLOAD_BASE}/${communityId}/amenidades/${filename}`;
 }
 
 /**
  * Ruta donde se guarda la imagen de un comunicado.
- * Ejemplo: uploads/{communityId}/comunicados/unique-name.jpg
+ * Ejemplo: ${UPLOAD_BASE}/{communityId}/comunicados/unique-name.jpg
  */
 export function comunicadoImageUploadPath(communityId: string, filename: string): string {
-  return `uploads/${communityId}/comunicados/${filename}`;
+  return `${UPLOAD_BASE}/${communityId}/comunicados/${filename}`;
+}
+
+/** Ruta base para comprobantes de pago (sin pagoId). ${UPLOAD_BASE}/communityId/residentId/pagos */
+export function pagoComprobanteBasePath(communityId: string, residentId: string): string {
+  return `${UPLOAD_BASE}/${communityId}/${residentId}/pagos`;
+}
+
+/** Ruta donde se guarda el comprobante de un pago. ${UPLOAD_BASE}/communityId/residentId/pagos/pagoId */
+export function pagoComprobanteUploadPath(communityId: string, residentId: string, pagoId: string): string {
+  return `${UPLOAD_BASE}/${communityId}/${residentId}/pagos/${pagoId}`;
 }

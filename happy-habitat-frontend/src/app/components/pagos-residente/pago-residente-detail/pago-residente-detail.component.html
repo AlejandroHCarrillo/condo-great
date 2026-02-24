@@ -57,7 +57,7 @@
           @if (pago()!.urlComprobante) {
             <div>
               <label class="label"><span class="label-text font-semibold">Comprobante</span></label>
-              <a [href]="pago()!.urlComprobante" target="_blank" rel="noopener noreferrer" class="link link-primary">Abrir comprobante</a>
+              <a [href]="getComprobanteUrl(pago()!.urlComprobante)" target="_blank" rel="noopener noreferrer" class="link link-primary">Abrir comprobante</a>
             </div>
           }
 

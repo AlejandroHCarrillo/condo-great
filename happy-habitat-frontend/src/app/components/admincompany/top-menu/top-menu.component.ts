@@ -79,6 +79,7 @@ export class TopMenuComponent implements OnInit, OnDestroy {
     this.navSubscription = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(() => {
+        this.reportesDropdownOpen.set(false);
         this.updateFromRoute();
         this.cdr.markForCheck();
       });
@@ -99,4 +100,7 @@ export class TopMenuComponent implements OnInit, OnDestroy {
 
   /** "Reportes" está activo si estamos en cualquier ruta reportes o reportes/* */
   readonly isReportesActive = computed(() => this.firstSegment() === 'reportes');
+
+  /** Controla si el dropdown de Reportes está abierto; se cierra al navegar. */
+  reportesDropdownOpen = signal(false);
 }

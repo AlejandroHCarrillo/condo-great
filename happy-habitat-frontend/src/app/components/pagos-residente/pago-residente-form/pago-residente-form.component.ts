@@ -11,6 +11,14 @@ import { AuthService } from '../../../services/auth.service';
 import { AdminCompanyContextService } from '../../../services/admin-company-context.service';
 import { UsersService } from '../../../services/users.service';
 import { CommunitiesService } from '../../../services/communities.service';
+import { FileService } from '../../../services/file.service';
+import { ImageUrlService } from '../../../services/image-url.service';
+import {
+  FileUploadComponent,
+  type AllowedFileType,
+  type MaxSizesByType
+} from '../../../shared/components/file-upload/file-upload.component';
+import { pagoComprobanteBasePath, pagoComprobanteUploadPath } from '../../../constants/upload-paths';
 import { Comunidad } from '../../../interfaces/comunidad.interface';
 import { Residente } from '../../../shared/interfaces/residente.interface';
 import { RolesEnum } from '../../../enums/roles.enum';
@@ -21,7 +29,7 @@ import type { CreatePagosResidenteDto, UpdatePagosResidenteDto } from '../../../
 @Component({
   selector: 'hh-pago-residente-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FileUploadComponent],
   templateUrl: './pago-residente-form.component.html'
 })
 export class PagoResidenteFormComponent implements OnInit, OnDestroy {
@@ -33,7 +41,25 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
   private communitiesService = inject(CommunitiesService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private fileService = inject(FileService);
+  private imageUrlService = inject(ImageUrlService);
   private destroy$ = new Subject<void>();
+
+  /** Comprobante: 1 archivo, imagen o PDF, máx 5 MB */
+  readonly fileUploadMaxFiles = 1;
+  readonly fileUploadAllowedTypes: AllowedFileType[] = ['image', 'document'];
+  readonly fileUploadMaxSizes: MaxSizesByType = {
+    image: 5 * 1024 * 1024,
+    document: 5 * 1024 * 1024
+  };
+  fileUploadSavePath = computed(() => {
+    const cid = this.selectedComunidadId();
+    const rid = this.form.residenteId;
+    if (cid && rid && rid !== 'all') return pagoComprobanteBasePath(cid, rid);
+    return '';
+  });
+
+  selectedFiles = signal<File[]>([]);
 
   isEditMode = signal(false);
   pagoId = signal<string | null>(null);
@@ -62,7 +88,7 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
     residenteId: '' as string,
     fechaPago: '' as string,
     monto: 0 as number,
-    status: 'PorConfirmar' as string,
+    status: 'Aplicado' as string,
     concepto: '' as string,
     urlComprobante: '' as string,
     nota: '' as string
@@ -93,7 +119,7 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
         this.form.residenteId = residentId;
         this.form.fechaPago = new Date().toISOString().slice(0, 10);
         this.form.monto = 0;
-        this.form.status = 'PorConfirmar';
+        this.form.status = 'Aplicado';
         this.form.concepto = '';
         this.form.urlComprobante = '';
         this.form.nota = '';
@@ -110,7 +136,7 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
         this.form.residenteId = 'all';
         this.form.fechaPago = new Date().toISOString().slice(0, 10);
         this.form.monto = 0;
-        this.form.status = 'PorConfirmar';
+        this.form.status = 'Aplicado';
         this.form.concepto = '';
         this.form.urlComprobante = '';
         this.form.nota = '';
@@ -235,6 +261,10 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
     return this.isEditMode() ? 'Editar pago' : 'Nuevo pago';
   }
 
+  onFilesChange(files: File[]): void {
+    this.selectedFiles.set(files);
+  }
+
   submit(): void {
     this.errorMessage.set(null);
     if (!this.form.residenteId?.trim()) {
@@ -253,6 +283,12 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
       this.errorMessage.set('El monto no puede ser negativo.');
       return;
     }
+    if (Number(this.form.monto) === 0) {
+      const confirmarCero = window.confirm(
+        'El monto es $0. ¿Confirma que desea guardar este pago con monto cero?'
+      );
+      if (!confirmarCero) return;
+    }
     this.isSaving.set(true);
     const fechaIso = new Date(this.form.fechaPago).toISOString();
     const currentUser = this.authService.currentUser();
@@ -263,26 +299,47 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
         this.isSaving.set(false);
         return;
       }
-      const dto: UpdatePagosResidenteDto = {
-        residenteId: this.form.residenteId.trim(),
-        fechaPago: fechaIso,
-        monto: Number(this.form.monto),
-        status: this.form.status,
-        concepto: this.form.concepto?.trim() || undefined,
-        urlComprobante: this.form.urlComprobante?.trim() || undefined,
-        nota: this.form.nota?.trim() || undefined,
-        updatedByUserId: currentUser?.id ?? undefined
+      const residentId = this.form.residenteId.trim();
+      const communityId = this.selectedComunidadId() || '';
+      const filesToUpload = this.selectedFiles();
+      const doUpdate = (urlComprobante?: string) => {
+        const dto: UpdatePagosResidenteDto = {
+          residenteId: residentId,
+          fechaPago: fechaIso,
+          monto: Number(this.form.monto),
+          status: this.form.status,
+          concepto: this.form.concepto?.trim() || undefined,
+          urlComprobante: urlComprobante ?? (this.form.urlComprobante?.trim() || undefined),
+          nota: this.form.nota?.trim() || undefined,
+          updatedByUserId: currentUser?.id ?? undefined
+        };
+        this.pagosService.update(id, dto).subscribe({
+          next: () => {
+            this.isSaving.set(false);
+            this.router.navigate(['/admincompany/pagos-residente'], this.getNavigateBackOptions());
+          },
+          error: () => {
+            this.errorMessage.set('Error al guardar los cambios.');
+            this.isSaving.set(false);
+          }
+        });
       };
-      this.pagosService.update(id, dto).subscribe({
-        next: () => {
-          this.isSaving.set(false);
-          this.router.navigate(['/admincompany/pagos-residente'], this.getNavigateBackOptions());
-        },
-        error: () => {
-          this.errorMessage.set('Error al guardar los cambios.');
-          this.isSaving.set(false);
-        }
-      });
+      if (filesToUpload.length > 0 && communityId) {
+        const file = filesToUpload[0];
+        const fileName = this.imageUrlService.uniqueFileName(file.name);
+        const path = `${pagoComprobanteUploadPath(communityId, residentId, id)}/${fileName}`;
+        this.fileService.uploadFile(file, path).subscribe({
+          next: (res) => {
+            doUpdate(res.relativePath);
+          },
+          error: () => {
+            this.errorMessage.set('Error al subir el comprobante.');
+            this.isSaving.set(false);
+          }
+        });
+      } else {
+        doUpdate();
+      }
     } else {
       const residentIds =
         this.form.residenteId === 'all'
@@ -298,6 +355,7 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
       }
 
       const createdByUserId = currentUser?.id ?? undefined;
+      const communityId = this.selectedComunidadId() || '';
       const dto: CreatePagosResidenteDto = {
         residenteId: residentIds[0],
         fechaPago: fechaIso,
@@ -310,13 +368,41 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
       };
 
       if (residentIds.length === 1) {
-        this.pagosService.create(dto).subscribe({
+        const filesToUpload = this.selectedFiles();
+        this.pagosService.create(dto).pipe(
+          switchMap((pago) => {
+            if (filesToUpload.length > 0 && communityId && pago.id) {
+              const file = filesToUpload[0];
+              const fileName = this.imageUrlService.uniqueFileName(file.name);
+              const path = `${pagoComprobanteUploadPath(communityId, pago.residenteId, pago.id)}/${fileName}`;
+              return this.fileService.uploadFile(file, path).pipe(
+                switchMap((res) =>
+                  this.pagosService.update(pago.id, {
+                    residenteId: pago.residenteId,
+                    fechaPago: dto.fechaPago,
+                    monto: dto.monto,
+                    status: dto.status,
+                    concepto: dto.concepto,
+                    urlComprobante: res.relativePath,
+                    nota: dto.nota,
+                    updatedByUserId: createdByUserId ?? undefined
+                  }).pipe(
+                    catchError(() => of(pago))
+                  )
+                ),
+                catchError(() => of(pago))
+              );
+            }
+            return of(pago);
+          }),
+          takeUntil(this.destroy$)
+        ).subscribe({
           next: () => {
             this.isSaving.set(false);
             this.router.navigate(['/admincompany/pagos-residente'], this.getNavigateBackOptions());
           },
           error: () => {
-            this.errorMessage.set('Error al crear el pago.');
+            this.errorMessage.set('Error al crear el pago o subir el comprobante.');
             this.isSaving.set(false);
           }
         });

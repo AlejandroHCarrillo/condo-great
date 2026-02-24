@@ -88,10 +88,19 @@
         <input id="concepto" type="text" class="input input-bordered w-full" [(ngModel)]="form.concepto" name="concepto" placeholder="Ej. Mantenimiento, Cuota de agua" maxlength="500" />
       </div>
 
-      <div class="form-control w-full">
-        <label class="label py-0" for="urlComprobante"><span class="label-text font-bold text-black">URL comprobante (opcional):</span></label>
-        <input id="urlComprobante" type="url" class="input input-bordered w-full" [(ngModel)]="form.urlComprobante" name="urlComprobante" placeholder="https://..." maxlength="2000" />
-      </div>
+      @if (fileUploadSavePath()) {
+        <div class="form-control w-full">
+          <label class="label py-0"><span class="label-text font-bold text-black">Comprobante (imagen o PDF, máx. 5 MB):</span></label>
+          <hh-file-upload
+            [maxFiles]="fileUploadMaxFiles"
+            [allowedTypes]="fileUploadAllowedTypes"
+            [savePath]="fileUploadSavePath()"
+            [maxSizesByType]="fileUploadMaxSizes"
+            componentId="pago-residente-comprobante"
+            (filesChange)="onFilesChange($event)"
+          />
+        </div>
+      }
 
       <div class="form-control w-full">
         <label class="label py-0" for="nota"><span class="label-text font-bold text-black">Nota (opcional):</span></label>

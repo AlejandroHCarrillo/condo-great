@@ -1,0 +1,105 @@
+<div class="p-4 max-w-2xl mx-auto">
+  <div class="flex items-center justify-between gap-4 mb-4">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-money-bill-1-wave text-primary"></i>
+      Registrar pago
+    </h1>
+    <button type="button" class="btn btn-secondary text-white" (click)="cancel()">
+      Cancelar
+    </button>
+  </div>
+
+  <p class="text-base-content/80 mb-4">
+    El pago quedará con estatus <strong>Por confirmar</strong>. Un administrador lo revisará y lo aplicará para que se tome en cuenta en tu historial.
+  </p>
+
+  <div class="bg-base-200 rounded-lg p-4">
+    @if (errorMessage()) {
+      <div class="alert alert-error mb-4">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <form class="space-y-6" (ngSubmit)="submit()">
+      <div class="flex flex-wrap items-center gap-3">
+        <label for="fechaPago" class="font-bold text-black shrink-0">Fecha de pago:</label>
+        <input
+          id="fechaPago"
+          type="date"
+          class="input input-bordered input-sm w-[10.5rem]"
+          [(ngModel)]="form.fechaPago"
+          name="fechaPago"
+          required
+        />
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <label for="monto" class="font-bold text-black shrink-0">Monto:</label>
+        <input
+          id="monto"
+          type="number"
+          step="0.01"
+          min="0"
+          class="input input-bordered input-sm w-28"
+          [(ngModel)]="form.monto"
+          name="monto"
+          required
+          placeholder="0.00"
+        />
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label py-0" for="concepto"><span class="label-text font-bold text-black">Concepto (opcional):</span></label>
+        <input
+          id="concepto"
+          type="text"
+          class="input input-bordered w-full"
+          [(ngModel)]="form.concepto"
+          name="concepto"
+          placeholder="Ej. Mantenimiento, Cuota de agua"
+          maxlength="500"
+        />
+      </div>
+
+      @if (fileUploadSavePath()) {
+        <div class="form-control w-full">
+          <label class="label py-0"><span class="label-text font-bold text-black">Comprobante (imagen o PDF, máx. 5 MB):</span></label>
+          <hh-file-upload
+            [maxFiles]="fileUploadMaxFiles"
+            [allowedTypes]="fileUploadAllowedTypes"
+            [savePath]="fileUploadSavePath()"
+            [maxSizesByType]="fileUploadMaxSizes"
+            componentId="resident-pago-comprobante"
+            (filesChange)="onFilesChange($event)"
+          />
+        </div>
+      }
+
+      <div class="form-control w-full">
+        <label class="label py-0" for="nota"><span class="label-text font-bold text-black">Nota (opcional):</span></label>
+        <textarea
+          id="nota"
+          class="textarea textarea-bordered w-full min-h-[80px]"
+          [(ngModel)]="form.nota"
+          name="nota"
+          placeholder="Referencia o comentario del pago"
+        ></textarea>
+      </div>
+
+      <div class="flex justify-center gap-3 pt-4">
+        <button type="submit" class="btn btn-primary text-white" [disabled]="isSaving()">
+          @if (isSaving()) {
+            <span class="loading loading-spinner loading-sm"></span>
+            Guardando...
+          } @else {
+            Registrar pago
+          }
+        </button>
+        <button type="button" class="btn btn-ghost" (click)="cancel()">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

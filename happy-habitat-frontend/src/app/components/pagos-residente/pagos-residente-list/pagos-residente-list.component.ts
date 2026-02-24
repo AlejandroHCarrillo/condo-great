@@ -11,6 +11,7 @@ import { UsersService } from '../../../services/users.service';
 import { CommunitiesService } from '../../../services/communities.service';
 import { ResidentsService } from '../../../services/residents.service';
 import { PagosResidenteService } from '../../../services/pagos-residente.service';
+import { ImageUrlService } from '../../../services/image-url.service';
 import { CommunityFilterComponent } from '../../../shared/components/community-filter/community-filter.component';
 import { PagosResidente } from '../../../shared/interfaces/pagos-residente.interface';
 import { Comunidad } from '../../../interfaces/comunidad.interface';
@@ -32,6 +33,7 @@ export class PagosResidenteListComponent implements OnInit {
   private communitiesService = inject(CommunitiesService);
   private residentsService = inject(ResidentsService);
   private pagosService = inject(PagosResidenteService);
+  private imageUrlService = inject(ImageUrlService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -288,6 +290,11 @@ export class PagosResidenteListComponent implements OnInit {
     if (!fecha) return '—';
     const d = new Date(fecha);
     return isNaN(d.getTime()) ? fecha : d.toLocaleDateString('es-MX', { dateStyle: 'short' });
+  }
+
+  getComprobanteUrl(url: string | null | undefined): string {
+    if (!url?.trim()) return '';
+    return this.imageUrlService.getImageUrl(url);
   }
 
   viewPagoDetail(pago: PagosResidente): void {

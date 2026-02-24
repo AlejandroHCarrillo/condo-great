@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using HappyHabitat.Domain.Entities;
+using HappyHabitat.Domain.Enums;
 using HappyHabitat.Infrastructure.Data;
 using HappyHabitat.Infrastructure.Services;
 using System.Linq;
@@ -1934,6 +1935,11 @@ public class DummySeeder : IDataSeeder
         Console.WriteLine("=== Starting AddVehiclesPetsAndVisitsToAllResidents ===");
         await AddVehiclesPetsAndVisitsToAllResidents();
         Console.WriteLine("=== Finished AddVehiclesPetsAndVisitsToAllResidents ===");
+
+        // Add maintenance cargos (2025/2026) and 2025 payments for El Pueblito residents
+        Console.WriteLine("=== Starting AddCargosYPagosMantenimientoPueblito ===");
+        await AddCargosYPagosMantenimientoPueblitoAsync();
+        Console.WriteLine("=== Finished AddCargosYPagosMantenimientoPueblito ===");
     }
 
     private async Task AddVehiclesPetsAndVisitsToAllResidents()
@@ -2173,6 +2179,124 @@ public class DummySeeder : IDataSeeder
             }
             throw; // Re-throw to let the caller know there was an error
         }
+    }
+
+    private static readonly string[] MesesNombres = { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
+
+    /// <summary>
+    /// Adds maintenance cargos for 2025 (800) and 2026 (1000) on the 1st of each month for all residents of Residencial El Pueblito.
+    /// Then adds payments for all residents covering 2025 cargos, with random dates (1 to end of month), concept "Mantenimiento Mes Año - Monto",
+    /// including combined payments (several months in one) and dates after current month.
+    /// </summary>
+    private async Task AddCargosYPagosMantenimientoPueblitoAsync()
+    {
+        var pueblitoId = new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87"); // Residencial El Pueblito
+        var residents = await _context.Residents
+            .Where(r => r.CommunityId == pueblitoId)
+            .ToListAsync();
+        if (residents.Count == 0) return;
+
+        var anyAlreadyHasMantenimiento = await _context.CargosResidente
+            .AnyAsync(c => c.Descripcion.Contains("Mantenimiento") && residents.Select(r => r.Id).Contains(c.ResidentId));
+        if (anyAlreadyHasMantenimiento)
+        {
+            Console.WriteLine("AddCargosYPagosMantenimientoPueblito: Cargos mantenimiento already exist, skipping.");
+            return;
+        }
+
+        var random = new Random();
+        const decimal monto2025 = 800m;
+        const decimal monto2026 = 1000m;
+
+        foreach (var resident in residents)
+        {
+            var cargos = new List<CargoResidente>();
+            for (int mes = 1; mes <= 12; mes++)
+            {
+                var fecha2025 = new DateTime(2025, mes, 1, 0, 0, 0, DateTimeKind.Utc);
+                cargos.Add(new CargoResidente
+                {
+                    Id = Guid.NewGuid(),
+                    ResidentId = resident.Id,
+                    Fecha = fecha2025,
+                    Descripcion = $"Mantenimiento {MesesNombres[mes - 1]} 2025",
+                    Monto = monto2025,
+                    Estatus = EstatusCargoResidente.Activo,
+                    CreatedAt = DateTime.UtcNow
+                });
+                var fecha2026 = new DateTime(2026, mes, 1, 0, 0, 0, DateTimeKind.Utc);
+                cargos.Add(new CargoResidente
+                {
+                    Id = Guid.NewGuid(),
+                    ResidentId = resident.Id,
+                    Fecha = fecha2026,
+                    Descripcion = $"Mantenimiento {MesesNombres[mes - 1]} 2026",
+                    Monto = monto2026,
+                    Estatus = EstatusCargoResidente.Activo,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+            await _context.CargosResidente.AddRangeAsync(cargos);
+        }
+        await _context.SaveChangesAsync();
+        Console.WriteLine($"AddCargosYPagosMantenimientoPueblito: Added {residents.Count * 24} maintenance cargos (12x2025 + 12x2026) for {residents.Count} residents.");
+
+        // Pagos para cubrir 2025: 12 * 800 = 9600 por residente. Pagos con fechas aleatorias (1 a fin de mes), algunos combinados y/o después del mes corriente.
+        foreach (var resident in residents)
+        {
+            int numPagos = random.Next(4, 11); // Entre 4 y 10 pagos (algunos combinados)
+            var mesesPorPago = new List<List<int>>();
+            var splitPoints = new List<int> { 0 };
+            for (int i = 0; i < numPagos - 1; i++)
+            {
+                int p;
+                do { p = random.Next(1, 12); } while (splitPoints.Contains(p));
+                splitPoints.Add(p);
+            }
+            splitPoints.Add(12);
+            splitPoints.Sort();
+            for (int i = 0; i < splitPoints.Count - 1; i++)
+            {
+                var meses = new List<int>();
+                for (int m = splitPoints[i] + 1; m <= splitPoints[i + 1]; m++)
+                    meses.Add(m);
+                if (meses.Count > 0)
+                    mesesPorPago.Add(meses);
+            }
+
+            var pagos = new List<PagoResidente>();
+            foreach (var meses in mesesPorPago)
+            {
+                decimal montoPago = meses.Count * monto2025;
+                string conceptoMeses = string.Join(", ", meses.Select(m => $"{MesesNombres[m - 1]} 2025"));
+                string concepto = $"Mantenimiento {conceptoMeses} - {montoPago:N0}";
+
+                int mesPago = meses[random.Next(meses.Count)];
+                int anioPago = 2025;
+                if (random.Next(0, 10) < 3)
+                {
+                    mesPago = random.Next(1, 13);
+                    anioPago = random.Next(0, 10) < 2 ? 2026 : 2025;
+                }
+                int diasEnMes = DateTime.DaysInMonth(anioPago, mesPago);
+                int dia = random.Next(1, diasEnMes + 1);
+                var fechaPago = new DateTime(anioPago, mesPago, dia, 0, 0, 0, DateTimeKind.Utc);
+
+                pagos.Add(new PagoResidente
+                {
+                    Id = Guid.NewGuid(),
+                    ResidenteId = resident.Id,
+                    FechaPago = fechaPago,
+                    Monto = montoPago,
+                    Status = StatusPagoResidente.Aplicado,
+                    Concepto = concepto,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+            await _context.PagosResidente.AddRangeAsync(pagos);
+        }
+        await _context.SaveChangesAsync();
+        Console.WriteLine("AddCargosYPagosMantenimientoPueblito: Added 2025 coverage payments for all Pueblito residents.");
     }
 
     /// <summary>

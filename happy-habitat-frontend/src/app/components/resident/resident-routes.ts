@@ -12,6 +12,7 @@ import { TicketFormComponent } from '../tickets/ticket-form/ticket-form.componen
 import { TicketDetailComponent } from '../tickets/ticket-detail/ticket-detail.component';
 import { ResidentPagosListComponent } from '../pagos-residente/resident-pagos-list/resident-pagos-list.component';
 import { ResidentPagoDetailComponent } from '../pagos-residente/resident-pago-detail/resident-pago-detail.component';
+import { ResidentPagoFormComponent } from '../pagos-residente/resident-pago-form/resident-pago-form.component';
 
 export const residentRoutes: Routes = [
     {
@@ -61,6 +62,10 @@ export const residentRoutes: Routes = [
         {
             path: 'pagos',
             component: ResidentPagosListComponent
+        },
+        {
+            path: 'pagos/nuevo',
+            component: ResidentPagoFormComponent
         },
         {
             path: 'pagos/:id',
