@@ -1,7 +1,7 @@
 <div class="p-4 max-w-2xl mx-auto">
   <div class="flex items-center justify-between gap-4 mb-6">
     <h1 class="text-2xl font-bold flex items-center gap-2">
-      <i class="fa-solid fa-dumbbell text-green-600"></i>
+      <i class="fa-solid fa-people-roof text-green-600"></i>
       {{ title }}
     </h1>
     <button type="button" class="btn btn-secondary text-white" (click)="cancel()">
@@ -15,12 +15,13 @@
       <span class="ml-4">Cargando...</span>
     </div>
   } @else {
-    @if (errorMessage()) {
-      <div class="alert alert-error mb-4">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        <span>{{ errorMessage() }}</span>
-      </div>
-    }
+    <div class="bg-base-300 rounded-lg p-6">
+      @if (errorMessage()) {
+        <div class="alert alert-error mb-4">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
 
     <form class="space-y-4" (ngSubmit)="save()">
       <div class="form-control w-full">
@@ -33,7 +34,7 @@
           [(ngModel)]="form.communityId"
           name="communityId"
           required
-          [disabled]="!!communityIdFromRoute()"
+          [disabled]="!!communityIdFromRoute() || isEditMode()"
         >
           <option value="">Seleccione una comunidad</option>
           @for (c of comunidadesAsociadas(); track c.id) {
@@ -98,33 +99,44 @@
             placeholder="0"
           />
         </div>
-        <div class="form-control w-full">
-          <label class="label" for="fechaAlta">
-            <span class="label-text font-medium">Fecha de alta</span>
-          </label>
-          <input
-            id="fechaAlta"
-            type="date"
-            class="input input-bordered w-full"
-            [(ngModel)]="form.fechaAlta"
-            name="fechaAlta"
-            required
-          />
-        </div>
       </div>
 
       <div class="form-control w-full">
         <label class="label" for="imagen">
-          <span class="label-text font-medium">Imagen (ruta o URL)</span>
+          <span class="label-text font-medium">Imagen</span>
         </label>
-        <input
-          id="imagen"
-          type="text"
-          class="input input-bordered w-full"
-          [(ngModel)]="form.imagen"
-          name="imagen"
-          placeholder="Ej: images/amenidades/mi-imagen.png"
-        />
+        @if (hasImageToShow() && imagenPreviewUrl()) {
+          <div class="flex flex-wrap items-start gap-3 p-3 bg-base-200 rounded-lg mb-2">
+            <img
+              [src]="imagenPreviewUrl()"
+              alt="Vista previa"
+              class="w-20 h-20 object-cover rounded shrink-0"
+            />
+            <div class="flex flex-col gap-2">
+              <div class="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  class="btn btn-sm bg-red-500 text-white btn-outline"
+                  (click)="removeImage()"
+                >
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <input
+            id="imagen"
+            type="file"
+            accept="image/*"
+            class="file-input file-input-bordered w-full max-w-md"
+            (change)="onImageSelect($event)"
+          />
+          <p class="text-sm text-base-content/70 mt-1">Máximo 5 MB. Formatos: JPG, PNG, etc.</p>
+        }
+        @if (imageError()) {
+          <p class="text-error text-sm mt-1">{{ imageError() }}</p>
+        }
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -176,5 +188,6 @@
         </button>
       </div>
     </form>
+    </div>
   }
 </div>

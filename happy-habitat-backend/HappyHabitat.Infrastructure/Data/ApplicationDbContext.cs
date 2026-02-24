@@ -332,7 +332,7 @@ public class ApplicationDbContext : DbContext
                 .HasMaxLength(200);
             entity.Property(e => e.Subtitulo)
                 .HasMaxLength(200);
-            entity.Property(e => e.Descripcion)
+            entity.Property(e => e.Contenido)
                 .HasMaxLength(2000);
             entity.Property(e => e.Fecha)
                 .IsRequired()

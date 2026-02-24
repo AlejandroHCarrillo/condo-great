@@ -9,9 +9,12 @@ import { ComunicadosService } from '../../../services/comunicados.service';
 import { AuthService } from '../../../services/auth.service';
 import { UsersService } from '../../../services/users.service';
 import { CommunitiesService } from '../../../services/communities.service';
+import { FileService } from '../../../services/file.service';
+import { ImageUrlService } from '../../../services/image-url.service';
 import { Comunidad } from '../../../interfaces/comunidad.interface';
 import { RolesEnum } from '../../../enums/roles.enum';
 import { mapCommunityDtoToComunidad } from '../../../shared/mappers/community.mapper';
+import { comunicadoImageUploadPath } from '../../../constants/upload-paths';
 import { CreateComunicadoDto, UpdateComunicadoDto } from '../../../shared/interfaces/comunicado.interface';
 
 @Component({
@@ -25,9 +28,13 @@ export class ComunicadoFormComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private usersService = inject(UsersService);
   private communitiesService = inject(CommunitiesService);
+  private fileService = inject(FileService);
+  private imageUrlService = inject(ImageUrlService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private destroy$ = new Subject<void>();
+
+  private static readonly MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB
 
   isEditMode = signal(false);
   comunicadoId = signal<string | null>(null);
@@ -35,7 +42,11 @@ export class ComunicadoFormComponent implements OnInit, OnDestroy {
   isLoading = signal(false);
   isSaving = signal(false);
   errorMessage = signal<string | null>(null);
+  imageError = signal<string | null>(null);
   private loadedCommunities = signal<Comunidad[]>([]);
+  selectedImageFile = signal<File | null>(null);
+  private imagePreviewObjectUrl = signal<string | null>(null);
+  private imagePathSignal = signal<string>('');
 
   comunidadesAsociadas = computed(() => {
     const user = this.authService.currentUser();
@@ -44,11 +55,23 @@ export class ComunicadoFormComponent implements OnInit, OnDestroy {
     return this.loadedCommunities().length ? this.loadedCommunities() : [];
   });
 
+  imagenPreviewUrl = computed(() => {
+    const file = this.selectedImageFile();
+    if (file) {
+      const url = this.imagePreviewObjectUrl();
+      return url ?? null;
+    }
+    const path = this.imagePathSignal().trim();
+    return path ? this.imageUrlService.getImageUrl(path) : null;
+  });
+
+  hasImageToShow = computed(() => !!this.selectedImageFile() || !!this.imagePathSignal().trim());
+
   form = {
     communityId: '' as string | undefined,
     titulo: '',
     subtitulo: '',
-    descripcion: '',
+    contenido: '',
     fecha: '', // YYYY-MM-DD para input date
     imagen: '' as string | undefined
   };
@@ -77,6 +100,7 @@ export class ComunicadoFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearImageSelection();
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -84,9 +108,53 @@ export class ComunicadoFormComponent implements OnInit, OnDestroy {
   private resetFormExceptCommunity(): void {
     this.form.titulo = '';
     this.form.subtitulo = '';
-    this.form.descripcion = '';
-    this.form.fecha = '';
+    this.form.contenido = '';
+    this.form.fecha = this.getTodayDateString();
     this.form.imagen = '';
+    this.imagePathSignal.set('');
+    this.clearImageSelection();
+  }
+
+  private getTodayDateString(): string {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  private clearImageSelection(): void {
+    const url = this.imagePreviewObjectUrl();
+    if (url) {
+      URL.revokeObjectURL(url);
+      this.imagePreviewObjectUrl.set(null);
+    }
+    this.selectedImageFile.set(null);
+    this.imageError.set(null);
+  }
+
+  onImageSelect(event: Event): void {
+    this.imageError.set(null);
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      this.imageError.set('Solo se permiten archivos de imagen.');
+      input.value = '';
+      return;
+    }
+    if (file.size > ComunicadoFormComponent.MAX_IMAGE_BYTES) {
+      this.imageError.set('La imagen no debe superar 5 MB.');
+      input.value = '';
+      return;
+    }
+    const prevUrl = this.imagePreviewObjectUrl();
+    if (prevUrl) URL.revokeObjectURL(prevUrl);
+    this.imagePreviewObjectUrl.set(URL.createObjectURL(file));
+    this.selectedImageFile.set(file);
+    input.value = '';
+  }
+
+  removeImage(): void {
+    this.form.imagen = '';
+    this.imagePathSignal.set('');
+    this.clearImageSelection();
   }
 
   private loadCommunitiesForAdmin(userId: string): void {
@@ -112,9 +180,11 @@ export class ComunicadoFormComponent implements OnInit, OnDestroy {
           this.form.communityId = comunicado.communityId ?? '';
           this.form.titulo = comunicado.titulo ?? '';
           this.form.subtitulo = comunicado.subtitulo ?? '';
-          this.form.descripcion = comunicado.descripcion ?? '';
+          this.form.contenido = comunicado.contenido ?? '';
           this.form.fecha = this.toInputDate(comunicado.fecha);
           this.form.imagen = comunicado.imagen ?? '';
+          this.imagePathSignal.set(this.form.imagen ?? '');
+          this.clearImageSelection();
         } else {
           this.errorMessage.set('No se encontró el comunicado.');
         }
@@ -140,10 +210,37 @@ export class ComunicadoFormComponent implements OnInit, OnDestroy {
 
   save(): void {
     this.errorMessage.set(null);
+    this.imageError.set(null);
+    const communityId = this.form.communityId?.trim();
+    if (!this.isEditMode() && !communityId) {
+      this.errorMessage.set('Debe seleccionar una comunidad.');
+      return;
+    }
     this.isSaving.set(true);
 
+    const file = this.selectedImageFile();
+    if (file && communityId) {
+      const filename = this.imageUrlService.uniqueFileName(file.name);
+      const path = comunicadoImageUploadPath(communityId, filename);
+      this.fileService.uploadFile(file, path).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (res) => {
+          this.form.imagen = res.relativePath ?? '';
+          this.imagePathSignal.set(this.form.imagen);
+          this.clearImageSelection();
+          this.doSave(communityId);
+        },
+        error: () => {
+          this.errorMessage.set('Error al subir la imagen.');
+          this.isSaving.set(false);
+        }
+      });
+      return;
+    }
+    this.doSave(communityId || undefined);
+  }
+
+  private doSave(communityId: string | undefined): void {
     const fechaIso = this.form.fecha ? new Date(this.form.fecha + 'T12:00:00').toISOString() : new Date().toISOString();
-    const communityId = this.form.communityId?.trim() || undefined;
 
     if (this.isEditMode()) {
       const id = this.comunicadoId();
@@ -155,7 +252,7 @@ export class ComunicadoFormComponent implements OnInit, OnDestroy {
         communityId: communityId || null,
         titulo: this.form.titulo.trim(),
         subtitulo: this.form.subtitulo.trim(),
-        descripcion: this.form.descripcion.trim(),
+        contenido: this.form.contenido.trim(),
         fecha: fechaIso,
         imagen: this.form.imagen?.trim() || null
       };
@@ -179,7 +276,7 @@ export class ComunicadoFormComponent implements OnInit, OnDestroy {
         communityId: communityId || null,
         titulo: this.form.titulo.trim(),
         subtitulo: this.form.subtitulo.trim(),
-        descripcion: this.form.descripcion.trim(),
+        contenido: this.form.contenido.trim(),
         fecha: fechaIso,
         imagen: this.form.imagen?.trim() || null
       };

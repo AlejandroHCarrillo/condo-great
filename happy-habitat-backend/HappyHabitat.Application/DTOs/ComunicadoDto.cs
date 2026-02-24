@@ -9,7 +9,7 @@ public class ComunicadoDto
     public string? CommunityName { get; set; }
     public string Titulo { get; set; } = string.Empty;
     public string Subtitulo { get; set; } = string.Empty;
-    public string Descripcion { get; set; } = string.Empty;
+    public string Contenido { get; set; } = string.Empty;
     public DateTime Fecha { get; set; } // Fecha del comunicado
     public string? Imagen { get; set; }
     public string CreatedAt { get; set; } = string.Empty;
@@ -26,8 +26,9 @@ public class CreateComunicadoDto
     [MaxLength(300)]
     public string Subtitulo { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "El contenido es obligatorio.")]
     [MaxLength(4000)]
-    public string Descripcion { get; set; } = string.Empty;
+    public string Contenido { get; set; } = string.Empty;
 
     public DateTime Fecha { get; set; } // Fecha del comunicado
 
@@ -46,8 +47,9 @@ public class UpdateComunicadoDto
     [MaxLength(300)]
     public string Subtitulo { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "El contenido es obligatorio.")]
     [MaxLength(4000)]
-    public string Descripcion { get; set; } = string.Empty;
+    public string Contenido { get; set; } = string.Empty;
 
     public DateTime Fecha { get; set; } // Fecha del comunicado
 

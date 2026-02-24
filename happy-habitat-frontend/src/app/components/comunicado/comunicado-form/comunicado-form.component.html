@@ -15,30 +15,46 @@
       <span class="ml-4">Cargando...</span>
     </div>
   } @else {
-    @if (errorMessage()) {
-      <div class="alert alert-error mb-4">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        <span>{{ errorMessage() }}</span>
-      </div>
-    }
+    <div class="bg-base-300 rounded-lg p-6">
+      @if (errorMessage()) {
+        <div class="alert alert-error mb-4">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
 
     <form class="space-y-4" (ngSubmit)="save()">
-      <div class="form-control w-full">
-        <label class="label" for="communityId">
-          <span class="label-text font-medium">Comunidad</span>
-        </label>
-        <select
-          id="communityId"
-          class="select select-bordered w-full"
-          [(ngModel)]="form.communityId"
-          name="communityId"
-          [disabled]="!!communityIdFromRoute()"
-        >
-          <option value="">Sin comunidad</option>
-          @for (c of comunidadesAsociadas(); track c.id) {
-            <option [value]="c.id">{{ c.nombre }}</option>
-          }
-        </select>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="form-control w-full">
+          <label class="label" for="communityId">
+            <span class="label-text font-medium">Comunidad</span>
+          </label>
+          <select
+            id="communityId"
+            class="select select-bordered w-full"
+            [(ngModel)]="form.communityId"
+            name="communityId"
+            [disabled]="!!communityIdFromRoute()"
+          >
+            <option value="">Sin comunidad</option>
+            @for (c of comunidadesAsociadas(); track c.id) {
+              <option [value]="c.id">{{ c.nombre }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-control w-full">
+          <label class="label" for="fecha">
+            <span class="label-text font-medium">Fecha</span>
+          </label>
+          <input
+            id="fecha"
+            type="date"
+            class="input input-bordered w-full"
+            [(ngModel)]="form.fecha"
+            name="fecha"
+            required
+          />
+        </div>
       </div>
 
       <div class="form-control w-full">
@@ -69,44 +85,54 @@
       </div>
 
       <div class="form-control w-full">
-        <label class="label" for="descripcion">
-          <span class="label-text font-medium">Descripción</span>
+        <label class="label" for="contenido">
+          <span class="label-text font-medium">Contenido</span>
         </label>
         <textarea
-          id="descripcion"
+          id="contenido"
           class="textarea textarea-bordered w-full min-h-[120px]"
-          [(ngModel)]="form.descripcion"
-          name="descripcion"
+          [(ngModel)]="form.contenido"
+          name="contenido"
           required
         ></textarea>
       </div>
 
       <div class="form-control w-full">
-        <label class="label" for="fecha">
-          <span class="label-text font-medium">Fecha</span>
-        </label>
-        <input
-          id="fecha"
-          type="date"
-          class="input input-bordered w-full"
-          [(ngModel)]="form.fecha"
-          name="fecha"
-          required
-        />
-      </div>
-
-      <div class="form-control w-full">
         <label class="label" for="imagen">
-          <span class="label-text font-medium">Imagen (ruta o URL)</span>
+          <span class="label-text font-medium">Imagen</span>
         </label>
-        <input
-          id="imagen"
-          type="text"
-          class="input input-bordered w-full"
-          [(ngModel)]="form.imagen"
-          name="imagen"
-          placeholder="Ej: images/anuncios/mi-imagen.png"
-        />
+        @if (hasImageToShow() && imagenPreviewUrl()) {
+          <div class="flex flex-wrap items-start gap-3 p-3 bg-base-200 rounded-lg mb-2">
+            <img
+              [src]="imagenPreviewUrl()"
+              alt="Vista previa"
+              class="w-20 h-20 object-cover rounded shrink-0"
+            />
+            <div class="flex flex-col gap-2">
+              <div class="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  class="btn btn-sm bg-red-500 text-white btn-outline"
+                  (click)="removeImage()"
+                >
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <input
+            id="imagen"
+            type="file"
+            accept="image/*"
+            class="file-input file-input-bordered w-full max-w-md"
+            (change)="onImageSelect($event)"
+          />
+          <p class="text-sm text-base-content/70 mt-1">Máximo 5 MB. Formatos: JPG, PNG, etc.</p>
+        }
+        @if (imageError()) {
+          <p class="text-error text-sm mt-1">{{ imageError() }}</p>
+        }
       </div>
 
       <div class="flex justify-center gap-3 pt-4">
@@ -127,5 +153,6 @@
         </button>
       </div>
     </form>
+    </div>
   }
 </div>

@@ -585,16 +585,16 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Property<Guid?>("CommunityId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Contenido")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid?>("CreatedByUserId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");

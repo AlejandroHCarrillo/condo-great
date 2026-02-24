@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ComunicadosService } from '../../../services/comunicados.service';
+import { ImageUrlService } from '../../../services/image-url.service';
 import { Comunicado } from '../../../shared/interfaces/comunicado.interface';
 import { AuthService } from '../../../services/auth.service';
 
@@ -16,6 +17,7 @@ export class ComunicadoDetailComponent {
   private router = inject(Router);
   private comunicadosService = inject(ComunicadosService);
   private authService = inject(AuthService);
+  private imageUrlService = inject(ImageUrlService);
 
   comunicado = signal<Comunicado | null>(null);
   isLoading = signal<boolean>(true);
@@ -55,6 +57,11 @@ export class ComunicadoDetailComponent {
     } catch {
       return fecha;
     }
+  }
+
+  getImagenUrl(relativePath: string | null | undefined): string {
+    if (!relativePath?.trim()) return '';
+    return this.imageUrlService.getImageUrl(relativePath);
   }
 
   goBack(): void {

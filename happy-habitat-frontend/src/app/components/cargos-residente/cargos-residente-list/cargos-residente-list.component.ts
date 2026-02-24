@@ -35,6 +35,8 @@ export class CargosResidenteListComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
+  private readonly PAGE_SIZE_STORAGE_KEY = 'hh_cargos_residente_pageSize';
+
   selectedComunidadId = signal<string>('');
   selectedResidentId = signal<string>('');
   private loadedCommunitiesForAdmin = signal<Comunidad[]>([]);
@@ -167,7 +169,22 @@ export class CargosResidenteListComponent implements OnInit {
       const pageSizeParam = params['pageSize'];
       if (pageSizeParam != null) {
         const ps = Number(pageSizeParam);
-        if (isPageSizeOption(ps)) this.pageSize.set(ps);
+        if (isPageSizeOption(ps)) {
+          this.pageSize.set(ps);
+          try {
+            localStorage.setItem(this.PAGE_SIZE_STORAGE_KEY, String(ps));
+          } catch {}
+        }
+      } else {
+        const stored = this.getStoredPageSize();
+        if (stored != null) {
+          this.pageSize.set(stored);
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { pageSize: stored },
+            queryParamsHandling: 'merge'
+          });
+        }
       }
     });
 
@@ -249,11 +266,25 @@ export class CargosResidenteListComponent implements OnInit {
     if (!isPageSizeOption(n)) return;
     this.pageSize.set(n);
     this.currentPage.set(1);
+    try {
+      localStorage.setItem(this.PAGE_SIZE_STORAGE_KEY, String(n));
+    } catch {}
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { page: null, pageSize: n },
       queryParamsHandling: 'merge'
     });
+  }
+
+  private getStoredPageSize(): number | null {
+    try {
+      const raw = localStorage.getItem(this.PAGE_SIZE_STORAGE_KEY);
+      if (raw == null) return null;
+      const n = Number(raw);
+      return isPageSizeOption(n) ? n : null;
+    } catch {
+      return null;
+    }
   }
 
   formatDate(fecha: string): string {

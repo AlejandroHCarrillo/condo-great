@@ -6,7 +6,7 @@ public class Comunicado : AuditBase
     public Guid? CommunityId { get; set; }
     public string Titulo { get; set; } = string.Empty;
     public string Subtitulo { get; set; } = string.Empty;
-    public string Descripcion { get; set; } = string.Empty;
+    public string Contenido { get; set; } = string.Empty;
     public DateTime Fecha { get; set; } // Fecha del comunicado
     public string? Imagen { get; set; }
     public bool IsActive { get; set; } = true;

@@ -9,9 +9,12 @@ import { AmenidadesService } from '../../../services/amenidades.service';
 import { AuthService } from '../../../services/auth.service';
 import { UsersService } from '../../../services/users.service';
 import { CommunitiesService } from '../../../services/communities.service';
+import { FileService } from '../../../services/file.service';
+import { ImageUrlService } from '../../../services/image-url.service';
 import { Comunidad } from '../../../interfaces/comunidad.interface';
 import { RolesEnum } from '../../../enums/roles.enum';
 import { mapCommunityDtoToComunidad } from '../../../shared/mappers/community.mapper';
+import { amenidadImageUploadPath } from '../../../constants/upload-paths';
 import type { CreateAmenityDto, UpdateAmenityDto } from '../../../shared/interfaces/amenidad.interface';
 
 @Component({
@@ -25,9 +28,13 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private usersService = inject(UsersService);
   private communitiesService = inject(CommunitiesService);
+  private fileService = inject(FileService);
+  private imageUrlService = inject(ImageUrlService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private destroy$ = new Subject<void>();
+
+  private static readonly MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB
 
   isEditMode = signal(false);
   amenidadId = signal<string | null>(null);
@@ -35,7 +42,14 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
   isLoading = signal(false);
   isSaving = signal(false);
   errorMessage = signal<string | null>(null);
+  imageError = signal<string | null>(null);
   private loadedCommunities = signal<Comunidad[]>([]);
+  /** Archivo de imagen seleccionado (aún no subido). */
+  selectedImageFile = signal<File | null>(null);
+  /** Object URL para previsualizar el archivo seleccionado; se revoca al quitar o al destruir. */
+  private imagePreviewObjectUrl = signal<string | null>(null);
+  /** Ruta de la imagen actual (reactiva) para que el preview se actualice al eliminar. */
+  private imagePathSignal = signal<string>('');
 
   comunidadesAsociadas = computed(() => {
     const user = this.authService.currentUser();
@@ -43,6 +57,20 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
     if (user.communities?.length) return user.communities;
     return this.loadedCommunities().length ? this.loadedCommunities() : [];
   });
+
+  /** URL para mostrar la imagen actual: guardada (imagePathSignal) o previsualización del archivo nuevo. */
+  imagenPreviewUrl = computed(() => {
+    const file = this.selectedImageFile();
+    if (file) {
+      const url = this.imagePreviewObjectUrl();
+      return url ?? null;
+    }
+    const path = this.imagePathSignal().trim();
+    return path ? this.imageUrlService.getImageUrl(path) : null;
+  });
+
+  /** Hay imagen para mostrar (guardada o archivo seleccionado). */
+  hasImageToShow = computed(() => !!this.selectedImageFile() || !!this.imagePathSignal().trim());
 
   form = {
     communityId: '' as string,
@@ -53,7 +81,7 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
     fechaAlta: '',
     imagen: '' as string | undefined,
     capacidadMaxima: null as number | null,
-    numeroReservacionesSimultaneas: null as number | null
+    numeroReservacionesSimultaneas: 1 as number | null
   };
 
   ngOnInit(): void {
@@ -80,6 +108,7 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearImageSelection();
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -92,7 +121,47 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
     this.form.fechaAlta = '';
     this.form.imagen = '';
     this.form.capacidadMaxima = null;
-    this.form.numeroReservacionesSimultaneas = null;
+    this.form.numeroReservacionesSimultaneas = 1;
+    this.imagePathSignal.set('');
+    this.clearImageSelection();
+  }
+
+  private clearImageSelection(): void {
+    const url = this.imagePreviewObjectUrl();
+    if (url) {
+      URL.revokeObjectURL(url);
+      this.imagePreviewObjectUrl.set(null);
+    }
+    this.selectedImageFile.set(null);
+    this.imageError.set(null);
+  }
+
+  onImageSelect(event: Event): void {
+    this.imageError.set(null);
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      this.imageError.set('Solo se permiten archivos de imagen.');
+      input.value = '';
+      return;
+    }
+    if (file.size > AmenidadFormComponent.MAX_IMAGE_BYTES) {
+      this.imageError.set('La imagen no debe superar 5 MB.');
+      input.value = '';
+      return;
+    }
+    const prevUrl = this.imagePreviewObjectUrl();
+    if (prevUrl) URL.revokeObjectURL(prevUrl);
+    this.imagePreviewObjectUrl.set(URL.createObjectURL(file));
+    this.selectedImageFile.set(file);
+    input.value = '';
+  }
+
+  removeImage(): void {
+    this.form.imagen = '';
+    this.imagePathSignal.set('');
+    this.clearImageSelection();
   }
 
   private loadCommunitiesForAdmin(userId: string): void {
@@ -123,7 +192,9 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
           this.form.fechaAlta = this.toInputDate(amenidad.fechaAlta);
           this.form.imagen = amenidad.imagen ?? '';
           this.form.capacidadMaxima = amenidad.capacidadMaxima ?? null;
-          this.form.numeroReservacionesSimultaneas = amenidad.numeroReservacionesSimultaneas ?? null;
+          this.form.numeroReservacionesSimultaneas = amenidad.numeroReservacionesSimultaneas ?? 1;
+          this.imagePathSignal.set(this.form.imagen ?? '');
+          this.clearImageSelection();
         } else {
           this.errorMessage.set('No se encontró la amenidad.');
         }
@@ -149,6 +220,7 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
 
   save(): void {
     this.errorMessage.set(null);
+    this.imageError.set(null);
     const communityId = this.form.communityId?.trim();
     if (!communityId) {
       this.errorMessage.set('Debe seleccionar una comunidad.');
@@ -156,8 +228,30 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
     }
     this.isSaving.set(true);
 
-    const fechaIso = this.form.fechaAlta
-      ? new Date(this.form.fechaAlta + 'T12:00:00').toISOString()
+    const file = this.selectedImageFile();
+    if (file) {
+      const filename = this.imageUrlService.uniqueFileName(file.name);
+      const path = amenidadImageUploadPath(communityId, filename);
+      this.fileService.uploadFile(file, path).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (res) => {
+          this.form.imagen = res.relativePath ?? '';
+          this.imagePathSignal.set(this.form.imagen);
+          this.clearImageSelection();
+          this.doSave(communityId);
+        },
+        error: () => {
+          this.errorMessage.set('Error al subir la imagen.');
+          this.isSaving.set(false);
+        }
+      });
+      return;
+    }
+    this.doSave(communityId);
+  }
+
+  private doSave(communityId: string): void {
+    const fechaIso = this.isEditMode()
+      ? (this.form.fechaAlta ? new Date(this.form.fechaAlta + 'T12:00:00').toISOString() : new Date().toISOString())
       : new Date().toISOString();
 
     if (this.isEditMode()) {
@@ -188,6 +282,7 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
         }
       });
     } else {
+      const currentUser = this.authService.currentUser();
       const dto: CreateAmenityDto = {
         nombre: this.form.nombre.trim(),
         descripcion: this.form.descripcion.trim(),
@@ -197,7 +292,8 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
         imagen: this.form.imagen?.trim() || null,
         communityId,
         capacidadMaxima: this.form.capacidadMaxima,
-        numeroReservacionesSimultaneas: this.form.numeroReservacionesSimultaneas
+        numeroReservacionesSimultaneas: this.form.numeroReservacionesSimultaneas,
+        createdByUserId: currentUser?.id ?? undefined
       };
       this.amenidadesService.createAmenity(dto).subscribe({
         next: () => {

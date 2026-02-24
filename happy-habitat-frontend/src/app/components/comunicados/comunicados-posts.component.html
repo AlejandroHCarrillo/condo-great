@@ -23,9 +23,9 @@
             <h2 class="text-xl">{{comunicado.subtitulo}}</h2>
             <hr>
             <p class="xs font-bold">{{ comunicado.fecha | date : 'MMM dd yyyy' }}</p>
-            <!-- <div style="white-space: pre;" class="w-full" [innerHTML]="comunicado.descripcion"></div> -->
+            <!-- <div style="white-space: pre;" class="w-full" [innerHTML]="comunicado.contenido"></div> -->
             <p class="py-6">
-              {{ comunicado.descripcion }}
+              {{ comunicado.contenido }}
             </p>
           </div>
         </div>

@@ -12,7 +12,7 @@
         (selectedIdChange)="onComunidadChange($event)"
       />
       <select
-        class="select select-bordered select-sm max-w-xs"
+        class="select select-bordered w-50 shrink-0"
         [ngModel]="selectedResidentId()"
         (ngModelChange)="onResidentChange($event)"
         [disabled]="!selectedComunidadId()"
@@ -28,7 +28,7 @@
       <a
         [routerLink]="selectedResidentId() && selectedResidentId() !== 'all' ? ['/admincompany/cargos-residente/nuevo', selectedResidentId()] : null"
         [queryParams]="selectedComunidadId() ? { comunidad: selectedComunidadId(), residente: selectedResidentId() } : null"
-        class="btn btn-primary btn-sm btn-square flex items-center justify-center text-white"
+        class="btn btn-primary btn-sm btn-square flex items-center justify-center text-white shrink-0"
         [class.btn-disabled]="!selectedResidentId() || selectedResidentId() === 'all'"
         [attr.aria-disabled]="!selectedResidentId() || selectedResidentId() === 'all'"
         (click)="(!selectedResidentId() || selectedResidentId() === 'all') && $event.preventDefault()"

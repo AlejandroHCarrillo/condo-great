@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AmenidadesService } from '../../../services/amenidades.service';
+import { ImageUrlService } from '../../../services/image-url.service';
 import { Amenidad } from '../../../shared/interfaces/amenidad.interface';
 import { AuthService } from '../../../services/auth.service';
 
@@ -16,6 +17,7 @@ export class AmenidadDetailComponent {
   private router = inject(Router);
   private amenidadesService = inject(AmenidadesService);
   private authService = inject(AuthService);
+  private imageUrlService = inject(ImageUrlService);
 
   amenidad = signal<Amenidad | null>(null);
   isLoading = signal<boolean>(true);
@@ -60,6 +62,11 @@ export class AmenidadDetailComponent {
   formatCosto(costo: number | null | undefined): string {
     if (costo == null) return '-';
     return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(costo);
+  }
+
+  getImagenUrl(relativePath: string | null | undefined): string {
+    if (!relativePath?.trim()) return '';
+    return this.imageUrlService.getImageUrl(relativePath);
   }
 
   goBack(): void {

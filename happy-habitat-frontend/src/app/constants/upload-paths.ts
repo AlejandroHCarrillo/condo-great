@@ -34,3 +34,19 @@ export function ticketBasePathFallback(): string {
 export function ticketUploadPathFallback(ticketId: number): string {
   return `${UPLOAD_BASE}/tickets/${ticketId}`;
 }
+
+/**
+ * Ruta donde se guarda la imagen de una amenidad.
+ * Ejemplo: uploads/{communityId}/amenidades/unique-name.jpg
+ */
+export function amenidadImageUploadPath(communityId: string, filename: string): string {
+  return `uploads/${communityId}/amenidades/${filename}`;
+}
+
+/**
+ * Ruta donde se guarda la imagen de un comunicado.
+ * Ejemplo: uploads/{communityId}/comunicados/unique-name.jpg
+ */
+export function comunicadoImageUploadPath(communityId: string, filename: string): string {
+  return `uploads/${communityId}/comunicados/${filename}`;
+}
