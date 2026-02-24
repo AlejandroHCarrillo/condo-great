@@ -8,6 +8,7 @@ namespace HappyHabitat.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[RequestSizeLimit(1_048_576)] // 1 MB for login/register JSON
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;

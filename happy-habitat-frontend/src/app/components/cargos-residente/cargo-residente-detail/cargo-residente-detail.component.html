@@ -1,0 +1,90 @@
+<div class="p-4">
+  <div class="mb-4 flex justify-between items-center">
+    <button (click)="goBack()" class="btn btn-sm btn-ghost btn-secondary">
+      <i class="fa-solid fa-arrow-left mr-2"></i>
+      Volver a la lista
+    </button>
+    @if (cargo()) {
+      <a
+        [routerLink]="['/admincompany/cargos-residente/editar', cargo()!.id]"
+        [queryParams]="{ comunidad: route.snapshot.queryParams['comunidad'], residente: route.snapshot.queryParams['residente'] }"
+        class="btn btn-sm btn-ghost bg-yellow-500"
+        title="Editar"
+      >
+        <i class="fa-solid fa-pen mr-2"></i>
+        Editar
+      </a>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando cargo...</span>
+    </div>
+  } @else if (cargo()) {
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-2xl mb-4">
+          <i class="fa-solid fa-receipt text-primary mr-2"></i>
+          Cargo a residente
+        </h2>
+
+        <div class="space-y-4">
+          <div>
+            <label class="label"><span class="label-text font-semibold">Residente</span></label>
+            <p class="text-lg">{{ cargo()!.residentName }} {{ cargo()!.residentNumber ? '(' + cargo()!.residentNumber + ')' : '' }}</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="label"><span class="label-text font-semibold">Fecha</span></label>
+              <p class="text-lg">{{ formatDate(cargo()!.fecha) }}</p>
+            </div>
+            <div>
+              <label class="label"><span class="label-text font-semibold">Monto</span></label>
+              <p class="text-lg font-mono">{{ cargo()!.monto | number:'1.2-2' }}</p>
+            </div>
+          </div>
+
+          <div>
+            <label class="label"><span class="label-text font-semibold">Descripción</span></label>
+            <div class="prose max-w-none whitespace-pre-wrap">{{ cargo()!.descripcion || '—' }}</div>
+          </div>
+
+          <div>
+            <label class="label"><span class="label-text font-semibold">Estatus</span></label>
+            <p class="text-lg">
+              <span
+                class="badge"
+                [class.badge-success]="cargo()!.estatus === 'Pagado'"
+                [class.badge-warning]="cargo()!.estatus === 'Activo' || cargo()!.estatus === 'Pago Parcial'"
+                [class.badge-ghost]="cargo()!.estatus === 'Cancelado'"
+              >
+                {{ cargo()!.estatus }}
+              </span>
+            </p>
+          </div>
+
+          @if (cargo()!.createdAt) {
+            <div>
+              <label class="label"><span class="label-text font-semibold">Fecha de creación</span></label>
+              <p class="text-sm text-base-content/70">{{ cargo()!.createdAt }}</p>
+            </div>
+          }
+          @if (cargo()!.updatedAt) {
+            <div>
+              <label class="label"><span class="label-text font-semibold">Última actualización</span></label>
+              <p class="text-sm text-base-content/70">{{ cargo()!.updatedAt }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="alert alert-error">
+      <i class="fa-solid fa-exclamation-triangle mr-2"></i>
+      <span>No se pudo cargar el cargo.</span>
+    </div>
+  }
+</div>

@@ -1,0 +1,80 @@
+@if (!hasValidPath()) {
+  <div class="alert alert-warning mb-4">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <span>No se ha definido la ruta donde guardar los archivos. Configure el parámetro <code>savePath</code>.</span>
+  </div>
+}
+
+<div class="label flex flex-row justify-between items-center">
+  <span class="label-text font-semibold">{{ typesLabel() }} (máx. {{ maxFiles() }})</span>
+  @if (labels().length < maxFiles()) {
+    <button type="button" class="btn btn-primary btn-sm text-white" (click)="addSlot()">
+      <i class="fa-solid fa-plus mr-1"></i> Agregar archivo
+    </button>
+  }
+</div>
+
+@if (fileError()) {
+  <div class="alert alert-warning text-sm mb-2 py-2">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <span>{{ fileError() }}</span>
+  </div>
+}
+
+<div
+  class="rounded-xl border-2 border-dashed transition-all duration-200 min-h-[100px] p-4 space-y-3"
+  [class.border-primary]="isDragOver()"
+  [class.border-base-300]="!isDragOver()"
+  [class.bg-primary]="isDragOver()"
+  [class.bg-opacity-10]="isDragOver()"
+  [class.bg-base-200]="!isDragOver()"
+  [class.bg-opacity-30]="!isDragOver()"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+>
+  @if (isDragOver()) {
+    <p class="text-sm text-primary font-medium flex items-center gap-2">
+      <i class="fa-solid fa-cloud-arrow-up"></i>
+      Suelte aquí ({{ helpSizeText() }})
+    </p>
+  }
+  @for (label of labels(); track $index) {
+    <div class="flex items-center gap-3 flex-wrap p-2 rounded-lg bg-base-100 border border-base-300/60">
+      <input
+        [id]="componentId() + '-file-' + $index"
+        type="file"
+        [accept]="acceptAttr()"
+        class="absolute opacity-0 w-0 h-0 pointer-events-none"
+        [attr.aria-label]="'Archivo ' + ($index + 1)"
+        (change)="onFileSelect($index, $event)"
+      />
+      <label
+        [for]="componentId() + '-file-' + $index"
+        class="btn btn-outline btn-sm btn-primary gap-1.5 cursor-pointer m-0"
+      >
+        <i class="fa-solid fa-file-arrow-up"></i>
+        Elegir archivo
+      </label>
+      <span
+        class="text-sm text-base-content/80 truncate max-w-[200px]"
+        [class.italic]="label === 'Sin archivos seleccionados'"
+      >
+        {{ label }}
+      </span>
+      <button
+        type="button"
+        class="btn btn-ghost btn-circle btn-sm text-base-content/50 hover:text-error hover:bg-error/10 ml-auto"
+        title="Quitar"
+        (click)="removeSlot($index)"
+      >
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+  }
+</div>
+
+<p class="text-sm text-base-content/50 mt-2 flex items-center gap-1.5">
+  <i class="fa-solid fa-info-circle"></i>
+  {{ typesLabel() }}. Máximo {{ maxFiles() }} archivos ({{ helpSizeText() }}). Arrastre aquí o use «Elegir archivo».
+</p>

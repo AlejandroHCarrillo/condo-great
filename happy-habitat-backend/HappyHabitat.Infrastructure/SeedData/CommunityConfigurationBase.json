@@ -1,62 +1,14 @@
 [
-  {
-    "titulo": "Logo de la comunidad",
-    "descripcion": "URL o ruta del logo de la comunidad",
-    "valor": "",
-    "tipoDato": "string"
-  },
-  {
-    "titulo": "Imagen principal",
-    "descripcion": "URL o ruta de la imagen principal de la comunidad",
-    "valor": "",
-    "tipoDato": "string"
-  },
-  {
-    "titulo": "Nombre del contacto principal",
-    "descripcion": "Nombre de la persona de contacto principal",
-    "valor": "",
-    "tipoDato": "string"
-  },
-  {
-    "titulo": "Nombre del administrador",
-    "descripcion": "Nombre del administrador de la comunidad",
-    "valor": "",
-    "tipoDato": "string"
-  },
-  {
-    "titulo": "Teléfono del administrador",
-    "descripcion": "Teléfono de contacto del administrador",
-    "valor": "",
-    "tipoDato": "string"
-  },
-  {
-    "titulo": "Correo electrónico del administrador",
-    "descripcion": "Correo electrónico del administrador",
-    "valor": "",
-    "tipoDato": "string"
-  },
-  {
-    "titulo": "WhatsApp del administrador",
-    "descripcion": "Número de WhatsApp del administrador",
-    "valor": "",
-    "tipoDato": "string"
-  },
-  {
-    "titulo": "RFC de la comunidad",
-    "descripcion": "Registro Federal de Contribuyentes de la comunidad",
-    "valor": "",
-    "tipoDato": "string"
-  },
-  {
-    "titulo": "Cuenta bancaria de la comunidad",
-    "descripcion": "Número de cuenta bancaria de la comunidad",
-    "valor": "",
-    "tipoDato": "string"
-  },
-  {
-    "titulo": "Banco",
-    "descripcion": "Nombre del banco de la comunidad",
-    "valor": "",
-    "tipoDato": "string"
-  }
+  {"codigo":"LOGO_COMUN","titulo":"Logo de la comunidad","descripcion":"URL o ruta del logo de la comunidad","valor":"","tipoDato":"string"},
+  {"codigo":"IMG_PRINC","titulo":"Imagen principal","descripcion":"URL o ruta de la imagen principal de la comunidad","valor":"","tipoDato":"string"},
+  {"codigo":"CONTACTO","titulo":"Nombre del contacto principal","descripcion":"Nombre de la persona de contacto principal","valor":"","tipoDato":"string"},
+  {"codigo":"ADM_NOMBR","titulo":"Nombre del administrador","descripcion":"Nombre del administrador de la comunidad","valor":"","tipoDato":"string"},
+  {"codigo":"ADM_TEL","titulo":"Teléfono del administrador","descripcion":"Teléfono de contacto del administrador","valor":"","tipoDato":"string"},
+  {"codigo":"ADM_EMAIL","titulo":"Correo electrónico del administrador","descripcion":"Correo electrónico del administrador","valor":"","tipoDato":"string"},
+  {"codigo":"ADM_WHATS","titulo":"WhatsApp del administrador","descripcion":"Número de WhatsApp del administrador","valor":"","tipoDato":"string"},
+  {"codigo":"RFC_COMUN","titulo":"RFC de la comunidad","descripcion":"Registro Federal de Contribuyentes de la comunidad","valor":"","tipoDato":"string"},
+  {"codigo":"CTA_BANCO","titulo":"Cuenta bancaria de la comunidad","descripcion":"Número de cuenta bancaria de la comunidad","valor":"","tipoDato":"string"},
+  {"codigo":"BANCO","titulo":"Banco","descripcion":"Nombre del banco de la comunidad","valor":"","tipoDato":"string"},
+  {"codigo":"DIA_PAGO","titulo":"Dia de pago de mantenimiento","descripcion":"Dia del mes para el pago del mantenimiento","valor":"01","tipoDato":"string"},
+  {"codigo":"DIAS_TOL","titulo":"Dias de tolerancia","descripcion":"Días de tolerancia para el pago","valor":"5","tipoDato":"numerico"}
 ]

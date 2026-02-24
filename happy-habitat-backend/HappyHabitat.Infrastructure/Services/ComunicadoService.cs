@@ -37,7 +37,7 @@ public class ComunicadoService : IComunicadoService
             CommunityName = c.Community?.Nombre,
             Titulo = c.Titulo,
             Subtitulo = c.Subtitulo,
-            Descripcion = c.Descripcion,
+            Contenido = c.Contenido,
             Fecha = c.Fecha,
             Imagen = c.Imagen,
             CreatedAt = c.CreatedAt.ToString("O")
@@ -68,7 +68,7 @@ public class ComunicadoService : IComunicadoService
             CommunityName = c.Community?.Nombre,
             Titulo = c.Titulo,
             Subtitulo = c.Subtitulo,
-            Descripcion = c.Descripcion,
+            Contenido = c.Contenido,
             Fecha = c.Fecha,
             Imagen = c.Imagen,
             CreatedAt = c.CreatedAt.ToString("O")
@@ -109,7 +109,7 @@ public class ComunicadoService : IComunicadoService
             CommunityName = c.Community?.Nombre,
             Titulo = c.Titulo,
             Subtitulo = c.Subtitulo,
-            Descripcion = c.Descripcion,
+            Contenido = c.Contenido,
             Fecha = c.Fecha,
             Imagen = c.Imagen,
             CreatedAt = c.CreatedAt.ToString("O")
@@ -140,7 +140,7 @@ public class ComunicadoService : IComunicadoService
             CommunityName = comunicado.Community?.Nombre,
             Titulo = comunicado.Titulo,
             Subtitulo = comunicado.Subtitulo,
-            Descripcion = comunicado.Descripcion,
+            Contenido = comunicado.Contenido,
             Fecha = comunicado.Fecha,
             Imagen = comunicado.Imagen,
             CreatedAt = comunicado.CreatedAt.ToString("O")
@@ -161,9 +161,9 @@ public class ComunicadoService : IComunicadoService
         {
             Id = Guid.NewGuid(),
             CommunityId = createComunicadoDto.CommunityId,
-            Titulo = createComunicadoDto.Titulo,
-            Subtitulo = createComunicadoDto.Subtitulo,
-            Descripcion = createComunicadoDto.Descripcion,
+            Titulo = createComunicadoDto.Titulo ?? string.Empty,
+            Subtitulo = createComunicadoDto.Subtitulo ?? string.Empty,
+            Contenido = createComunicadoDto.Contenido ?? string.Empty,
             Fecha = createComunicadoDto.Fecha,
             Imagen = createComunicadoDto.Imagen,
             CreatedAt = DateTime.UtcNow
@@ -182,7 +182,7 @@ public class ComunicadoService : IComunicadoService
             CommunityName = comunicado.Community?.Nombre,
             Titulo = comunicado.Titulo,
             Subtitulo = comunicado.Subtitulo,
-            Descripcion = comunicado.Descripcion,
+            Contenido = comunicado.Contenido,
             Fecha = comunicado.Fecha,
             Imagen = comunicado.Imagen,
             CreatedAt = comunicado.CreatedAt.ToString("O")
@@ -207,9 +207,9 @@ public class ComunicadoService : IComunicadoService
         }
 
         comunicado.CommunityId = updateComunicadoDto.CommunityId;
-        comunicado.Titulo = updateComunicadoDto.Titulo;
-        comunicado.Subtitulo = updateComunicadoDto.Subtitulo;
-        comunicado.Descripcion = updateComunicadoDto.Descripcion;
+        comunicado.Titulo = updateComunicadoDto.Titulo ?? string.Empty;
+        comunicado.Subtitulo = updateComunicadoDto.Subtitulo ?? string.Empty;
+        comunicado.Contenido = updateComunicadoDto.Contenido ?? string.Empty;
         comunicado.Fecha = updateComunicadoDto.Fecha;
         comunicado.Imagen = updateComunicadoDto.Imagen;
 
@@ -225,7 +225,7 @@ public class ComunicadoService : IComunicadoService
             CommunityName = comunicado.Community?.Nombre,
             Titulo = comunicado.Titulo,
             Subtitulo = comunicado.Subtitulo,
-            Descripcion = comunicado.Descripcion,
+            Contenido = comunicado.Contenido,
             Fecha = comunicado.Fecha,
             Imagen = comunicado.Imagen,
             CreatedAt = comunicado.CreatedAt.ToString("O")

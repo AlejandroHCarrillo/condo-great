@@ -27,6 +27,7 @@ public class CreateAmenityDto
     public Guid CommunityId { get; set; }
     public int? CapacidadMaxima { get; set; }
     public int? NumeroReservacionesSimultaneas { get; set; }
+    public Guid? CreatedByUserId { get; set; }
 }
 
 public class UpdateAmenityDto

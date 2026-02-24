@@ -385,6 +385,9 @@ public class DummySeeder : IDataSeeder
         // Seed default community configurations from CommunityConfigurationBase.json for all communities
         await SeedCommunityConfigurationsFromBaseAsync();
 
+        // Seed default community prices from CommunityPrices.json for all communities
+        await SeedCommunityPricesFromBaseAsync();
+
         // Seed 10 residents per community (for all communities in the database)
         var firstNames = new[] { "María", "José", "Ana", "Carlos", "Laura", "Pedro", "Isabel", "Miguel", "Carmen", "Francisco", "Elena", "Roberto", "Patricia", "Jorge", "Sofía", "Luis", "Gabriela", "Ricardo", "Daniela", "Alejandro" };
         var lastNames = new[] { "González", "Martínez", "López", "Hernández", "García", "Rodríguez", "Pérez", "Sánchez", "Ramírez", "Torres", "Flores", "Rivera", "Gómez", "Díaz", "Morales", "Reyes", "Jiménez", "Ruiz", "Mendoza", "Vázquez" };
@@ -1102,16 +1105,16 @@ public class DummySeeder : IDataSeeder
         var allCommunitiesForComunicados = await _context.Communities.ToListAsync();
         var comunicadosTemplates = new[]
         {
-            new { Titulo = "Propuesta de reglamento revisión", Subtitulo = "Participación vecinal", Descripcion = "Estimados condóminos: Durante el taller de revisión del reglamento no fue posible concluir con todas las preguntas. La administración compartirá el reglamento con el texto resaltado. Envíen sus dudas o sugerencias por Whatsapp. Fecha límite: 12 de Septiembre.", Fecha = new DateTime(2025, 9, 8), Imagen = (string?)null },
-            new { Titulo = "Mantenimiento de la alberca", Subtitulo = "Cierre temporal por limpieza", Descripcion = "La alberca estará cerrada el 2025-09-12 para realizar limpieza profunda y revisión del sistema de filtrado.", Fecha = new DateTime(2025, 9, 12), Imagen = "images/anuncios/manenimiento_alberca.png" },
-            new { Titulo = "Jornada de reciclaje", Subtitulo = "Trae tus residuos separados", Descripcion = "Este sábado 2025-09-14 se instalará un punto de acopio en el parque central para reciclaje de papel, plástico y electrónicos.", Fecha = new DateTime(2025, 9, 14), Imagen = "images/anuncios/jornada-reciclaje.png" },
-            new { Titulo = "Fumigación preventiva", Subtitulo = "Control de plagas en áreas comunes", Descripcion = "El lunes 2025-09-16 se realizará fumigación en jardines y pasillos. Evita transitar por zonas tratadas durante ese día.", Fecha = new DateTime(2025, 9, 16), Imagen = "images/anuncios/fumigacion.png" },
-            new { Titulo = "Reunión vecinal mensual", Subtitulo = "Temas de seguridad y mantenimiento", Descripcion = "La reunión se llevará a cabo el 2025-09-20 a las 18:00 hrs en el salón común. Participa y haz escuchar tu voz.", Fecha = new DateTime(2025, 9, 20), Imagen = "images/anuncios/reunion-mensual.png" },
-            new { Titulo = "Instalación de cámaras", Subtitulo = "Mejora de seguridad perimetral", Descripcion = "El 2025-09-22 se instalarán nuevas cámaras en los accesos principales. Habrá personal técnico en el área.", Fecha = new DateTime(2025, 9, 22), Imagen = "images/anuncios/instalacion-camaras.png" },
-            new { Titulo = "Decoración de otoño", Subtitulo = "Convocatoria para voluntarios", Descripcion = "El comité invita a decorar áreas comunes con temática otoñal el 2025-09-25. Puedes donar adornos o ayudar en el montaje.", Fecha = new DateTime(2025, 9, 25), Imagen = "images/anuncios/decoracion-otono.png" },
-            new { Titulo = "Poda de árboles", Subtitulo = "Mantenimiento de áreas verdes", Descripcion = "El 2025-09-28 se realizará poda en los jardines del lado norte. Favor de retirar objetos personales cercanos.", Fecha = new DateTime(2025, 9, 28), Imagen = "images/anuncios/poda-arboles.png" },
-            new { Titulo = "Taller de compostaje", Subtitulo = "Aprende a reducir residuos orgánicos", Descripcion = "El 2025-10-01 se impartirá un taller gratuito sobre compostaje en el salón común. Cupo limitado, regístrate con anticipación.", Fecha = new DateTime(2025, 10, 1), Imagen = "images/anuncios/taller-compostaje.png" },
-            new { Titulo = "Festival comunitario", Subtitulo = "Música, comida y juegos", Descripcion = "El 2025-10-06 se celebrará el festival anual en el parque central. ¡Trae a tu familia y disfruta!", Fecha = new DateTime(2025, 10, 6), Imagen = "images/anuncios/festival-comunitario.png" }
+            new { Titulo = "Propuesta de reglamento revisión", Subtitulo = "Participación vecinal", Contenido = "Estimados condóminos: Durante el taller de revisión del reglamento no fue posible concluir con todas las preguntas. La administración compartirá el reglamento con el texto resaltado. Envíen sus dudas o sugerencias por Whatsapp. Fecha límite: 12 de Septiembre.", Fecha = new DateTime(2025, 9, 8), Imagen = (string?)null },
+            new { Titulo = "Mantenimiento de la alberca", Subtitulo = "Cierre temporal por limpieza", Contenido = "La alberca estará cerrada el 2025-09-12 para realizar limpieza profunda y revisión del sistema de filtrado.", Fecha = new DateTime(2025, 9, 12), Imagen = "images/anuncios/manenimiento_alberca.png" },
+            new { Titulo = "Jornada de reciclaje", Subtitulo = "Trae tus residuos separados", Contenido = "Este sábado 2025-09-14 se instalará un punto de acopio en el parque central para reciclaje de papel, plástico y electrónicos.", Fecha = new DateTime(2025, 9, 14), Imagen = "images/anuncios/jornada-reciclaje.png" },
+            new { Titulo = "Fumigación preventiva", Subtitulo = "Control de plagas en áreas comunes", Contenido = "El lunes 2025-09-16 se realizará fumigación en jardines y pasillos. Evita transitar por zonas tratadas durante ese día.", Fecha = new DateTime(2025, 9, 16), Imagen = "images/anuncios/fumigacion.png" },
+            new { Titulo = "Reunión vecinal mensual", Subtitulo = "Temas de seguridad y mantenimiento", Contenido = "La reunión se llevará a cabo el 2025-09-20 a las 18:00 hrs en el salón común. Participa y haz escuchar tu voz.", Fecha = new DateTime(2025, 9, 20), Imagen = "images/anuncios/reunion-mensual.png" },
+            new { Titulo = "Instalación de cámaras", Subtitulo = "Mejora de seguridad perimetral", Contenido = "El 2025-09-22 se instalarán nuevas cámaras en los accesos principales. Habrá personal técnico en el área.", Fecha = new DateTime(2025, 9, 22), Imagen = "images/anuncios/instalacion-camaras.png" },
+            new { Titulo = "Decoración de otoño", Subtitulo = "Convocatoria para voluntarios", Contenido = "El comité invita a decorar áreas comunes con temática otoñal el 2025-09-25. Puedes donar adornos o ayudar en el montaje.", Fecha = new DateTime(2025, 9, 25), Imagen = "images/anuncios/decoracion-otono.png" },
+            new { Titulo = "Poda de árboles", Subtitulo = "Mantenimiento de áreas verdes", Contenido = "El 2025-09-28 se realizará poda en los jardines del lado norte. Favor de retirar objetos personales cercanos.", Fecha = new DateTime(2025, 9, 28), Imagen = "images/anuncios/poda-arboles.png" },
+            new { Titulo = "Taller de compostaje", Subtitulo = "Aprende a reducir residuos orgánicos", Contenido = "El 2025-10-01 se impartirá un taller gratuito sobre compostaje en el salón común. Cupo limitado, regístrate con anticipación.", Fecha = new DateTime(2025, 10, 1), Imagen = "images/anuncios/taller-compostaje.png" },
+            new { Titulo = "Festival comunitario", Subtitulo = "Música, comida y juegos", Contenido = "El 2025-10-06 se celebrará el festival anual en el parque central. ¡Trae a tu familia y disfruta!", Fecha = new DateTime(2025, 10, 6), Imagen = "images/anuncios/festival-comunitario.png" }
         };
 
         if (allCommunitiesForComunicados.Count > 0)
@@ -1130,7 +1133,7 @@ public class DummySeeder : IDataSeeder
                             CommunityId = community.Id,
                             Titulo = template.Titulo,
                             Subtitulo = template.Subtitulo,
-                            Descripcion = template.Descripcion,
+                            Contenido = template.Contenido,
                             Fecha = template.Fecha,
                             Imagen = template.Imagen,
                             CreatedAt = DateTime.UtcNow
@@ -1896,6 +1899,37 @@ public class DummySeeder : IDataSeeder
             await _context.SaveChangesAsync();
         }
 
+        // Seed un reporte (ticket) de cada categoría para la comunidad "Residencial El Pueblito"
+        var pueblitoCommunity = await _context.Communities.FirstOrDefaultAsync(c => c.Nombre == "Residencial El Pueblito");
+        if (pueblitoCommunity != null)
+        {
+            var pueblitoResident = await _context.Residents
+                .FirstOrDefaultAsync(r => r.CommunityId == pueblitoCommunity.Id);
+            var categorias = await _context.CategoriasTicket.OrderBy(c => c.Id).ToListAsync();
+            var statusNuevo = await _context.StatusTickets.FirstOrDefaultAsync(s => s.Code == "Nuevo");
+            if (pueblitoResident != null && categorias.Any() && statusNuevo != null)
+            {
+                foreach (var categoria in categorias)
+                {
+                    var alreadyHasTicket = await _context.Tickets
+                        .AnyAsync(t => t.CommunityId == pueblitoCommunity.Id && t.ResidentId == pueblitoResident.Id && t.CategoriaTicketId == categoria.Id);
+                    if (!alreadyHasTicket)
+                    {
+                        _context.Tickets.Add(new Ticket
+                        {
+                            CommunityId = pueblitoCommunity.Id,
+                            ResidentId = pueblitoResident.Id,
+                            CategoriaTicketId = categoria.Id,
+                            StatusId = statusNuevo.Id,
+                            FechaReporte = DateTime.UtcNow.AddDays(-categorias.IndexOf(categoria)),
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                }
+                await _context.SaveChangesAsync();
+            }
+        }
+
         // Add vehicles, pets, and visits for all residents
         Console.WriteLine("=== Starting AddVehiclesPetsAndVisitsToAllResidents ===");
         await AddVehiclesPetsAndVisitsToAllResidents();
@@ -2176,6 +2210,7 @@ public class DummySeeder : IDataSeeder
                 {
                     Id = Guid.NewGuid(),
                     CommunityId = communityId,
+                    Codigo = (t.Codigo ?? string.Empty).Length > 10 ? (t.Codigo ?? string.Empty)[..10] : (t.Codigo ?? string.Empty),
                     Titulo = t.Titulo ?? string.Empty,
                     Descripcion = t.Descripcion ?? string.Empty,
                     Valor = t.Valor ?? string.Empty,
@@ -2190,14 +2225,91 @@ public class DummySeeder : IDataSeeder
             await _context.CommunityConfigurations.AddRangeAsync(configsToAdd);
             await _context.SaveChangesAsync();
         }
+
+        // Actualizar Codigo en configuraciones existentes que lo tengan vacío (por Titulo contra las plantillas del JSON).
+        var configsSinCodigo = await _context.CommunityConfigurations
+            .Where(cc => string.IsNullOrWhiteSpace(cc.Codigo))
+            .ToListAsync();
+        foreach (var config in configsSinCodigo)
+        {
+            var tituloConfig = (config.Titulo ?? string.Empty).Trim();
+            var template = templates.FirstOrDefault(t =>
+                string.Equals((t.Titulo ?? string.Empty).Trim(), tituloConfig, StringComparison.OrdinalIgnoreCase));
+            if (template != null && !string.IsNullOrWhiteSpace(template.Codigo))
+            {
+                config.Codigo = template.Codigo!.Length > 10 ? template.Codigo[..10] : template.Codigo;
+            }
+        }
+        if (configsSinCodigo.Count > 0)
+        {
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    /// <summary>
+    /// Loads CommunityPrices.json (embedded resource) and creates one CommunityPrice per template for each community that does not have any prices yet.
+    /// </summary>
+    private async Task SeedCommunityPricesFromBaseAsync()
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+        var resourceName = assembly.GetManifestResourceNames()
+            .FirstOrDefault(n => n.EndsWith("CommunityPrices.json", StringComparison.OrdinalIgnoreCase));
+        if (string.IsNullOrEmpty(resourceName))
+            return;
+
+        await using var stream = assembly.GetManifestResourceStream(resourceName);
+        if (stream == null)
+            return;
+
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var templates = await JsonSerializer.DeserializeAsync<List<CommunityPriceBaseItem>>(stream, options);
+        if (templates == null || templates.Count == 0)
+            return;
+
+        var communityIds = await _context.Communities.Select(c => c.Id).ToListAsync();
+        var pricesToAdd = new List<CommunityPrice>();
+
+        foreach (var communityId in communityIds)
+        {
+            var existingCount = await _context.CommunityPrices.CountAsync(cp => cp.CommunityId == communityId);
+            if (existingCount > 0)
+                continue;
+
+            foreach (var t in templates)
+            {
+                pricesToAdd.Add(new CommunityPrice
+                {
+                    Id = Guid.NewGuid(),
+                    CommunityId = communityId,
+                    Concepto = t.Concepto ?? string.Empty,
+                    Monto = t.Monto,
+                    IsActive = t.IsActive,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+        }
+
+        if (pricesToAdd.Count > 0)
+        {
+            await _context.CommunityPrices.AddRangeAsync(pricesToAdd);
+            await _context.SaveChangesAsync();
+        }
     }
 
     private sealed class CommunityConfigurationBaseItem
     {
+        public string? Codigo { get; set; }
         public string? Titulo { get; set; }
         public string? Descripcion { get; set; }
         public string? Valor { get; set; }
         public string? TipoDato { get; set; }
+    }
+
+    private sealed class CommunityPriceBaseItem
+    {
+        public string? Concepto { get; set; }
+        public decimal Monto { get; set; }
+        public bool IsActive { get; set; } = true;
     }
 }
 

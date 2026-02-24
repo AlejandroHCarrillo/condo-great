@@ -1,9 +1,6 @@
 @if (communities().length > 0) {
   <div class="flex items-center gap-4">
-    <label class="text-sm font-medium whitespace-nowrap">
-      <i class="fa-solid fa-building mr-2"></i>
-      Filtrar por Comunidad
-    </label>
+    <i class="fa-solid fa-building mr-0"></i>
     <select
       class="select select-bordered w-full max-w-xs"
       [ngModel]="selectedId()"

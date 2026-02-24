@@ -1,0 +1,13 @@
+---
+description: Al compilar o ejecutar el backend, si falla por estar corriendo, detenerlo o pedir que lo detengan
+alwaysApply: true
+---
+
+# Backend: compilar cuando está en ejecución
+
+Cuando estés **compilando o ejecutando comandos en el backend** (por ejemplo `dotnet build`, `dotnet ef`, `dotnet run`) y falle porque la API está en ejecución (DLL en uso, puerto en uso, etc.):
+
+1. **Intenta detener el proceso** del backend (por ejemplo el que ejecuta la API en la terminal) y luego **continúa con los pasos** (compilar, migraciones, seed, etc.).
+2. **Si no puedes detenerlo** (no hay acceso a la terminal, el proceso no se detiene, etc.): **pide al usuario que detenga el backend** y, cuando confirme que lo detuvo, **continúa** con los procesos pendientes.
+
+No esperes indefinidamente: si no puedes detener el proceso, pide al usuario que lo haga y sigue cuando esté listo.

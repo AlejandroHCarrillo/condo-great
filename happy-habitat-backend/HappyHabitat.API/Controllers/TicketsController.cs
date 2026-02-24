@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using HappyHabitat.Application.DTOs;
 using HappyHabitat.Application.Interfaces;
+using HappyHabitat.API.Extensions;
 
 namespace HappyHabitat.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
+[RequestSizeLimit(1_048_576)] // 1 MB for JSON payloads
 public class TicketsController : ControllerBase
 {
     private readonly ITicketService _service;
@@ -21,6 +23,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "ADMIN_COMPANY,SYSTEM_ADMIN")]
     public async Task<ActionResult<IEnumerable<TicketDto>>> GetAll()
     {
         var list = await _service.GetAllAsync();
@@ -28,6 +31,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpGet("community/{communityId:guid}")]
+    [Authorize(Roles = "ADMIN_COMPANY,SYSTEM_ADMIN")]
     public async Task<ActionResult<IEnumerable<TicketDto>>> GetByCommunityId(Guid communityId)
     {
         var list = await _service.GetByCommunityIdAsync(communityId);
@@ -39,7 +43,7 @@ public class TicketsController : ControllerBase
     {
         var resident = await GetResidentFromToken();
         if (resident == null)
-            return BadRequest("Usuario no está registrado como residente.");
+            return this.BadRequestApiError("BAD_REQUEST", "Usuario no está registrado como residente.");
         var list = await _service.GetByResidentIdAsync(resident.Id);
         return Ok(list);
     }
@@ -56,23 +60,65 @@ public class TicketsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<TicketDto>> Create([FromBody] CreateTicketDto dto)
     {
-        var resident = await GetResidentFromToken();
-        if (resident == null)
-            return BadRequest("Usuario no está registrado como residente.");
+        Guid residentId;
+        var role = User.FindFirst(ClaimTypes.Role)?.Value;
+        var isAdmin = role == "ADMIN_COMPANY" || role == "SYSTEM_ADMIN";
+        if (isAdmin)
+        {
+            if (dto.ResidentId.HasValue)
+            {
+                var resident = await _residentService.GetByIdAsync(dto.ResidentId.Value);
+                if (resident == null)
+                    return this.BadRequestApiError("BAD_REQUEST", "Residente no encontrado.");
+                residentId = resident.Id;
+            }
+            else if (dto.CommunityId.HasValue)
+            {
+                var residents = await _residentService.GetByCommunityIdAsync(dto.CommunityId.Value);
+                var first = residents.FirstOrDefault();
+                if (first == null)
+                    return this.BadRequestApiError("BAD_REQUEST", "La comunidad no tiene residentes registrados.");
+                residentId = first.Id;
+            }
+            else
+            {
+                return this.BadRequestApiError("BAD_REQUEST", "Debe indicar CommunityId o ResidentId.");
+            }
+        }
+        else
+        {
+            var resident = await GetResidentFromToken();
+            if (resident == null)
+                return this.BadRequestApiError("BAD_REQUEST", "Usuario no está registrado como residente.");
+            residentId = resident.Id;
+        }
         try
         {
-            var item = await _service.CreateAsync(resident.Id, dto);
+            var item = await _service.CreateAsync(residentId, dto);
             return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(ex.Message);
+            return this.BadRequestApiError("INVALID_OPERATION", ex.Message);
         }
     }
 
     [HttpPut("{id:int}")]
     public async Task<ActionResult<TicketDto>> Update(int id, [FromBody] UpdateTicketDto dto)
     {
+        var existing = await _service.GetByIdAsync(id);
+        if (existing == null)
+            return NotFound();
+
+        var role = User.FindFirst(ClaimTypes.Role)?.Value;
+        var isAdmin = role == "ADMIN_COMPANY" || role == "SYSTEM_ADMIN";
+        if (!isAdmin)
+        {
+            var resident = await GetResidentFromToken();
+            if (resident == null || existing.ResidentId != resident.Id)
+                return Forbid();
+        }
+
         var item = await _service.UpdateAsync(id, dto);
         if (item == null)
             return NotFound();

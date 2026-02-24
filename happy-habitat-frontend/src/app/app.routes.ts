@@ -45,12 +45,12 @@ export const routes: Routes = [
     {
         path: 'admincompany',
         loadChildren: () => import('./components/admincompany/admincompany-routes'),
-        canActivate: [authGuard] // TODO: Cambiar a roleGuard([RolesEnum.ADMIN_COMPANY]) cuando los roles estén configurados
+        canActivate: [roleGuard([RolesEnum.ADMIN_COMPANY])]
     },
     {
         path: 'vigilancia',
         loadChildren: () => import('./components/vigilancia/vigilancia-routes'),
-        canActivate: [authGuard] // TODO: Cambiar a roleGuard([RolesEnum.VIGILANCE]) cuando los roles estén configurados
+        canActivate: [roleGuard([RolesEnum.VIGILANCE])]
     },
     {
         path: 'amenidades',

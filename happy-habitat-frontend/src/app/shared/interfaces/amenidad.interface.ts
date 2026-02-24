@@ -19,11 +19,12 @@ export interface CreateAmenityDto {
   descripcion: string;
   reglas: string;
   costo?: number | null;
-  fechaAlta: string; // ISO date string
+  fechaAlta: string; // ISO date string (se asigna fecha del día en el frontend)
   imagen?: string | null;
   communityId: string;
   capacidadMaxima?: number | null;
   numeroReservacionesSimultaneas?: number | null;
+  createdByUserId?: string | null;
 }
 
 /** DTO para actualizar amenidad (PUT /api/amenities/:id) */

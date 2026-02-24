@@ -10,7 +10,7 @@ namespace HappyHabitat.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Roles = "ADMIN_COMPANY,SYSTEM_ADMIN")]
 public class DocumentsController : ControllerBase
 {
     private readonly IDocumentService _documentService;

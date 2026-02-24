@@ -1,0 +1,104 @@
+<div class="p-4">
+  <div class="mb-4 flex justify-between items-center">
+    <button (click)="goBack()" class="btn btn-sm btn-ghost btn-secondary">
+      <i class="fa-solid fa-arrow-left mr-2"></i>
+      Volver a la lista
+    </button>
+    @if (amenidad()) {
+      <a
+        [routerLink]="['/admincompany/amenidades/editar', amenidad()!.id]"
+        class="btn btn-sm btn-ghost bg-yellow-500"
+        title="Editar"
+      >
+        <i class="fa-solid fa-pen mr-2"></i>
+        Editar
+      </a>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando amenidad...</span>
+    </div>
+  } @else if (amenidad()) {
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-2xl mb-4">
+          <i class="fa-solid fa-people-roof text-primary mr-2"></i>
+          {{ amenidad()!.nombre }}
+        </h2>
+
+        <div class="space-y-4">
+          <div>
+            <label class="label">
+              <span class="label-text font-bold">Comunidad</span>
+            </label>
+            <p class="text-lg">{{ getComunidadNombre(amenidad()!) }}</p>
+          </div>
+
+          <div>
+            <label class="label">
+              <span class="label-text font-bold">Descripción</span>
+            </label>
+            <div class="prose max-w-none whitespace-pre-wrap">{{ amenidad()!.descripcion || '-' }}</div>
+          </div>
+
+          @if (amenidad()!.reglas) {
+            <div>
+              <label class="label">
+                <span class="label-text font-bold">Reglas</span>
+              </label>
+              <div class="prose max-w-none whitespace-pre-wrap">{{ amenidad()!.reglas }}</div>
+            </div>
+          }
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="label">
+                <span class="label-text font-bold">Costo</span>
+              </label>
+              <p class="text-lg">{{ formatCosto(amenidad()!.costo) }}</p>
+            </div>
+            <div>
+              <label class="label">
+                <span class="label-text font-bold">Fecha de alta</span>
+              </label>
+              <p class="text-lg">{{ formatFecha(amenidad()!.fechaAlta) }}</p>
+            </div>
+            @if (amenidad()!.capacidadMaxima != null) {
+              <div>
+                <label class="label">
+                  <span class="label-text font-bold">Capacidad máxima</span>
+                </label>
+                <p class="text-lg">{{ amenidad()!.capacidadMaxima }}</p>
+              </div>
+            }
+            @if (amenidad()!.numeroReservacionesSimultaneas != null) {
+              <div>
+                <label class="label">
+                  <span class="label-text font-bold">Reservaciones simultáneas</span>
+                </label>
+                <p class="text-lg">{{ amenidad()!.numeroReservacionesSimultaneas }}</p>
+              </div>
+            }
+          </div>
+
+          @if (amenidad()!.imagen) {
+            <div>
+              <label class="label">
+                <span class="label-text font-bold">Imagen</span>
+              </label>
+              <img [src]="getImagenUrl(amenidad()!.imagen)" alt="Imagen de la amenidad" class="max-w-full rounded-lg shadow" />
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="alert alert-error">
+      <i class="fa-solid fa-exclamation-triangle mr-2"></i>
+      <span>No se pudo cargar la amenidad.</span>
+    </div>
+  }
+</div>

@@ -4,7 +4,7 @@ export interface Comunicado {
   communityName?: string | null;
   titulo: string;
   subtitulo: string;
-  descripcion: string;
+  contenido: string;
   fecha: string; // Fecha en formato ISO string (serializada desde DateTime del backend)
   imagen?: string | null;
   createdAt?: string;
@@ -15,7 +15,7 @@ export interface CreateComunicadoDto {
   communityId?: string | null;
   titulo: string;
   subtitulo: string;
-  descripcion: string;
+  contenido: string;
   fecha: string; // ISO date string
   imagen?: string | null;
 }
@@ -25,7 +25,7 @@ export interface UpdateComunicadoDto {
   communityId?: string | null;
   titulo: string;
   subtitulo: string;
-  descripcion: string;
+  contenido: string;
   fecha: string;
   imagen?: string | null;
 }

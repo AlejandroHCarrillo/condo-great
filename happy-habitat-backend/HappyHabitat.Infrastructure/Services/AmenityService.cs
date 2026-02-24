@@ -86,6 +86,7 @@ public class AmenityService : IAmenityService
             Community = community,
             CapacidadMaxima = dto.CapacidadMaxima,
             NumeroReservacionesSimultaneas = dto.NumeroReservacionesSimultaneas,
+            CreatedByUserId = dto.CreatedByUserId,
             CreatedAt = DateTime.UtcNow
         };
 

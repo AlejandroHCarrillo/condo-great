@@ -2,6 +2,7 @@ export interface CommunityConfiguration {
   id: string;
   communityId: string;
   communityName?: string | null;
+  codigo: string;
   titulo: string;
   descripcion: string;
   valor: string;
@@ -14,6 +15,7 @@ export interface CommunityConfiguration {
 
 export interface CreateCommunityConfigurationDto {
   communityId: string;
+  codigo: string;
   titulo: string;
   descripcion: string;
   valor: string;
@@ -23,6 +25,7 @@ export interface CreateCommunityConfigurationDto {
 
 export interface UpdateCommunityConfigurationDto {
   communityId: string;
+  codigo: string;
   titulo: string;
   descripcion: string;
   valor: string;

@@ -31,15 +31,18 @@ public class ApplicationDbContext : DbContext
     public DbSet<CommunityProvider> CommunityProviders { get; set; }
     public DbSet<Document> Documents { get; set; }
     public DbSet<CommunityConfiguration> CommunityConfigurations { get; set; }
+    public DbSet<CommunityPrice> CommunityPrices { get; set; }
     public DbSet<ResidentConfiguration> ResidentConfigurations { get; set; }
     public DbSet<Encuesta> Encuestas { get; set; }
     public DbSet<PreguntaEncuesta> PreguntasEncuesta { get; set; }
     public DbSet<OpcionRespuesta> OpcionesRespuesta { get; set; }
     public DbSet<RespuestaResidente> RespuestasResidente { get; set; }
-    public DbSet<TipoReporte> TiposReporte { get; set; }
+    public DbSet<CategoriaTicket> CategoriasTicket { get; set; }
     public DbSet<StatusTicket> StatusTickets { get; set; }
     public DbSet<Ticket> Tickets { get; set; }
     public DbSet<Comentario> Comentarios { get; set; }
+    public DbSet<CargoResidente> CargosResidente { get; set; }
+    public DbSet<PagoResidente> PagosResidente { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -330,7 +333,7 @@ public class ApplicationDbContext : DbContext
                 .HasMaxLength(200);
             entity.Property(e => e.Subtitulo)
                 .HasMaxLength(200);
-            entity.Property(e => e.Descripcion)
+            entity.Property(e => e.Contenido)
                 .HasMaxLength(2000);
             entity.Property(e => e.Fecha)
                 .IsRequired()
@@ -712,6 +715,9 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<CommunityConfiguration>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.Property(e => e.Codigo)
+                .IsRequired()
+                .HasMaxLength(10);
             entity.Property(e => e.Titulo)
                 .IsRequired()
                 .HasMaxLength(200);
@@ -733,6 +739,74 @@ public class ApplicationDbContext : DbContext
                 .HasForeignKey(e => e.CommunityId)
                 .OnDelete(DeleteBehavior.Cascade);
             // CreatedByUserId / UpdatedByUserId sin FK: solo informativos; al eliminar el usuario el valor se conserva.
+        });
+
+        modelBuilder.Entity<CommunityPrice>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Concepto)
+                .IsRequired()
+                .HasMaxLength(200);
+            entity.Property(e => e.Monto)
+                .HasPrecision(10, 2);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired()
+                .HasColumnType("datetime2");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime2");
+            entity.HasOne(e => e.Community)
+                .WithMany(c => c.CommunityPrices)
+                .HasForeignKey(e => e.CommunityId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<CargoResidente>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Descripcion)
+                .IsRequired()
+                .HasMaxLength(500);
+            entity.Property(e => e.Monto)
+                .HasPrecision(10, 2);
+            entity.Property(e => e.Estatus)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired()
+                .HasColumnType("datetime2");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime2");
+            entity.HasOne(e => e.Resident)
+                .WithMany(r => r.CargosResidente)
+                .HasForeignKey(e => e.ResidentId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<PagoResidente>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Monto)
+                .HasPrecision(10, 2);
+            entity.Property(e => e.Status)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+            entity.Property(e => e.Concepto)
+                .HasMaxLength(500);
+            entity.Property(e => e.UrlComprobante)
+                .HasMaxLength(2000);
+            entity.Property(e => e.Nota)
+                .HasMaxLength(2000);
+            entity.Property(e => e.FechaPago)
+                .HasColumnType("datetime2");
+            entity.Property(e => e.CreatedAt)
+                .IsRequired()
+                .HasColumnType("datetime2");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime2");
+            entity.HasOne(e => e.Resident)
+                .WithMany(r => r.PagosResidente)
+                .HasForeignKey(e => e.ResidenteId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<ResidentConfiguration>(entity =>
@@ -845,11 +919,11 @@ public class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
-        modelBuilder.Entity<TipoReporte>(entity =>
+        modelBuilder.Entity<CategoriaTicket>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).UseIdentityColumn();
-            entity.Property(e => e.Tipo).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Categoria).IsRequired().HasMaxLength(100);
         });
 
         modelBuilder.Entity<StatusTicket>(entity =>
@@ -858,6 +932,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Id).UseIdentityColumn();
             entity.Property(e => e.Code).IsRequired().HasMaxLength(50);
             entity.Property(e => e.Descripcion).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Color).IsRequired().HasMaxLength(50);
         });
 
         modelBuilder.Entity<Ticket>(entity =>
@@ -865,6 +940,8 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).UseIdentityColumn();
             entity.Property(e => e.FechaReporte).IsRequired();
+            entity.Property(e => e.Contenido).HasMaxLength(4000);
+            entity.Property(e => e.ImageUrlsJson).HasMaxLength(2000);
             entity.Property(e => e.CreatedAt).IsRequired().HasColumnType("datetime2");
             entity.Property(e => e.UpdatedAt).HasColumnType("datetime2");
             entity.HasOne(e => e.Community)
@@ -875,9 +952,9 @@ public class ApplicationDbContext : DbContext
                 .WithMany(r => r.Tickets)
                 .HasForeignKey(e => e.ResidentId)
                 .OnDelete(DeleteBehavior.Restrict);
-            entity.HasOne(e => e.TipoReporte)
-                .WithMany(t => t.Tickets)
-                .HasForeignKey(e => e.TipoReporteId)
+            entity.HasOne(e => e.CategoriaTicket)
+                .WithMany(c => c.Tickets)
+                .HasForeignKey(e => e.CategoriaTicketId)
                 .OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(e => e.StatusTicket)
                 .WithMany(s => s.Tickets)
@@ -892,6 +969,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Origen).IsRequired().HasMaxLength(50);
             entity.Property(e => e.IdOrigen).IsRequired().HasMaxLength(50);
             entity.Property(e => e.ComentarioTexto).IsRequired().HasMaxLength(4000);
+            entity.Property(e => e.ImageUrlsJson).HasMaxLength(8000);
             entity.Property(e => e.CreatedAt).IsRequired().HasColumnType("datetime2");
             entity.Property(e => e.UpdatedAt).HasColumnType("datetime2");
             entity.HasOne(e => e.Resident)

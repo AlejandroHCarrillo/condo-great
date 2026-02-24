@@ -1,0 +1,231 @@
+<div class="p-4">
+  <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-clipboard-list text-primary"></i>
+      Gestión de Encuestas
+    </h1>
+
+    <hh-community-filter
+      [communities]="comunidadesAsociadas()"
+      [selectedId]="selectedComunidadId()"
+      (selectedIdChange)="onComunidadChange($event)"
+    />
+    <a
+      [routerLink]="selectedComunidadId() ? ['/admincompany/encuestas/nuevo', selectedComunidadId()] : null"
+      class="btn btn-primary btn-sm btn-square flex items-center justify-center text-white"
+      [class.btn-disabled]="!selectedComunidadId()"
+      [attr.aria-disabled]="!selectedComunidadId()"
+      (click)="!selectedComunidadId() && $event.preventDefault()"
+    >
+      <i class="fa-solid fa-plus"></i>
+    </a>
+  </div>
+
+  @if (comunidadesAsociadas().length === 0) {
+    <div class="alert alert-warning mb-6">
+      <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+      <span>No tienes comunidades asociadas. Contacta al administrador del sistema.</span>
+    </div>
+  }
+
+  @if (!selectedComunidadId()) {
+    <div class="alert alert-info mb-6">
+      <i class="fa-solid fa-info-circle mr-2"></i>
+      <span>Selecciona una comunidad para ver las encuestas.</span>
+    </div>
+  }
+
+  @if (selectedComunidadId() && isLoading()) {
+    <div class="flex justify-center items-center py-8">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando encuestas...</span>
+    </div>
+  } @else if (selectedComunidadId()) {
+    <div class="overflow-x-auto">
+      <table class="table table-zebra w-full">
+        <thead class="bg-secondary text-white [&_th]:rounded-none [&_th]:text-white">
+          <tr>
+            <th class="w-12">#</th>
+            <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('titulo')">
+              <span class="flex items-center gap-1">
+                Título
+                @if (sortColumn() === 'titulo') {
+                  <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
+                } @else {
+                  <i class="fa-solid fa-sort text-white/70 text-xs"></i>
+                }
+              </span>
+            </th>
+            <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('fechaInicio')">
+              <span class="flex items-center gap-1">
+                Inicio
+                @if (sortColumn() === 'fechaInicio') {
+                  <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
+                } @else {
+                  <i class="fa-solid fa-sort text-white/70 text-xs"></i>
+                }
+              </span>
+            </th>
+            <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('fechaFin')">
+              <span class="flex items-center gap-1">
+                Fin
+                @if (sortColumn() === 'fechaFin') {
+                  <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
+                } @else {
+                  <i class="fa-solid fa-sort text-white/70 text-xs"></i>
+                }
+              </span>
+            </th>
+            <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('isActive')">
+              <span class="flex items-center gap-1">
+                Activa
+                @if (sortColumn() === 'isActive') {
+                  <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
+                } @else {
+                  <i class="fa-solid fa-sort text-white/70 text-xs"></i>
+                }
+              </span>
+            </th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (encuestasPaginadas().length === 0) {
+            <tr>
+              <td colspan="6" class="text-center py-8 text-gray-500">
+                <i class="fa-solid fa-inbox mr-2"></i>
+                No se encontraron encuestas
+              </td>
+            </tr>
+          } @else {
+            @for (encuesta of encuestasPaginadas(); track encuesta.id; let index = $index) {
+              <tr class="cursor-pointer hover:bg-base-200 transition-colors" (click)="viewEncuestaDetail(encuesta)">
+                <td><span class="text-sm">{{ (currentPage() - 1) * pageSize() + index + 1 }}</span></td>
+                <td class="font-medium max-w-[200px] truncate" [title]="encuesta.titulo">{{ encuesta.titulo }}</td>
+                <td>{{ formatDate(encuesta.fechaInicio) }}</td>
+                <td>{{ formatDate(encuesta.fechaFin) }}</td>
+                <td>
+                  @if (encuesta.isActive) {
+                    <span class="badge badge-success">Activa</span>
+                  } @else {
+                    <span class="badge badge-ghost">Inactiva</span>
+                  }
+                </td>
+                <td>
+                  <div class="flex gap-1 items-center">
+                    <a
+                      [routerLink]="['/admincompany/encuestas/editar', encuesta.id]"
+                      class="btn btn-square btn-ghost bg-yellow-500"
+                      (click)="$event.stopPropagation()"
+                      title="Editar"
+                    >
+                      <i class="fa-solid fa-pen"></i>
+                    </a>
+                    <button
+                      type="button"
+                      class="btn btn-square btn-ghost bg-red-500 text-white"
+                      (click)="openDeleteModal(encuesta); $event.stopPropagation()"
+                      title="Eliminar"
+                    >
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (selectedComunidadId() && totalPages() > 0) {
+      <div class="flex items-center gap-4 mt-4">
+        <div class="flex-1 min-w-0">
+          <p class="text-sm text-base-content/70">
+            Mostrando {{ encuestasPaginadas().length }} de {{ totalCount() }} encuesta(s)
+          </p>
+        </div>
+        <div class="flex justify-center flex-shrink-0">
+          <div class="join">
+            <button
+              type="button"
+              class="join-item btn btn-sm"
+              [class.btn-disabled]="currentPage() <= 1"
+              (click)="goToPage(currentPage() - 1)"
+            >
+              « Anterior
+            </button>
+            @for (p of paginasVisibles(); track p) {
+              <button
+                type="button"
+                class="join-item btn btn-sm"
+                [class.btn-active]="p === currentPage()"
+                (click)="goToPage(p)"
+              >
+                {{ p }}
+              </button>
+            }
+            <button
+              type="button"
+              class="join-item btn btn-sm"
+              [class.btn-disabled]="currentPage() >= totalPages()"
+              (click)="goToPage(currentPage() + 1)"
+            >
+              Siguiente »
+            </button>
+          </div>
+        </div>
+        <div class="flex justify-end flex-1 min-w-0">
+          <label class="flex items-center gap-2 text-sm">
+            <span class="text-base-content/70 whitespace-nowrap">Mostrar por página:</span>
+            <select
+              class="select select-bordered select-sm w-20"
+              [ngModel]="pageSize()"
+              (ngModelChange)="onPageSizeChange($event)"
+            >
+              @for (opt of pageSizeOptions; track opt) {
+                <option [value]="opt">{{ opt }}</option>
+              }
+            </select>
+          </label>
+        </div>
+      </div>
+    }
+  }
+
+  <dialog id="deleteEncuestaModal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-triangle-exclamation text-error"></i>
+        <span>Confirmar Eliminación</span>
+      </h3>
+
+      @if (encuestaToDelete()) {
+        <p class="py-4">
+          ¿Está seguro de que desea eliminar la encuesta <strong>{{ encuestaToDelete()!.titulo }}</strong>?
+        </p>
+        <p class="text-sm text-base-content/70 mb-4">
+          Esta acción no se puede deshacer. Se eliminarán también las preguntas asociadas.
+        </p>
+      }
+
+      <div class="modal-action">
+        <button class="btn btn-ghost" (click)="closeDeleteModal()">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-ghost bg-red-500 text-white min-w-28"
+          (click)="confirmDeleteEncuesta()"
+        >
+          <i class="fa-solid fa-trash mr-2"></i>
+          Eliminar
+        </button>
+      </div>
+    </div>
+
+    <form method="dialog" class="modal-backdrop">
+      <button type="button" (click)="closeDeleteModal()">Cerrar</button>
+    </form>
+  </dialog>
+</div>

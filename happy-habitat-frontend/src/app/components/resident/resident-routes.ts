@@ -7,6 +7,11 @@ import { RegistroPreferenciasComponent } from './registro-preferencias/registro-
 import { ReservacionesComponent } from '../reservaciones/reservaciones.component';
 import { ResidentEncuestasComponent } from './resident-encuestas/resident-encuestas.component';
 import { ResidentEncuestaResponderComponent } from './resident-encuesta-responder/resident-encuesta-responder.component';
+import { TicketsComponent } from '../tickets/tickets/tickets.component';
+import { TicketFormComponent } from '../tickets/ticket-form/ticket-form.component';
+import { TicketDetailComponent } from '../tickets/ticket-detail/ticket-detail.component';
+import { ResidentPagosListComponent } from '../pagos-residente/resident-pagos-list/resident-pagos-list.component';
+import { ResidentPagoDetailComponent } from '../pagos-residente/resident-pago-detail/resident-pago-detail.component';
 
 export const residentRoutes: Routes = [
     {
@@ -41,22 +46,26 @@ export const residentRoutes: Routes = [
             path: 'encuestas/:id',
             component: ResidentEncuestaResponderComponent
         },
-        /*
-        {
-            path: 'pagos',
-            component: PagosComponent
-        },
-        
-        /* 
         {
             path: 'tickets',
             component: TicketsComponent
-        }, 
-        */
-        // {
-        //     path: 'by/:code',
-        //     component: CountryPageComponent
-        // }
+        },
+        {
+            path: 'tickets/nuevo',
+            component: TicketFormComponent
+        },
+        {
+            path: 'tickets/:id',
+            component: TicketDetailComponent
+        },
+        {
+            path: 'pagos',
+            component: ResidentPagosListComponent
+        },
+        {
+            path: 'pagos/:id',
+            component: ResidentPagoDetailComponent
+        },
         {
             path: '**',
             redirectTo: 'visitantes'

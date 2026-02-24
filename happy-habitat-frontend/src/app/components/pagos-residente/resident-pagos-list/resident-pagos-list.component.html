@@ -1,0 +1,71 @@
+<div class="p-4">
+  <h1 class="text-2xl font-bold mb-6 flex items-center gap-2">
+    <i class="fa-solid fa-money-bill-1-wave text-primary"></i>
+    Mis pagos
+  </h1>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando pagos...</span>
+    </div>
+  } @else if (pagos().length === 0) {
+    <div class="alert alert-info">
+      <i class="fa-solid fa-info-circle mr-2"></i>
+      <span>No tienes pagos registrados.</span>
+    </div>
+  } @else {
+    <div class="overflow-x-auto">
+      <table class="table table-zebra w-full">
+        <thead class="bg-secondary text-white [&_th]:rounded-none [&_th]:text-white">
+          <tr>
+            <th class="w-12">#</th>
+            <th>Fecha de pago</th>
+            <th>Monto</th>
+            <th>Concepto</th>
+            <th>Comprobante</th>
+            <th>Estatus</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (pago of pagos(); track pago.id; let index = $index) {
+            <tr class="cursor-pointer hover:bg-base-200 transition-colors" (click)="viewDetail(pago)">
+              <td><span class="text-sm">{{ index + 1 }}</span></td>
+              <td>{{ formatDate(pago.fechaPago) }}</td>
+              <td class="font-mono">{{ pago.monto | number:'1.2-2' }}</td>
+              <td class="max-w-[160px] truncate" [title]="pago.concepto || ''">{{ pago.concepto || '—' }}</td>
+              <td>
+                @if (pago.urlComprobante) {
+                  <a [href]="pago.urlComprobante" target="_blank" rel="noopener noreferrer" class="link link-primary text-sm" (click)="$event.stopPropagation()" title="Abrir comprobante">Ver</a>
+                } @else {
+                  <span class="text-base-content/50">—</span>
+                }
+              </td>
+              <td>
+                <span
+                  class="badge badge-sm"
+                  [class.badge-warning]="pago.status === 'PorConfirmar'"
+                  [class.badge-success]="pago.status === 'Aplicado'"
+                  [class.badge-ghost]="pago.status === 'Cancelado'"
+                >
+                  {{ pago.status }}
+                </span>
+              </td>
+              <td>
+                <a
+                  [routerLink]="['/resident', 'pagos', pago.id]"
+                  class="btn btn-ghost btn-sm"
+                  (click)="$event.stopPropagation()"
+                  title="Ver detalle"
+                >
+                  <i class="fa-solid fa-arrow-right"></i>
+                </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

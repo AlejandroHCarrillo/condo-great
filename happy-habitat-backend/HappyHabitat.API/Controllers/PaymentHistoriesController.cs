@@ -8,7 +8,7 @@ namespace HappyHabitat.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Roles = "ADMIN_COMPANY,SYSTEM_ADMIN")]
 public class PaymentHistoriesController : ControllerBase
 {
     private readonly IPaymentHistoryService _paymentHistoryService;

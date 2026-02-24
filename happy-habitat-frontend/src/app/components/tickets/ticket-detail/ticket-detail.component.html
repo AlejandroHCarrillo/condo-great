@@ -1,0 +1,281 @@
+<div class="p-4">
+  <div class="mb-4 flex justify-between items-center">
+    <button type="button" (click)="goBack()" class="btn btn-sm btn-ghost btn-secondary">
+      <i class="fa-solid fa-arrow-left mr-2"></i>
+      Volver a la lista
+    </button>
+    @if (ticket() && isCreator()) {
+      <button
+        type="button"
+        class="btn btn-sm btn-ghost bg-yellow-500"
+        title="Editar contenido y fotos"
+        (click)="scrollToEditar()"
+      >
+        <i class="fa-solid fa-pen mr-2"></i>
+        Editar
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando ticket...</span>
+    </div>
+  } @else if (ticket()) {
+    <div id="ticket-editar" class="card bg-base-100 shadow-xl mb-6">
+      <div class="card-body">
+        <h2 class="card-title text-xl flex items-center gap-2 text-bold bg-base-200 p-2">
+          <i class="fa-solid fa-ticket text-primary"></i>
+          Ticket #{{ ticket()!.id }}
+        </h2>
+        @if (errorMessage()) {
+          <div class="alert alert-error text-sm">
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
+          <div class="flex items-baseline gap-2 flex-wrap">
+            <span class="font-semibold text-base-content/90 shrink-0">Fecha reporte:</span>
+            <span>{{ formatDate(ticket()!.fechaReporte) }}</span>
+          </div>
+          <div class="flex items-baseline gap-2 flex-wrap">
+            <span class="font-semibold text-base-content/90 shrink-0">Residente:</span>
+            <span>{{ ticket()!.residentName ?? '—' }}</span>
+          </div>
+          <div class="flex items-baseline gap-2 flex-wrap">
+            <span class="font-semibold text-base-content/90 shrink-0">Categoría:</span>
+            <span>{{ ticket()!.categoriaTicketNombre ?? '—' }}</span>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="font-semibold text-base-content/90 shrink-0">Estado:</span>
+            <select
+              class="select select-bordered select-sm max-w-xs"
+              [ngModel]="ticket()?.statusId"
+              (ngModelChange)="onStatusChange($event)"
+              [disabled]="isSavingStatus()"
+            >
+              @for (s of statusList(); track s.id) {
+                <option [ngValue]="s.id">{{ s.code }}</option>
+              }
+            </select>
+            @if (isSavingStatus()) {
+              <span class="loading loading-spinner loading-sm"></span>
+            }
+            @if (statusSavedMessage()) {
+              <span class="text-sm text-success">{{ statusSavedMessage() }}</span>
+            }
+          </div>
+        </div>
+
+        @if (isEditingMode()) {
+          <div class="md:col-span-2">
+            <label class="label"><span class="label-text font-semibold">Contenido</span></label>
+            <textarea
+              class="textarea textarea-bordered w-full min-h-[520px] bg-base-200"
+              [value]="editContenido()"
+              (input)="editContenido.set($any($event.target).value)"
+              [disabled]="isSavingEdit()"
+              placeholder="Descripción del ticket..."
+            ></textarea>
+          </div>
+          @if (ticket()!.imageUrls && ticket()!.imageUrls!.length > 0) {
+            <div class="md:col-span-2">
+              <label class="label"><span class="label-text font-semibold">Fotos actuales</span></label>
+              <div class="flex flex-wrap gap-3">
+                @for (url of ticket()!.imageUrls; track url) {
+                  <a
+                    [href]="getImageUrl(url)"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="block rounded-lg overflow-hidden border border-base-300 hover:opacity-90"
+                    title="Ver imagen"
+                  >
+                    <img
+                      [src]="getImageUrl(url)"
+                      alt="Foto del ticket"
+                      class="object-cover w-32 h-32 bg-base-200"
+                      loading="lazy"
+                      (error)="onImageError($event)"
+                    />
+                  </a>
+                }
+              </div>
+            </div>
+          }
+          <div class="md:col-span-2">
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="label-text font-semibold">Agregar más fotos</span>
+              <button type="button" class="btn btn-primary btn-sm" (click)="addNewImage()" [disabled]="isSavingEdit()">
+                <i class="fa-solid fa-plus mr-1"></i> Otra imagen
+              </button>
+            </div>
+            <div class="flex flex-wrap gap-3">
+              @for (label of newImageLabels(); track $index) {
+                <div class="flex items-center gap-2 flex-wrap p-2 rounded-lg bg-base-200/80 border border-base-300/60">
+                  <input
+                    [id]="'ticket-edit-file-' + $index"
+                    type="file"
+                    accept="image/*"
+                    class="absolute opacity-0 w-0 h-0 pointer-events-none"
+                    [attr.aria-label]="'Añadir imagen al ticket ' + ($index + 1)"
+                    (change)="onNewImageSelect($index, $event)"
+                    [disabled]="isSavingEdit()"
+                  />
+                  <label
+                    [for]="'ticket-edit-file-' + $index"
+                    class="btn btn-outline btn-sm btn-primary gap-1.5 cursor-pointer m-0"
+                    [class.btn-disabled]="isSavingEdit()"
+                  >
+                    <i class="fa-solid fa-image"></i>
+                    Elegir
+                  </label>
+                  <span class="text-sm text-base-content/80 truncate max-w-[140px]" [class.italic]="label === 'Sin archivos seleccionados'">{{ label }}</span>
+                  @if (newImageLabels().length > 1) {
+                    <button type="button" class="btn btn-ghost btn-circle btn-sm text-base-content/50 hover:text-error" (click)="removeNewImageSlot($index)" title="Quitar" [disabled]="isSavingEdit()">
+                      <i class="fa-solid fa-times"></i>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+          <div class="md:col-span-2 flex gap-2">
+            <button type="button" class="btn btn-primary" [disabled]="isSavingEdit()" (click)="saveEdit()">
+              @if (isSavingEdit()) {
+                <span class="loading loading-spinner loading-sm"></span>
+              } @else {
+                <i class="fa-solid fa-check mr-2"></i>
+              }
+              Guardar
+            </button>
+            <button type="button" class="btn btn-ghost" [disabled]="isSavingEdit()" (click)="cancelEdit()">
+              Cancelar
+            </button>
+          </div>
+        } @else {
+          @if (ticket()!.contenido) {
+            <div class="md:col-span-2">
+              <label class="label"><span class="label-text font-semibold">Contenido</span></label>
+              <p class="whitespace-pre-wrap bg-base-200 rounded-lg p-3">{{ ticket()!.contenido }}</p>
+            </div>
+          }
+          @if (ticket()!.imageUrls && ticket()!.imageUrls!.length > 0) {
+            <div class="md:col-span-2">
+              <label class="label"><span class="label-text font-semibold">Fotos</span></label>
+              <p class="text-sm text-base-content/70 mb-2">Haz clic en una imagen para verla en tamaño completo.</p>
+              <div class="flex flex-wrap gap-3">
+                @for (url of ticket()!.imageUrls; track url) {
+                  <a
+                    [href]="getImageUrl(url)"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="block rounded-lg overflow-hidden border border-base-300 hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary"
+                    title="Ver imagen"
+                  >
+                    <img
+                      [src]="getImageUrl(url)"
+                      alt="Foto del ticket"
+                      class="object-cover w-32 h-32 md:w-40 md:h-40 bg-base-200"
+                      loading="lazy"
+                      (error)="onImageError($event)"
+                    />
+                  </a>
+                }
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Comentarios -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h3 class="card-title text-lg">
+          <i class="fa-solid fa-comments mr-2 text-primary"></i>
+          Comentarios ({{ comentarios().length }})
+        </h3>
+
+        <div class="space-y-4">
+          @if (comentarios().length === 0) {
+            <p class="text-base-content/70">Aún no hay comentarios.</p>
+          } @else {
+            @for (c of comentarios(); track c.id) {
+              <div class="bg-base-200 rounded-lg p-3">
+                <p class="text-sm font-medium">{{ c.residentName ?? 'Residente' }} · {{ formatDate(c.createdAt) }}</p>
+                <p class="whitespace-pre-wrap mt-1">{{ c.comentarioTexto }}</p>
+                @let commentUrls = getCommentImageUrls(c);
+                @if (commentUrls.length > 0) {
+                  <div class="flex flex-wrap gap-2 mt-2">
+                    @for (url of commentUrls; track url) {
+                      <a
+                        [href]="getImageUrl(url)"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="block rounded border border-base-300 overflow-hidden hover:opacity-90"
+                      >
+                        <img
+                          [src]="getImageUrl(url)"
+                          alt="Imagen del comentario"
+                          class="object-cover w-20 h-20 bg-base-300"
+                          loading="lazy"
+                          (error)="onImageError($event)"
+                        />
+                      </a>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          }
+        </div>
+
+        <div class="divider"></div>
+
+        <div>
+          <label class="label"><span class="label-text font-semibold">Nuevo comentario</span></label>
+          <textarea
+            class="textarea textarea-bordered w-full min-h-[80px] mb-2"
+            placeholder="Escriba un comentario..."
+            [value]="nuevoComentario()"
+            (input)="nuevoComentario.set($any($event.target).value)"
+            [disabled]="isSavingComment()"
+          ></textarea>
+          <div class="mb-3" [class.pointer-events-none]="isSavingComment()" [class.opacity-70]="isSavingComment()">
+            <hh-file-upload
+              #commentFileUpload
+              [maxFiles]="commentUploadMaxFiles"
+              [allowedTypes]="commentUploadAllowedTypes"
+              [savePath]="commentUploadSavePath()"
+              [maxSizesByType]="commentUploadMaxSizes"
+              componentId="ticket-detail-comment-files"
+              (filesChange)="onCommentFilesChange($event)"
+            />
+          </div>
+          <div class="flex gap-2 flex-wrap">
+            <button
+              type="button"
+              class="btn btn-primary"
+              [disabled]="!nuevoComentario().trim() || isSavingComment()"
+              (click)="submitComentario()"
+            >
+              @if (isSavingComment()) {
+                <span class="loading loading-spinner loading-sm"></span>
+              } @else {
+                <i class="fa-solid fa-paper-plane mr-2"></i>
+                Enviar
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="alert alert-error">
+      <i class="fa-solid fa-exclamation-triangle mr-2"></i>
+      <span>No se pudo cargar el ticket.</span>
+    </div>
+  }
+</div>
