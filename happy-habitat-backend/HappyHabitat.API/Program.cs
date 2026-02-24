@@ -144,6 +144,7 @@ builder.Services.AddScoped<IChargesService, ChargesService>();
 builder.Services.AddScoped<IResidentService, ResidentService>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<ICargoResidenteService, CargoResidenteService>();
+builder.Services.AddScoped<IPagosResidenteService, PagosResidenteService>();
 
 // Register seeders
 builder.Services.AddScoped<InitialSeeder>();

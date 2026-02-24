@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, DestroyRef, computed } from '@angular/core';
+import { Component, inject, OnInit, AfterViewInit, signal, DestroyRef, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
@@ -27,7 +27,7 @@ const MAX_VIDEO_MB = 10;
   imports: [CommonModule, ReactiveFormsModule, RouterLink, FileUploadComponent],
   templateUrl: './ticket-form.component.html'
 })
-export class TicketFormComponent implements OnInit {
+export class TicketFormComponent implements OnInit, AfterViewInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(FormBuilder);
@@ -74,8 +74,22 @@ export class TicketFormComponent implements OnInit {
     });
   }
 
+  ngAfterViewInit(): void {
+    this.openRecomendacionesModal();
+  }
+
   onFilesChange(files: File[]): void {
     this.selectedFiles.set(files);
+  }
+
+  openRecomendacionesModal(): void {
+    const modal = document.getElementById('ticketRecomendacionesModal') as HTMLDialogElement;
+    if (modal) modal.showModal();
+  }
+
+  closeRecomendacionesModal(): void {
+    const modal = document.getElementById('ticketRecomendacionesModal') as HTMLDialogElement;
+    if (modal) modal.close();
   }
 
   submit(): void {

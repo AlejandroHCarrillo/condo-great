@@ -31,6 +31,9 @@ import { TicketFormComponent } from '../tickets/ticket-form/ticket-form.componen
 import { CargosResidenteListComponent } from '../cargos-residente/cargos-residente-list/cargos-residente-list.component';
 import { CargoResidenteFormComponent } from '../cargos-residente/cargo-residente-form/cargo-residente-form.component';
 import { CargoResidenteDetailComponent } from '../cargos-residente/cargo-residente-detail/cargo-residente-detail.component';
+import { PagosResidenteListComponent } from '../pagos-residente/pagos-residente-list/pagos-residente-list.component';
+import { PagoResidenteFormComponent } from '../pagos-residente/pago-residente-form/pago-residente-form.component';
+import { PagoResidenteDetailComponent } from '../pagos-residente/pago-residente-detail/pago-residente-detail.component';
 
 export const admincompanyRoutes: Routes = [
     {
@@ -196,6 +199,26 @@ export const admincompanyRoutes: Routes = [
             {
                 path: 'cargos-residente/:id',
                 component: CargoResidenteDetailComponent
+            },
+            {
+                path: 'pagos-residente',
+                component: PagosResidenteListComponent
+            },
+            {
+                path: 'pagos-residente/nuevo',
+                component: PagoResidenteFormComponent
+            },
+            {
+                path: 'pagos-residente/nuevo/:residentId',
+                component: PagoResidenteFormComponent
+            },
+            {
+                path: 'pagos-residente/editar/:id',
+                component: PagoResidenteFormComponent
+            },
+            {
+                path: 'pagos-residente/:id',
+                component: PagoResidenteDetailComponent
             },
             {
                 path: 'reportes/morosos',

@@ -42,6 +42,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Ticket> Tickets { get; set; }
     public DbSet<Comentario> Comentarios { get; set; }
     public DbSet<CargoResidente> CargosResidente { get; set; }
+    public DbSet<PagoResidente> PagosResidente { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -778,6 +779,33 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(e => e.Resident)
                 .WithMany(r => r.CargosResidente)
                 .HasForeignKey(e => e.ResidentId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<PagoResidente>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Monto)
+                .HasPrecision(10, 2);
+            entity.Property(e => e.Status)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+            entity.Property(e => e.Concepto)
+                .HasMaxLength(500);
+            entity.Property(e => e.UrlComprobante)
+                .HasMaxLength(2000);
+            entity.Property(e => e.Nota)
+                .HasMaxLength(2000);
+            entity.Property(e => e.FechaPago)
+                .HasColumnType("datetime2");
+            entity.Property(e => e.CreatedAt)
+                .IsRequired()
+                .HasColumnType("datetime2");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime2");
+            entity.HasOne(e => e.Resident)
+                .WithMany(r => r.PagosResidente)
+                .HasForeignKey(e => e.ResidenteId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 

@@ -1,7 +1,6 @@
 <ul class="menu w-full min-w-10 flex overflow-x-auto whitespace-nowrap bg-base-200 p-2">
   <hh-panic-button/>
-  <!-- @for (item of items; track $index) {} -->
-  @for (menuoption of menu; track $index) {
+  @for (menuoption of menu(); track menuoption.id) {
     <hh-menu-item [menuitem]="menuoption"/>
   }
 </ul>

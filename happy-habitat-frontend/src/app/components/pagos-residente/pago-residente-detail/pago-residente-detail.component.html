@@ -1,0 +1,106 @@
+<div class="p-4">
+  <div class="mb-4 flex justify-between items-center">
+    <button (click)="goBack()" class="btn btn-sm btn-ghost btn-secondary">
+      <i class="fa-solid fa-arrow-left mr-2"></i>
+      Volver a la lista
+    </button>
+    @if (pago()) {
+      <a
+        [routerLink]="['/admincompany/pagos-residente/editar', pago()!.id]"
+        [queryParams]="{ comunidad: route.snapshot.queryParams['comunidad'], residente: route.snapshot.queryParams['residente'] }"
+        class="btn btn-sm btn-ghost bg-yellow-500"
+        title="Editar"
+      >
+        <i class="fa-solid fa-pen mr-2"></i>
+        Editar
+      </a>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando pago...</span>
+    </div>
+  } @else if (pago()) {
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-2xl mb-4">
+          <i class="fa-solid fa-money-bill-1-wave text-primary mr-2"></i>
+          Pago de residente
+        </h2>
+
+        <div class="space-y-4">
+          <div>
+            <label class="label"><span class="label-text font-semibold">Residente</span></label>
+            <p class="text-lg">{{ pago()!.residentName }} {{ pago()!.residentNumber ? '(' + pago()!.residentNumber + ')' : '' }}</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="label"><span class="label-text font-semibold">Fecha de pago</span></label>
+              <p class="text-lg">{{ formatDate(pago()!.fechaPago) }}</p>
+            </div>
+            <div>
+              <label class="label"><span class="label-text font-semibold">Monto</span></label>
+              <p class="text-lg font-mono">{{ pago()!.monto | number:'1.2-2' }}</p>
+            </div>
+          </div>
+
+          @if (pago()!.concepto) {
+            <div>
+              <label class="label"><span class="label-text font-semibold">Concepto</span></label>
+              <p class="text-lg">{{ pago()!.concepto }}</p>
+            </div>
+          }
+
+          @if (pago()!.urlComprobante) {
+            <div>
+              <label class="label"><span class="label-text font-semibold">Comprobante</span></label>
+              <a [href]="pago()!.urlComprobante" target="_blank" rel="noopener noreferrer" class="link link-primary">Abrir comprobante</a>
+            </div>
+          }
+
+          <div>
+            <label class="label"><span class="label-text font-semibold">Estatus</span></label>
+            <p class="text-lg">
+              <span
+                class="badge"
+                [class.badge-warning]="pago()!.status === 'PorConfirmar'"
+                [class.badge-success]="pago()!.status === 'Aplicado'"
+                [class.badge-ghost]="pago()!.status === 'Cancelado'"
+              >
+                {{ pago()!.status }}
+              </span>
+            </p>
+          </div>
+
+          @if (pago()!.nota) {
+            <div>
+              <label class="label"><span class="label-text font-semibold">Nota</span></label>
+              <div class="prose max-w-none whitespace-pre-wrap">{{ pago()!.nota }}</div>
+            </div>
+          }
+
+          @if (pago()!.createdAt) {
+            <div>
+              <label class="label"><span class="label-text font-semibold">Fecha de creación</span></label>
+              <p class="text-sm text-base-content/70">{{ pago()!.createdAt }}</p>
+            </div>
+          }
+          @if (pago()!.updatedAt) {
+            <div>
+              <label class="label"><span class="label-text font-semibold">Última actualización</span></label>
+              <p class="text-sm text-base-content/70">{{ pago()!.updatedAt }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="alert alert-error">
+      <i class="fa-solid fa-exclamation-triangle mr-2"></i>
+      <span>No se pudo cargar el pago.</span>
+    </div>
+  }
+</div>

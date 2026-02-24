@@ -13,7 +13,39 @@
   <h1 class="w-full max-w-2xl text-2xl font-bold flex items-center gap-2 mb-6">
     <i class="fa-solid fa-ticket text-primary"></i>
     Nuevo Ticket
+    <span class="flex-1"></span>
+    <button
+      type="button"
+      class="btn btn-primary btn-circle btn-sm text-white shrink-0"
+      (click)="openRecomendacionesModal()"
+      title="Recomendaciones para crear un ticket"
+      aria-label="Ver recomendaciones"
+    >
+      <i class="fa-solid fa-circle-info"></i>
+    </button>
   </h1>
+
+  <dialog id="ticketRecomendacionesModal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box max-w-lg">
+      <h3 class="font-bold text-lg flex items-center gap-2 text-primary mb-4">
+        <i class="fa-solid fa-circle-info"></i>
+        Recomendaciones para crear un ticket
+      </h3>
+      <ul class="list-disc list-inside space-y-2 text-base-content/90 text-sm">
+        <li>Seleccione la <strong>categoría</strong> que mejor describa el reporte o sugerencia.</li>
+        <li>Escriba el <strong>contenido</strong> de forma clara: qué ocurrió, cuándo y dónde, si aplica.</li>
+        <li>Sea específico: evite mensajes vagos para agilizar la atención.</li>
+        <li>Puede adjuntar <strong>imágenes o videos</strong> (máx. 5 archivos; imágenes hasta 5 MB, videos hasta 10 MB) como evidencia.</li>
+        <li>Revise ortografía y redacción antes de enviar.</li>
+      </ul>
+      <div class="modal-action">
+        <button type="button" class="btn btn-primary" (click)="closeRecomendacionesModal()">Entendido</button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button type="button" (click)="closeRecomendacionesModal()">Cerrar</button>
+    </form>
+  </dialog>
 
   @if (errorMessage()) {
     <div class="w-full max-w-2xl alert alert-error mb-4">
