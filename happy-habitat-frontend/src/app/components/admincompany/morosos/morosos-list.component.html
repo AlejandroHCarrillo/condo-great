@@ -91,7 +91,14 @@
     }
 
     <p class="text-base-content/80 mt-6 text-sm">
-      Se consideran morosos solo los residentes que deban al menos el equivalente a <strong>2 mantenimientos</strong>. Monto de mensualidad usado para los cálculos: <strong>{{ formatCurrency(montoMantenimientoUsado() ?? 0) }}</strong> (umbral = 2 × mensualidad). La suma de cargos considera solo cargos anteriores al día actual; solo se restan pagos con estatus Aplicado. El valor de la mensualidad se toma de Configuración de la comunidad («Monto mantenimiento»).
+      Se consideran morosos solo los residentes que deban al menos el equivalente a <strong>2 mantenimientos</strong>. 
+      Monto de mensualidad usado para los cálculos: <strong>{{ formatCurrency(montoMantenimientoUsado() ?? 0) }}</strong> 
+      (umbral = 2 × mensualidad) = <strong>{{ formatCurrency(2 * (montoMantenimientoUsado() ?? 0)) }}</strong>. La suma de cargos considera solo cargos anteriores al día actual; solo se restan pagos con estatus Aplicado.
+      @if (montoDesdeListaPrecios()) {
+        El valor de la mensualidad se toma de la <strong>Lista de precios</strong> de la comunidad (concepto «Mantenimiento»).
+      } @else {
+        El valor de la mensualidad se toma de Configuración de la comunidad («Monto mantenimiento») o un valor por defecto.
+      }
     </p>
   }
 </div>

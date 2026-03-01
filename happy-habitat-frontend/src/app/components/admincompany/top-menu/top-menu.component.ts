@@ -22,8 +22,9 @@ export class TopMenuComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private navSubscription?: Subscription;
 
-  /** Menú principal: Gestionar, Configuración, Encuestas, Reportes (con submenú) */
+  /** Menú principal: Dashboard, Gestionar, Configuración, Encuestas, Reportes (con submenú) */
   readonly mainMenuItems: AdmincompanyMenuItem[] = [
+    { route: '/dashboard', label: 'Dashboard', icon: 'fa-solid fa-gauge-high' },
     { route: 'comunicados', label: 'Gestionar', icon: 'fa-solid fa-screwdriver-wrench' },
     { route: 'configuracion', label: 'Configuración', icon: 'fa-solid fa-gear' },
     { route: 'precios', label: 'Precios', icon: 'fa-solid fa-tags' },
