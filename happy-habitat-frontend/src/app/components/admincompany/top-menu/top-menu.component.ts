@@ -9,7 +9,7 @@ export interface AdmincompanyMenuItem {
   icon: string;
 }
 
-const GESTIONAR_ROUTES = ['comunicados', 'residentes', 'amenidades', 'proveedores', 'documentos', 'cargos-residente', 'pagos-residente'] as const;
+const GESTIONAR_ROUTES = ['comunicados', 'residentes', 'amenidades', 'proveedores', 'documentos', 'cargos-residente', 'pagos-residente', 'saldo-banco'] as const;
 
 @Component({
   selector: 'hh-top-menu',
@@ -42,13 +42,14 @@ export class TopMenuComponent implements OnInit, OnDestroy {
     { route: 'reportes/resumen', label: 'Resumen', icon: 'fa-solid fa-chart-pie' }
   ];
 
-  /** Barra secundaria (cuando estamos en Gestionar): Comunicados, Residentes, Amenidades, Proveedores */
+  /** Barra secundaria (cuando estamos en Gestionar): Comunicados, Residentes, Amenidades, Proveedores, etc. */
   readonly secondaryMenuItems: AdmincompanyMenuItem[] = [
     { route: 'comunicados', label: 'Comunicados', icon: 'fa-solid fa-bullhorn' },
     { route: 'residentes', label: 'Residentes', icon: 'fa-solid fa-address-book' },
     { route: 'residentes/tickets', label: 'Tickets', icon: 'fa-solid fa-ticket' },
     { route: 'cargos-residente', label: 'Cargos', icon: 'fa-solid fa-receipt' },
     { route: 'pagos-residente', label: 'Pagos', icon: 'fa-solid fa-money-bill-1-wave' },
+    { route: 'saldo-banco', label: 'Saldo banco', icon: 'fa-solid fa-building-columns' },
     { route: 'amenidades', label: 'Amenidades', icon: 'fa-solid fa-people-roof' },
     { route: 'proveedores', label: 'Proveedores', icon: 'fa-solid fa-phone-volume' }, 
     { route: 'documentos', label: 'Documentos', icon: 'fa-solid fa-file-lines' },
@@ -79,6 +80,7 @@ export class TopMenuComponent implements OnInit, OnDestroy {
     this.navSubscription = this.router.events
       .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
       .subscribe(() => {
+        this.reportesDropdownOpen.set(false);
         this.updateFromRoute();
         this.cdr.markForCheck();
       });
@@ -99,4 +101,7 @@ export class TopMenuComponent implements OnInit, OnDestroy {
 
   /** "Reportes" está activo si estamos en cualquier ruta reportes o reportes/* */
   readonly isReportesActive = computed(() => this.firstSegment() === 'reportes');
+
+  /** Controla si el dropdown de Reportes está abierto; se cierra al navegar. */
+  reportesDropdownOpen = signal(false);
 }

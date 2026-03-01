@@ -39,7 +39,7 @@ public class EncuestaService : IEncuestaService
                     Id = p.Id,
                     TipoPregunta = (int)p.TipoPregunta,
                     Pregunta = p.Pregunta,
-                    Opciones = p.OpcionesRespuesta?.OrderBy(o => o.CreatedAt).Select(o => o.Respuesta).ToList() ?? new List<string>()
+                    Opciones = p.OpcionesRespuesta?.OrderBy(o => o.CreatedAt).Select(o => o.Respuesta).ToList() ?? []
                 })
                 .ToList();
         }
@@ -240,7 +240,7 @@ public class EncuestaService : IEncuestaService
             throw new InvalidOperationException("El residente no pertenece a la comunidad de esta encuesta.");
 
         var preguntaIds = encuesta.Preguntas.Select(p => p.Id).ToHashSet();
-        foreach (var item in dto.Respuestas ?? new List<SubmitRespuestaItemDto>())
+        foreach (var item in dto.Respuestas ?? [])
         {
             if (!preguntaIds.Contains(item.PreguntaId))
                 continue;

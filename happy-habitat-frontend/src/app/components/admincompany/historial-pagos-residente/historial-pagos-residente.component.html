@@ -1,0 +1,109 @@
+<div class="p-4">
+  <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-history text-primary"></i>
+      Historial de pagos
+      @if (resident(); as r) {
+        {{ r.fullname }}
+          @if (r.number) {
+            <span class="text-base-content/70">({{ r.number }})</span>
+          }
+
+      }
+    </h1>
+    <div class="flex gap-2">
+      @if (resident(); as r) {
+        <button type="button" class="btn btn-ghost btn-sm" (click)="goToResident()" title="Ver ficha del residente">
+          <i class="fa-solid fa-user"></i>
+          Ver residente
+        </button>
+      }
+      <button type="button" class="btn btn-ghost btn-sm" (click)="goBack()">
+        <i class="fa-solid fa-arrow-left"></i>
+        Volver
+      </button>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="alert alert-error mb-6">
+      <i class="fa-solid fa-circle-exclamation mr-2"></i>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando historial...</span>
+    </div>
+  }
+
+  @if (!isLoading() && !errorMessage() && resident()) {
+    <div class="mb-4 flex items-center gap-4 flex-wrap">
+      <span class="badge badge-lg badge-outline">
+        Saldo actual: <strong [class.text-red-500]="saldoActual() > 0" [class.text-success]="saldoActual() <= 0">{{ formatCurrency(saldoActual()) }}</strong>
+      </span>
+    </div>
+
+    @if (rows().length === 0) {
+      <div class="alert alert-info">
+        <i class="fa-solid fa-info-circle mr-2"></i>
+        <span>No hay cargos ni pagos registrados para este residente.</span>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="table table-zebra w-full">
+          <thead class="bg-secondary text-white [&_th]:rounded-none [&_th]:text-white">
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Descripción</th>
+              <th class="text-right">Cargo</th>
+              <th class="text-right">Pago</th>
+              <th class="text-right">Saldo</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.id + row.date) {
+              <tr class="hover:bg-base-200 transition-colors">
+                <td class="whitespace-nowrap">{{ formatDate(row.date) }}</td>
+                <td>
+                  @if (row.type === 'cargo') {
+                    <span class="badge bg-red-500 badge-sm text-white">Cargo</span>
+                  } @else if (row.pagoAplicado) {
+                    <span class="badge bg-green-500 badge-sm text-white">Pago</span>
+                  } @else {
+                    <span class="badge badge-sm bg-purple-500 text-white border-0">Pago (no aplicado)</span>
+                  }
+                </td>
+                <td>{{ row.description }}</td>
+                <td class="text-right font-mono">
+                  @if (row.cargoAmount > 0) {
+                    {{ formatCurrency(row.cargoAmount) }}
+                  } @else {
+                    <span class="text-base-content/40">—</span>
+                  }
+                </td>
+                <td class="text-right font-mono">
+                  @if (row.pagoAmount > 0) {
+                    {{ formatCurrency(row.pagoAmount) }}
+                  } @else {
+                    <span class="text-base-content/40">—</span>
+                  }
+                </td>
+                <td class="text-right font-mono font-semibold" [class.text-red-500]="row.balanceAfter > 0" [class.text-green-500]="row.balanceAfter <= 0">
+                  {{ formatCurrency(row.balanceAfter) }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>
+<p class="text-base-content/80 mb-4">
+  <i class="fa-solid fa-info-circle mr-2"></i>
+  Cargos y pagos del más reciente al más antiguo. Saldo = cargos − pagos aplicados.
+</p>

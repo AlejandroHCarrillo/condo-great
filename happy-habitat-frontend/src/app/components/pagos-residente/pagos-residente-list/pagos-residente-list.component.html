@@ -138,7 +138,7 @@
                 <td class="max-w-[180px] truncate" [title]="pago.concepto || ''">{{ pago.concepto || '—' }}</td>
                 <td>
                   @if (pago.urlComprobante) {
-                    <a [href]="pago.urlComprobante" target="_blank" rel="noopener noreferrer" class="link link-primary text-sm" (click)="$event.stopPropagation()" title="Abrir comprobante">Ver</a>
+                    <a [href]="getComprobanteUrl(pago.urlComprobante)" target="_blank" rel="noopener noreferrer" class="link link-primary text-sm" (click)="$event.stopPropagation()" title="Abrir comprobante">Ver</a>
                   } @else {
                     <span class="text-base-content/50">—</span>
                   }
@@ -159,7 +159,7 @@
                     </a>
                     <button
                       type="button"
-                      class="btn btn-square btn-ghost text-error"
+                      class="btn btn-square btn-ghost bg-red-500 text-white"
                       (click)="$event.stopPropagation(); openDeleteModal(pago)"
                       title="Eliminar"
                     >

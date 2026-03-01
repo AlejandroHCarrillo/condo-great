@@ -1,175 +1,164 @@
-<h1 class="text-2xl">Ideas para el Dashboard</h1>
-<ul>
-  <li>Grafica de cobranza del mes</li>
-  <li>Grafica de Morosidad de los ultimos meses</li>
-  <li>Grafica de tickets levantados, tiempo de respuesta y % de resolusion</li>
-  <li>Numero de morosos en el mes</li>
-  <li>Saldo en el banco de los meses anteriores</li>
-  <li>Total de ingresos y egresos del mes</li>
-</ul>
-<!-- Data enviada: {{ reportSignal() | json }} -->
-<div class="stats shadow w-full mx-5">
-  <div class="stat">
-    <div class="stat-figure text-secondary">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        class="inline-block h-8 w-8 stroke-current"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        ></path>
-      </svg>
-    </div>
-    <div class="stat-title">Cuotas del Mes</div>
-    <div class="stat-value">158</div>
-    <div class="stat-desc">Septiembre</div>
+<div class="p-4">
+  <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+    <h1 class="text-2xl font-bold">Dashboard</h1>
+    <hh-community-filter
+      [communities]="comunidadesAsociadas()"
+      [selectedId]="selectedComunidadId()"
+      (selectedIdChange)="onComunidadChange($event)"
+    />
   </div>
 
-  <div class="stat">
-    <div class="stat-figure text-secondary">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        class="inline-block h-8 w-8 stroke-current"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-        ></path>
-      </svg>
+  @if (comunidadesAsociadas().length === 0) {
+    <div class="alert alert-warning mx-4">
+      <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+      <span>No tienes comunidades asociadas. Contacta al administrador.</span>
     </div>
-    <div class="stat-title">Recuadacion</div>
-    <div class="stat-value">126,400.00</div>
-    <div class="stat-desc">↗︎ 400 (62%)</div>
-  </div>
+  }
 
-  <div class="stat">
-    <div class="stat-figure text-secondary">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        class="inline-block h-8 w-8 stroke-current"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
-        ></path>
-      </svg>
+  @if (comunidadesAsociadas().length > 0 && !selectedComunidadId()) {
+    <div class="alert alert-info mx-4">
+      <i class="fa-solid fa-info-circle mr-2"></i>
+      <span>Seleccione una comunidad para ver su dashboard.</span>
     </div>
-    <div class="stat-title">Morosidad</div>
-    <div class="stat-value">152,200</div>
-    <div class="stat-desc">↘︎ 90 (14%)</div>
-  </div>
-</div>
+  }
 
-<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4 p-5 sm:w-full bg-base-300 2xl:grid-cols-4">
-
-  <div class="card bg-base-100 shadow-sm w-fit sm:w-full">
-    <div class="card-body items-center">
-      <h2 class="card-title">Morosos del mes</h2>
-      <hh-bar-chart [data]="reportSignal()" />
+  @if (errorMessage()) {
+    <div class="alert alert-error mx-4 mb-4">
+      <i class="fa-solid fa-circle-exclamation mr-2"></i>
+      <span>{{ errorMessage() }}</span>
     </div>
-  </div>
+  }
 
-  <div class="card bg-base-100 shadow-sm w-fit sm:w-full">
-    <div class="card-body items-center">
-      <h2 class="card-title">Cobranza</h2>
-      <hh-area-chart [data]="reportSignal()" />
+  @if (selectedComunidadId() && isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando dashboard...</span>
     </div>
-  </div>
+  }
 
-  <div class="card bg-base-100 shadow-sm w-fit sm:w-full">
-    <div class="card-body items-center">
-      <h2 class="card-title">Saldo en la cuenta</h2>
-      <hh-area-chart [data]="reportSignal()" />
+  @if (selectedComunidadId() && !isLoading()) {
+    <!-- Tarjetas: Morosos, Ingresos, Egresos, Saldo banco -->
+    <div class="stats shadow w-full mx-4 mt-4">
+      <div class="stat">
+        <div class="stat-figure text-warning">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block h-8 w-8 stroke-current">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="stat-title">Morosos en el mes</div>
+        <div class="stat-value text-warning">{{ numeroMorososMes() }}</div>
+        <div class="stat-desc">Monto en mora: {{ formatCurrency(montoEnMora()) }}</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-figure text-success">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block h-8 w-8 stroke-current">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div class="stat-title">Ingresos del mes</div>
+        <div class="stat-value text-success">{{ formatCurrency(totalIngresosMes()) }}</div>
+        <div class="stat-desc">Total recaudado</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-figure text-error">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block h-8 w-8 stroke-current">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2h-2m-4-1V9a2 2 0 012-2h2a2 2 0 012 2v1m-6 10l2 2 4-4"></path>
+          </svg>
+        </div>
+        <div class="stat-title">Egresos del mes</div>
+        <div class="stat-value text-error">{{ formatCurrency(totalEgresosMes()) }}</div>
+        <div class="stat-desc">Total gastos</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-figure text-info">
+          <i class="fa-solid fa-building-columns text-2xl"></i>
+        </div>
+        <div class="stat-title">Saldo actual en banco</div>
+        <div class="stat-value text-info">{{ formatCurrency(saldoActualEnBanco()) }}</div>
+        <div class="stat-desc">Recaudación menos gastos</div>
+      </div>
     </div>
-  </div>
 
-    <div class="card bg-base-100 shadow-sm w-fit sm:w-full">
-    <div class="card-body items-center">
-      <h2 class="card-title">Cobranza</h2>
-      <hh-bar-chart [data]="reportSignal()" />
-    </div>
-  </div>
+    <!-- Grid de gráficas -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 p-4 w-full">
+      <!-- Recaudación mensual (últimos meses) -->
+      <div class="card bg-base-100 shadow-sm w-full">
+        <div class="card-body">
+          <h2 class="card-title">Recaudación mensual</h2>
+          <p class="text-sm text-base-content/70">Últimos {{ ULTIMOS_MESES }} meses</p>
+          @if (recaudacionMensual().length > 0) {
+            <div class="w-full min-h-[280px] flex justify-center">
+              <hh-area-chart [data]="recaudacionMensual()" />
+            </div>
+          } @else {
+            <p class="text-base-content/60 py-8">Sin datos de recaudación</p>
+          }
+        </div>
+      </div>
 
-</section>
+      <!-- Gastos mensuales -->
+      <div class="card bg-base-100 shadow-sm w-full">
+        <div class="card-body">
+          <h2 class="card-title">Gastos mensuales</h2>
+          <p class="text-sm text-base-content/70">Últimos {{ ULTIMOS_MESES }} meses</p>
+          @if (gastosMensuales().length > 0) {
+            <div class="w-full min-h-[280px] flex justify-center">
+              <hh-bar-chart [data]="gastosMensuales()" />
+            </div>
+          } @else {
+            <p class="text-base-content/60 py-8">Sin datos de gastos</p>
+          }
+        </div>
+      </div>
 
+      <!-- Tickets -->
+      <div class="card bg-base-100 shadow-sm w-full">
+        <div class="card-body">
+          <h2 class="card-title">Tickets</h2>
+          <p class="text-sm text-base-content/70">Levantados y resueltos</p>
+          <div class="flex flex-wrap gap-4 mt-2">
+            <div class="badge badge-lg badge-outline gap-1">
+              <span>Levantados:</span>
+              <span class="font-semibold">{{ ticketsLevantados() }}</span>
+            </div>
+            <div class="badge badge-lg badge-outline gap-1">
+              <span>Resueltos:</span>
+              <span class="font-semibold">{{ ticketsResueltos() }}</span>
+            </div>
+            <div class="badge badge-lg badge-outline gap-1">
+              <span>Resolución:</span>
+              <span class="font-semibold">{{ porcentajeResolucion() }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <!-- Morosos resumen -->
+      <div class="card bg-base-100 shadow-sm w-full">
+        <div class="card-body items-center justify-center">
+          <h2 class="card-title">Morosos en el mes</h2>
+          <p class="text-5xl font-bold text-warning">{{ numeroMorososMes() }}</p>
+          <p class="text-sm text-base-content/70">Monto en mora: {{ formatCurrency(montoEnMora()) }}</p>
+        </div>
+      </div>
 
-
-
-<div class="stats shadow w-full">
-  <div class="stat">
-    <div class="stat-figure text-secondary">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        class="inline-block h-8 w-8 stroke-current"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        ></path>
-      </svg>
-    </div>
-    <div class="stat-title">Tickets del mes</div>
-    <div class="stat-value">120</div>
-    <div class="stat-desc">Sep 1st - Sep 30th</div>
-  </div>
-
-  <div class="stat">
-    <div class="stat-figure text-secondary">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        class="inline-block h-8 w-8 stroke-current"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-        ></path>
-      </svg>
-    </div>
-    <div class="stat-title">Recuadacion por multas</div>
-    <div class="stat-value">4,200</div>
-    <div class="stat-desc">↗︎ 400 (22%)</div>
-  </div>
-
-  <div class="stat">
-    <div class="stat-figure text-secondary">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        class="inline-block h-8 w-8 stroke-current"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
-        ></path>
-      </svg>
-    </div>
-    <div class="stat-title">Otros</div>
-    <div class="stat-value">1,200</div>
-    <div class="stat-desc">↘︎ 90 (14%)</div>
-  </div>
+      <!-- Saldo en banco (meses anteriores) -->
+      <div class="card bg-base-100 shadow-sm w-full md:col-span-2">
+        <div class="card-body">
+          <h2 class="card-title">Saldo en banco (evolución)</h2>
+          <p class="text-sm text-base-content/70">Últimos {{ ULTIMOS_MESES }} meses</p>
+          @if (saldoBancoMeses().length > 0) {
+            <div class="w-full min-h-[280px] flex justify-center">
+              <hh-area-chart [data]="saldoBancoMeses()" />
+            </div>
+          } @else {
+            <p class="text-base-content/60 py-8">Sin datos de saldo en banco</p>
+          }
+        </div>
+      </div>
+    </section>
+  }
 </div>

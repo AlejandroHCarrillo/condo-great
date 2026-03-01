@@ -15,12 +15,12 @@ public class User : AuditBase
 
     // Navigation properties
     public Role? Role { get; set; } // Kept for backward compatibility
-    public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+    public ICollection<UserRole> UserRoles { get; set; } = [];
     public Resident? Resident { get; set; }
-    public ICollection<UserCommunity> UserCommunities { get; set; } = new List<UserCommunity>();
-    public ICollection<Contrato> UpdatedContratos { get; set; } = new List<Contrato>();
-    public ICollection<PaymentHistory> UpdatedPaymentHistories { get; set; } = new List<PaymentHistory>();
-    public ICollection<CommunityProvider> CreatedByCommunityProviders { get; set; } = new List<CommunityProvider>();
-    public ICollection<CommunityProvider> UpdatedByCommunityProviders { get; set; } = new List<CommunityProvider>();
+    public ICollection<UserCommunity> UserCommunities { get; set; } = [];
+    public ICollection<Contrato> UpdatedContratos { get; set; } = [];
+    public ICollection<PaymentHistory> UpdatedPaymentHistories { get; set; } = [];
+    public ICollection<CommunityProvider> CreatedByCommunityProviders { get; set; } = [];
+    public ICollection<CommunityProvider> UpdatedByCommunityProviders { get; set; } = [];
 }
 

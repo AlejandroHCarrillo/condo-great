@@ -1,0 +1,137 @@
+<div class="p-4 max-w-2xl mx-auto">
+  <div class="flex items-center justify-between gap-4 mb-6">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-building-columns text-primary"></i>
+      {{ title }}
+    </h1>
+    <button type="button" class="btn btn-secondary text-white" (click)="cancel()">
+      Regresar
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando...</span>
+    </div>
+  } @else {
+    @if (errorMessage()) {
+      <div class="alert alert-error mb-4">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (!isEditMode() && configBancoCuentaFaltante()) {
+      <div class="alert alert-warning mb-4">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>Para registrar saldos debe configurar primero el <strong>Banco</strong> y el <strong>Número de cuenta</strong> en la configuración de la comunidad. Puede editarlos más adelante en Configuración.</span>
+      </div>
+    }
+
+    <form class="space-y-6 rounded-lg bg-base-200 p-6" (ngSubmit)="save()">
+      @if (isEditMode()) {
+        <div class="rounded-lg border border-base-300 bg-base-100 p-4">
+          <p class="text-sm font-medium text-base-content/70">Comunidad</p>
+          <p class="mt-1">{{ displayedCommunityName() }}</p>
+        </div>
+      } @else {
+        <div class="form-control w-full">
+          <label class="label" for="communityId">
+            <span class="label-text font-medium">Comunidad</span>
+          </label>
+          <select
+            id="communityId"
+            class="select select-bordered w-full"
+            [(ngModel)]="form.communityId"
+            name="communityId"
+            required
+            [disabled]="!!communityIdFromRoute()"
+            (ngModelChange)="onCommunityChange($event)"
+          >
+            <option value="">Seleccione una comunidad</option>
+            @for (c of comunidadesAsociadas(); track c.id) {
+              <option [value]="c.id">{{ c.nombre }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control w-full">
+          <label class="label" for="banco">
+            <span class="label-text font-medium">Banco</span>
+          </label>
+          <input
+            id="banco"
+            type="text"
+            class="input input-bordered w-full"
+            [(ngModel)]="form.banco"
+            name="banco"
+            required
+            placeholder="Ej. BBVA, Banamex"
+          />
+        </div>
+        <div class="form-control w-full">
+          <label class="label" for="cuenta">
+            <span class="label-text font-medium">Número de cuenta</span>
+          </label>
+          <input
+            id="cuenta"
+            type="text"
+            class="input input-bordered w-full"
+            [(ngModel)]="form.cuenta"
+            name="cuenta"
+            required
+            placeholder="Número de cuenta o CLABE"
+          />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="form-control w-full">
+          <label class="label" for="fechaSaldo">
+            <span class="label-text font-medium">Fecha del saldo</span>
+          </label>
+          <input
+            id="fechaSaldo"
+            type="date"
+            class="input input-bordered w-full"
+            [(ngModel)]="form.fechaSaldo"
+            name="fechaSaldo"
+            required
+          />
+        </div>
+        <div class="form-control w-full">
+          <label class="label" for="monto">
+            <span class="label-text font-medium">Monto (MXN)</span>
+          </label>
+          <input
+            id="monto"
+            type="number"
+            step="0.01"
+            class="input input-bordered w-full"
+            [(ngModel)]="form.monto"
+            name="monto"
+            required
+            placeholder="0.00"
+          />
+        </div>
+      </div>
+
+      <div class="flex justify-center gap-3 pt-4">
+        <button type="submit" class="btn btn-primary text-white" [disabled]="isSaving()">
+          @if (isSaving()) {
+            <span class="loading loading-spinner loading-sm"></span>
+            Guardando...
+          } @else {
+            Guardar
+          }
+        </button>
+        <button type="button" class="btn btn-ghost" (click)="cancel()">
+          Cancelar
+        </button>
+      </div>
+    </form>
+  }
+</div>

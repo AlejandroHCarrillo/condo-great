@@ -10,5 +10,7 @@
   {"codigo":"CTA_BANCO","titulo":"Cuenta bancaria de la comunidad","descripcion":"Número de cuenta bancaria de la comunidad","valor":"","tipoDato":"string"},
   {"codigo":"BANCO","titulo":"Banco","descripcion":"Nombre del banco de la comunidad","valor":"","tipoDato":"string"},
   {"codigo":"DIA_PAGO","titulo":"Dia de pago de mantenimiento","descripcion":"Dia del mes para el pago del mantenimiento","valor":"01","tipoDato":"string"},
-  {"codigo":"DIAS_TOL","titulo":"Dias de tolerancia","descripcion":"Días de tolerancia para el pago","valor":"5","tipoDato":"numerico"}
+  {"codigo":"DIAS_TOL","titulo":"Dias de tolerancia","descripcion":"Días de tolerancia para el pago","valor":"5","tipoDato":"numerico"},
+  {"codigo":"MONTO_MANT","titulo":"Monto mantenimiento","descripcion":"Monto de un mantenimiento mensual (para umbral de morosos: se considera moroso quien deba al menos 2 mantenimientos)","valor":"800","tipoDato":"numerico"},
+  {"codigo":"INTERNT_CC","titulo":"Internet casa club","descripcion":"Password de acceseo al Internet casa club","valor":"XXXX","tipoDato":"string"}
 ]

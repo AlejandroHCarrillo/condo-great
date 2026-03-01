@@ -7,6 +7,6 @@ public class VehicleType
     public string Description { get; set; } = string.Empty;
     
     // Navigation property
-    public ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
+    public ICollection<Vehicle> Vehicles { get; set; } = [];
 }
 

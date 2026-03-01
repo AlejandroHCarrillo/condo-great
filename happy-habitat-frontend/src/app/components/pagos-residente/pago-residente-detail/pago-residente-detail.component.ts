@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PagosResidenteService } from '../../../services/pagos-residente.service';
+import { ImageUrlService } from '../../../services/image-url.service';
 import { PagosResidente } from '../../../shared/interfaces/pagos-residente.interface';
 
 @Component({
@@ -14,6 +15,7 @@ export class PagoResidenteDetailComponent {
   route = inject(ActivatedRoute);
   private router = inject(Router);
   private pagosService = inject(PagosResidenteService);
+  private imageUrlService = inject(ImageUrlService);
 
   pago = signal<PagosResidente | null>(null);
   isLoading = signal<boolean>(true);
@@ -43,6 +45,11 @@ export class PagoResidenteDetailComponent {
     if (!fecha) return '—';
     const d = new Date(fecha);
     return isNaN(d.getTime()) ? fecha : d.toLocaleDateString('es-MX', { dateStyle: 'medium' });
+  }
+
+  getComprobanteUrl(url: string | null | undefined): string {
+    if (!url?.trim()) return '';
+    return this.imageUrlService.getImageUrl(url);
   }
 
   goBack(): void {

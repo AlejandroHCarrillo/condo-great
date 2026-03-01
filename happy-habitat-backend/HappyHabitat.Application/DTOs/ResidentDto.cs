@@ -13,7 +13,7 @@ public class ResidentDto
     public string? Number { get; set; }
     public string Address { get; set; } = string.Empty;
     /// <summary>Ids de comunidades (compatibilidad con frontend; típicamente un elemento si CommunityId está definido).</summary>
-    public List<Guid> CommunityIds { get; set; } = new List<Guid>();
+    public List<Guid> CommunityIds { get; set; } = [];
     public string CreatedAt { get; set; } = string.Empty;
 }
 

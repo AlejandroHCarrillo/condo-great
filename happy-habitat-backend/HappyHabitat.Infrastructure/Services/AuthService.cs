@@ -51,7 +51,7 @@ public class AuthService : IAuthService
         // Get roles from UserRoles, fallback to Role for backward compatibility
         var roles = user.UserRoles.Any() 
             ? user.UserRoles.Select(ur => ur.Role).ToList()
-            : (user.Role != null ? new List<Role> { user.Role } : new List<Role>());
+            : (user.Role != null ? [user.Role] : []);
 
         if (!roles.Any())
             throw new InvalidOperationException("User has no roles assigned");
@@ -82,11 +82,11 @@ public class AuthService : IAuthService
         if (user.Resident != null)
         {
             // Load communities from UserCommunities
-            var comunidadesList = new List<string>();
+            List<string> comunidadesList = [];
             CommunityDto? communityDto = null;
             
             // Get communities from UserCommunities
-            var comunidadesCompletasList = new List<CommunityDto>();
+            List<CommunityDto> comunidadesCompletasList = [];
             if (user.UserCommunities.Any())
             {
                 foreach (var uc in user.UserCommunities)
@@ -163,8 +163,8 @@ public class AuthService : IAuthService
         // Handle users with communities but no resident info (e.g., ADMIN_COMPANY)
         else if (user.UserCommunities.Any())
         {
-            var comunidadesList = new List<string>();
-            var comunidadesCompletasList = new List<CommunityDto>();
+            List<string> comunidadesList = [];
+            List<CommunityDto> comunidadesCompletasList = [];
             CommunityDto? communityDto = null;
 
             foreach (var uc in user.UserCommunities)

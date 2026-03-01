@@ -1387,6 +1387,53 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("HappyHabitat.Domain.Entities.SaldoCuentaBancaria", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Banco")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<Guid>("CommunityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Cuenta")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("FechaSaldo")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Monto")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommunityId");
+
+                    b.ToTable("SaldosCuentaBancaria");
+                });
+
             modelBuilder.Entity("HappyHabitat.Domain.Entities.StatusTicket", b =>
                 {
                     b.Property<int>("Id")
@@ -2007,6 +2054,17 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Navigation("Resident");
                 });
 
+            modelBuilder.Entity("HappyHabitat.Domain.Entities.SaldoCuentaBancaria", b =>
+                {
+                    b.HasOne("HappyHabitat.Domain.Entities.Community", "Community")
+                        .WithMany("SaldosCuentaBancaria")
+                        .HasForeignKey("CommunityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Community");
+                });
+
             modelBuilder.Entity("HappyHabitat.Domain.Entities.Ticket", b =>
                 {
                     b.HasOne("HappyHabitat.Domain.Entities.CategoriaTicket", "CategoriaTicket")
@@ -2145,6 +2203,8 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Navigation("Encuestas");
 
                     b.Navigation("Residents");
+
+                    b.Navigation("SaldosCuentaBancaria");
 
                     b.Navigation("Tickets");
 

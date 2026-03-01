@@ -26,8 +26,8 @@ public class Contrato : AuditBase
     // Navigation properties
     public Community Community { get; set; } = null!;
     public User? UpdatedByUser { get; set; }
-    public ICollection<PaymentHistory> PaymentHistories { get; set; } = new List<PaymentHistory>();
-    public ICollection<CargosComunidad> CargosComunidad { get; set; } = new List<CargosComunidad>();
+    public ICollection<PaymentHistory> PaymentHistories { get; set; } = [];
+    public ICollection<CargosComunidad> CargosComunidad { get; set; } = [];
 }
 
 

@@ -1,0 +1,97 @@
+<div class="p-4">
+  <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-user-clock text-primary"></i>
+      Morosos
+    </h1>
+    <hh-community-filter
+      [communities]="comunidadesAsociadas()"
+      [selectedId]="selectedComunidadId()"
+      (selectedIdChange)="onComunidadChange($event)"
+    />
+  </div>
+
+  @if (comunidadesAsociadas().length === 0) {
+    <div class="alert alert-warning mb-6">
+      <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+      <span>No tienes comunidades asociadas. Contacta al administrador del sistema.</span>
+    </div>
+  }
+
+  @if (!selectedComunidadId()) {
+    <div class="alert alert-info mb-6">
+      <i class="fa-solid fa-info-circle mr-2"></i>
+      <span>Selecciona una comunidad para ver el listado de morosos.</span>
+    </div>
+  }
+
+  @if (selectedComunidadId() && isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando morosos...</span>
+    </div>
+  }
+
+  @if (selectedComunidadId() && errorMessage()) {
+    <div class="alert alert-error mb-6">
+      <i class="fa-solid fa-circle-exclamation mr-2"></i>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (selectedComunidadId() && !isLoading() && !errorMessage()) {
+    @if (morosos().length === 0) {
+      <div class="alert alert-success">
+        <i class="fa-solid fa-circle-check mr-2"></i>
+        <span>No hay morosos en esta comunidad. Todos los residentes están al corriente.</span>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="table table-zebra w-full">
+          <thead class="bg-secondary text-white [&_th]:rounded-none [&_th]:text-white">
+            <tr>
+              <th class="w-12">#</th>
+              <th>Residente</th>
+              <th class="text-right">Total cargos</th>
+              <th class="text-right">Total pagos (aplicados)</th>
+              <th class="text-right">Balance a deber</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of morosos(); track item.residentId; let index = $index) {
+              <tr class="hover:bg-base-200 transition-colors">
+                <td><span class="text-sm">{{ index + 1 }}</span></td>
+                <td>
+                  <span class="font-medium">{{ item.fullname }}</span>
+                  @if (item.number) {
+                    <span class="text-base-content/70 ml-1">({{ item.number }})</span>
+                  }
+                </td>
+                <td class="text-right font-mono">{{ formatCurrency(item.totalCargos) }}</td>
+                <td class="text-right font-mono">{{ formatCurrency(item.totalPagos) }}</td>
+                <td class="text-right font-mono font-semibold text-red-500">{{ formatCurrency(item.balance) }}</td>
+                <td>
+                  <div class="flex gap-1">
+                    <button
+                      type="button"
+                      class="btn btn-ghost btn-sm"
+                      (click)="goToHistorial(item.residentId)"
+                      title="Ver historial de pagos y cargos"
+                    >
+                      <i class="fa-solid fa-history"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <p class="text-base-content/80 mt-6 text-sm">
+      Se consideran morosos solo los residentes que deban al menos el equivalente a <strong>2 mantenimientos</strong>. Monto de mensualidad usado para los cálculos: <strong>{{ formatCurrency(montoMantenimientoUsado() ?? 0) }}</strong> (umbral = 2 × mensualidad). La suma de cargos considera solo cargos anteriores al día actual; solo se restan pagos con estatus Aplicado. El valor de la mensualidad se toma de Configuración de la comunidad («Monto mantenimiento»).
+    </p>
+  }
+</div>

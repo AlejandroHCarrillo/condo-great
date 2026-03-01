@@ -9,8 +9,8 @@ public class LoginResponseDto
     // Backward compatibility - first role
     public string Role { get; set; } = string.Empty;
     // Multiple roles support
-    public List<string> Roles { get; set; } = new List<string>();
-    public List<RoleDto> RoleDetails { get; set; } = new List<RoleDto>();
+    public List<string> Roles { get; set; } = [];
+    public List<RoleDto> RoleDetails { get; set; } = [];
     public string ExpiresAt { get; set; } = string.Empty; // ISO date string
     public LoginResidentInfoDto? ResidentInfo { get; set; }
 }

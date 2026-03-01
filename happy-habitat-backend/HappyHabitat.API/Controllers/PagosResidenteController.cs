@@ -75,12 +75,46 @@ public class PagosResidenteController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "ADMIN_COMPANY,SYSTEM_ADMIN")]
+    [Authorize]
     public async Task<ActionResult<PagosResidenteDto>> Create(CreatePagosResidenteDto dto)
     {
+        var role = User.FindFirst(ClaimTypes.Role)?.Value;
+        var isAdmin = role == "ADMIN_COMPANY" || role == "SYSTEM_ADMIN";
+
+        if (isAdmin)
+        {
+            try
+            {
+                var item = await _service.CreateAsync(dto);
+                return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return this.BadRequestApiError("INVALID_OPERATION", ex.Message);
+            }
+        }
+
+        // Resident: can only create a payment for themselves, always with status PorConfirmar
+        var resident = await GetResidentFromToken();
+        if (resident == null)
+            return this.BadRequestApiError("BAD_REQUEST", "Usuario no está registrado como residente.");
+        if (dto.ResidenteId != resident.Id)
+            return Forbid();
+
+        var residentCreateDto = new CreatePagosResidenteDto
+        {
+            ResidenteId = resident.Id,
+            FechaPago = dto.FechaPago,
+            Monto = dto.Monto,
+            Status = "PorConfirmar",
+            Concepto = dto.Concepto,
+            UrlComprobante = dto.UrlComprobante,
+            Nota = dto.Nota,
+            CreatedByUserId = Guid.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var uid) ? uid : null
+        };
         try
         {
-            var item = await _service.CreateAsync(dto);
+            var item = await _service.CreateAsync(residentCreateDto);
             return CreatedAtAction(nameof(GetById), new { id = item.Id }, item);
         }
         catch (InvalidOperationException ex)

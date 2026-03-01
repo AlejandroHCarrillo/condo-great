@@ -43,6 +43,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Comentario> Comentarios { get; set; }
     public DbSet<CargoResidente> CargosResidente { get; set; }
     public DbSet<PagoResidente> PagosResidente { get; set; }
+    public DbSet<SaldoCuentaBancaria> SaldosCuentaBancaria { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -807,6 +808,31 @@ public class ApplicationDbContext : DbContext
                 .WithMany(r => r.PagosResidente)
                 .HasForeignKey(e => e.ResidenteId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<SaldoCuentaBancaria>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Banco)
+                .IsRequired()
+                .HasMaxLength(200);
+            entity.Property(e => e.Cuenta)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.FechaSaldo)
+                .HasColumnType("datetime2");
+            entity.Property(e => e.Monto)
+                .HasPrecision(18, 2);
+            entity.Property(e => e.CreatedAt)
+                .IsRequired()
+                .HasColumnType("datetime2");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime2");
+            entity.HasOne(e => e.Community)
+                .WithMany(c => c.SaldosCuentaBancaria)
+                .HasForeignKey(e => e.CommunityId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<ResidentConfiguration>(entity =>

@@ -39,6 +39,6 @@ public class PagoComunidadDto
 
 public class StatementDto
 {
-    public List<CargoComunidadDto> Cargos { get; set; } = new List<CargoComunidadDto>();
-    public List<PagoComunidadDto> Pagos { get; set; } = new List<PagoComunidadDto>();
+    public List<CargoComunidadDto> Cargos { get; set; } = [];
+    public List<PagoComunidadDto> Pagos { get; set; } = [];
 }

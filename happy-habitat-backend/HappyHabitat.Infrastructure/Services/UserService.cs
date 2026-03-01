@@ -52,7 +52,7 @@ public class UserService : IUserService
                 // Get all role codes from UserRoles, fallback to Role if no UserRoles
                 var currentUserRoleCodes = currentUser.UserRoles.Any() 
                     ? currentUser.UserRoles.Select(ur => ur.Role.Code).ToList()
-                    : (currentUser.Role != null ? new List<string> { currentUser.Role.Code } : new List<string>());
+                    : (currentUser.Role != null ? [currentUser.Role.Code] : []);
                 
                 var allowedRoleCodes = GetAllowedRoleCodesForViewing(currentUserRoleCodes);
                 if (allowedRoleCodes.Any())
@@ -66,7 +66,7 @@ public class UserService : IUserService
                 else
                 {
                     // User has no permission to view any users
-                    return new List<UserDto>();
+                    return [];
                 }
             }
         }
@@ -106,7 +106,7 @@ public class UserService : IUserService
     public async Task<UserDto> CreateUserAsync(CreateUserDto createUserDto, Guid? currentUserId = null)
     {
         // Prepare role IDs list (support backward compatibility with RoleId)
-        var roleIds = new List<Guid>();
+        List<Guid> roleIds = [];
         if (createUserDto.RoleId.HasValue)
         {
             roleIds.Add(createUserDto.RoleId.Value);
@@ -136,7 +136,7 @@ public class UserService : IUserService
                 // Get all role codes from UserRoles, fallback to Role if no UserRoles
                 var currentUserRoleCodes = currentUser.UserRoles.Any() 
                     ? currentUser.UserRoles.Select(ur => ur.Role.Code).ToList()
-                    : (currentUser.Role != null ? new List<string> { currentUser.Role.Code } : new List<string>());
+                    : (currentUser.Role != null ? [currentUser.Role.Code] : []);
 
                 // Validate each target role
                 foreach (var roleId in roleIds)
@@ -180,7 +180,7 @@ public class UserService : IUserService
             // If current user is ADMIN_COMPANY, use their community
             var currentUserRoleCodesForCommunity = currentUser?.UserRoles.Any() == true
                 ? currentUser.UserRoles.Select(ur => ur.Role.Code).ToList()
-                : (currentUser?.Role != null ? new List<string> { currentUser.Role.Code } : new List<string>());
+                : (currentUser?.Role != null ? [currentUser.Role.Code] : []);
             
             if (currentUserRoleCodesForCommunity.Contains("ADMIN_COMPANY") && currentUser?.Resident?.CommunityId != null)
             {
@@ -308,7 +308,7 @@ public class UserService : IUserService
             return null;
 
         // Prepare role IDs list (support backward compatibility with RoleId)
-        var roleIds = new List<Guid>();
+        List<Guid> roleIds = [];
         if (updateUserDto.RoleId.HasValue)
         {
             roleIds.Add(updateUserDto.RoleId.Value);
@@ -338,7 +338,7 @@ public class UserService : IUserService
                 // Get all role codes from UserRoles, fallback to Role if no UserRoles
                 var currentUserRoleCodes = currentUser.UserRoles.Any() 
                     ? currentUser.UserRoles.Select(ur => ur.Role.Code).ToList()
-                    : (currentUser.Role != null ? new List<string> { currentUser.Role.Code } : new List<string>());
+                    : (currentUser.Role != null ? [currentUser.Role.Code] : []);
 
                 // Validate each target role
                 foreach (var roleId in roleIds)
@@ -442,7 +442,7 @@ public class UserService : IUserService
             // If current user is ADMIN_COMPANY, use their community
             var currentUserRoleCodesForCommunity = currentUser?.UserRoles.Any() == true
                 ? currentUser.UserRoles.Select(ur => ur.Role.Code).ToList()
-                : (currentUser?.Role != null ? new List<string> { currentUser.Role.Code } : new List<string>());
+                : (currentUser?.Role != null ? [currentUser.Role.Code] : []);
             
             if (currentUserRoleCodesForCommunity.Contains("ADMIN_COMPANY") && currentUser?.Resident?.CommunityId != null)
             {
@@ -558,7 +558,7 @@ public class UserService : IUserService
         // Get roles from UserRoles, fallback to Role for backward compatibility
         var roles = user.UserRoles.Any() 
             ? user.UserRoles.Select(ur => ur.Role).ToList()
-            : (user.Role != null ? new List<Role> { user.Role } : new List<Role>());
+            : (user.Role != null ? [user.Role] : []);
 
         var dto = new UserDto
         {
@@ -593,8 +593,8 @@ public class UserService : IUserService
                 Address = user.Resident.Address,
                 CommunityId = user.Resident.CommunityId,
                 CommunityIds = user.Resident.CommunityId.HasValue 
-                    ? new List<Guid> { user.Resident.CommunityId.Value } 
-                    : new List<Guid>()
+                    ? [user.Resident.CommunityId.Value] 
+                    : []
             };
         }
 
@@ -614,21 +614,21 @@ public class UserService : IUserService
         // If user has SYSTEM_ADMIN role, they can view ADMIN_COMPANY
         if (currentUserRoleCodes.Contains("SYSTEM_ADMIN"))
         {
-            return new List<string> { "ADMIN_COMPANY" };
+            return ["ADMIN_COMPANY"];
         }
         
         // If user has ADMIN_COMPANY role, they can view RESIDENT, COMITEE_MEMBER, VIGILANCE
         if (currentUserRoleCodes.Contains("ADMIN_COMPANY"))
         {
-            return new List<string> { "RESIDENT", "COMITEE_MEMBER", "VIGILANCE" };
+            return ["RESIDENT", "COMITEE_MEMBER", "VIGILANCE"];
         }
         
-        return new List<string>();
+        return [];
     }
 
     private void ValidateUserCreationPermission(List<string> currentUserRoleCodes, string targetRoleCode, Guid? currentUserCommunityId)
     {
-        List<string> allowedRoleCodes = new List<string>();
+        List<string> allowedRoleCodes = [];
         
         // If user has SYSTEM_ADMIN role, they can create ADMIN_COMPANY
         if (currentUserRoleCodes.Contains("SYSTEM_ADMIN"))
@@ -639,7 +639,7 @@ public class UserService : IUserService
         // If user has ADMIN_COMPANY role, they can create RESIDENT, COMITEE_MEMBER, VIGILANCE
         if (currentUserRoleCodes.Contains("ADMIN_COMPANY"))
         {
-            allowedRoleCodes.AddRange(new List<string> { "RESIDENT", "COMITEE_MEMBER", "VIGILANCE" });
+            allowedRoleCodes.AddRange(["RESIDENT", "COMITEE_MEMBER", "VIGILANCE"]);
         }
 
         if (!allowedRoleCodes.Contains(targetRoleCode))

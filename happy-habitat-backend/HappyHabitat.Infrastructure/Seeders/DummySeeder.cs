@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using HappyHabitat.Domain.Entities;
+using HappyHabitat.Domain.Enums;
 using HappyHabitat.Infrastructure.Data;
 using HappyHabitat.Infrastructure.Services;
 using System.Linq;
@@ -29,7 +30,7 @@ public class DummySeeder : IDataSeeder
         var vigilanceRoleId = new Guid("66666666-6666-6666-6666-666666666666");
 
         // Create dummy users for testing
-        var dummyUsers = new List<User>();
+        List<User> dummyUsers = [];
 
         // Admin Company users
         if (!await _context.Users.AnyAsync(u => u.Username == "admin1"))
@@ -387,6 +388,10 @@ public class DummySeeder : IDataSeeder
 
         // Seed default community prices from CommunityPrices.json for all communities
         await SeedCommunityPricesFromBaseAsync();
+
+        // Asegurar configuraciones BANCO y CTA_BANCO por comunidad; luego saldos últimos 12 meses
+        await EnsureBancoConfigurationsForCommunitiesAsync();
+        await SeedSaldosCuentaBancariaUltimos12MesesAsync();
 
         // Seed 10 residents per community (for all communities in the database)
         var firstNames = new[] { "María", "José", "Ana", "Carlos", "Laura", "Pedro", "Isabel", "Miguel", "Carmen", "Francisco", "Elena", "Roberto", "Patricia", "Jorge", "Sofía", "Luis", "Gabriela", "Ricardo", "Daniela", "Alejandro" };
@@ -941,7 +946,7 @@ public class DummySeeder : IDataSeeder
         if (existingBannersCount == 0)
         {
             var currentYear = DateTime.UtcNow.Year;
-            var banners = new List<Banner>();
+            List<Banner> banners = [];
 
             // Año Nuevo - 1 de enero
             banners.Add(new Banner
@@ -1122,7 +1127,7 @@ public class DummySeeder : IDataSeeder
             var existingComunicadosCount = await _context.Comunicados.CountAsync();
             if (existingComunicadosCount == 0)
             {
-                var comunicados = new List<Comunicado>();
+                List<Comunicado> comunicados = [];
                 foreach (var community in allCommunitiesForComunicados)
                 {
                     foreach (var template in comunicadosTemplates)
@@ -1165,7 +1170,7 @@ public class DummySeeder : IDataSeeder
             if (existingAmenitiesCount == 0)
             {
                 var rnd = new Random();
-                var amenityList = new List<Amenity>();
+                List<Amenity> amenityList = [];
                 foreach (var community in allCommunitiesForAmenities)
                 {
                     var count = rnd.Next(2, 6); // 2 a 5 inclusive
@@ -1222,7 +1227,7 @@ public class DummySeeder : IDataSeeder
 
             var rndProvider = new Random();
             var allCommunitiesForProviders = await _context.Communities.ToListAsync();
-            var providerList = new List<CommunityProvider>();
+            List<CommunityProvider> providerList = [];
 
             foreach (var community in allCommunitiesForProviders)
             {
@@ -1271,9 +1276,9 @@ public class DummySeeder : IDataSeeder
         if (!await _context.Encuestas.AnyAsync())
         {
             var allCommunitiesForEncuestas = await _context.Communities.ToListAsync();
-            var encuestaList = new List<Encuesta>();
-            var preguntaList = new List<PreguntaEncuesta>();
-            var opcionList = new List<OpcionRespuesta>();
+            List<Encuesta> encuestaList = [];
+            List<PreguntaEncuesta> preguntaList = [];
+            List<OpcionRespuesta> opcionList = [];
 
             foreach (var community in allCommunitiesForEncuestas)
             {
@@ -1386,7 +1391,7 @@ public class DummySeeder : IDataSeeder
             var userCreatedNames = new[] { "Alejandro Hernández", "Carla Méndez", "Luis Ortega", "María López", "Roberto Díaz", "Patricia Gómez", "Admin Comunidad" };
             var rndDoc = new Random();
             var allCommunitiesForDocs = await _context.Communities.ToListAsync();
-            var documentList = new List<Document>();
+            List<Document> documentList = [];
 
             foreach (var community in allCommunitiesForDocs)
             {
@@ -1431,8 +1436,8 @@ public class DummySeeder : IDataSeeder
         if (!existingContratosBruselas)
         {
             var today = DateTime.UtcNow;
-            var contratosBruselas = new List<Contrato>
-            {
+            List<Contrato> contratosBruselas =
+            [
                 new Contrato
                 {
                     Id = Guid.NewGuid(),
@@ -1481,7 +1486,7 @@ public class DummySeeder : IDataSeeder
                     IsActive = true,
                     CreatedAt = today.AddMonths(-3)
                 }
-            };
+            ];
 
             await _context.Contratos.AddRangeAsync(contratosBruselas);
             await _context.SaveChangesAsync();
@@ -1499,8 +1504,8 @@ public class DummySeeder : IDataSeeder
         if (!existingContratosCotoBerlin)
         {
             var today = DateTime.UtcNow;
-            var contratosCotoBerlin = new List<Contrato>
-            {
+            List<Contrato> contratosCotoBerlin =
+            [
                 new Contrato
                 {
                     Id = Guid.NewGuid(),
@@ -1573,7 +1578,7 @@ public class DummySeeder : IDataSeeder
                     IsActive = true,
                     CreatedAt = today.AddMonths(-1)
                 }
-            };
+            ];
 
             await _context.Contratos.AddRangeAsync(contratosCotoBerlin);
             await _context.SaveChangesAsync();
@@ -1594,7 +1599,7 @@ public class DummySeeder : IDataSeeder
     /// </summary>
     private async Task GenerarCargosParaContrato(Contrato contrato)
     {
-        var cargos = new List<CargosComunidad>();
+        List<CargosComunidad> cargos = [];
         var fechaInicio = DateTime.Parse(contrato.FechaInicio);
         var today = DateTime.UtcNow;
 
@@ -1677,8 +1682,8 @@ public class DummySeeder : IDataSeeder
         if (!cargos.Any())
             return;
 
-        var pagos = new List<PagoComunidad>();
-        var pagoCargos = new List<PagoCargoComunidad>();
+        List<PagoComunidad> pagos = [];
+        List<PagoCargoComunidad> pagoCargos = [];
 
         // Obtener un usuario para asignar como UpdatedByUserId (usar el primer admin disponible)
         var adminUser = await _context.Users
@@ -1899,41 +1904,23 @@ public class DummySeeder : IDataSeeder
             await _context.SaveChangesAsync();
         }
 
-        // Seed un reporte (ticket) de cada categoría para la comunidad "Residencial El Pueblito"
-        var pueblitoCommunity = await _context.Communities.FirstOrDefaultAsync(c => c.Nombre == "Residencial El Pueblito");
-        if (pueblitoCommunity != null)
-        {
-            var pueblitoResident = await _context.Residents
-                .FirstOrDefaultAsync(r => r.CommunityId == pueblitoCommunity.Id);
-            var categorias = await _context.CategoriasTicket.OrderBy(c => c.Id).ToListAsync();
-            var statusNuevo = await _context.StatusTickets.FirstOrDefaultAsync(s => s.Code == "Nuevo");
-            if (pueblitoResident != null && categorias.Any() && statusNuevo != null)
-            {
-                foreach (var categoria in categorias)
-                {
-                    var alreadyHasTicket = await _context.Tickets
-                        .AnyAsync(t => t.CommunityId == pueblitoCommunity.Id && t.ResidentId == pueblitoResident.Id && t.CategoriaTicketId == categoria.Id);
-                    if (!alreadyHasTicket)
-                    {
-                        _context.Tickets.Add(new Ticket
-                        {
-                            CommunityId = pueblitoCommunity.Id,
-                            ResidentId = pueblitoResident.Id,
-                            CategoriaTicketId = categoria.Id,
-                            StatusId = statusNuevo.Id,
-                            FechaReporte = DateTime.UtcNow.AddDays(-categorias.IndexOf(categoria)),
-                            CreatedAt = DateTime.UtcNow
-                        });
-                    }
-                }
-                await _context.SaveChangesAsync();
-            }
-        }
+        // Seed tickets para dashboard: Pueblito (uno por categoría + algunos Resueltos) y resto de comunidades (mix Nuevo/Resuelto)
+        await SeedTicketsParaTodasLasComunidadesAsync();
 
         // Add vehicles, pets, and visits for all residents
         Console.WriteLine("=== Starting AddVehiclesPetsAndVisitsToAllResidents ===");
         await AddVehiclesPetsAndVisitsToAllResidents();
         Console.WriteLine("=== Finished AddVehiclesPetsAndVisitsToAllResidents ===");
+
+        // Add maintenance cargos (2025/2026) and 2025 payments for El Pueblito residents
+        Console.WriteLine("=== Starting AddCargosYPagosMantenimientoPueblito ===");
+        await AddCargosYPagosMantenimientoPueblitoAsync();
+        Console.WriteLine("=== Finished AddCargosYPagosMantenimientoPueblito ===");
+
+        // Add maintenance cargos and payments for other communities (dashboard: ingresos, morosos, saldo)
+        Console.WriteLine("=== Starting AddCargosYPagosMantenimientoParaOtrasComunidades ===");
+        await AddCargosYPagosMantenimientoParaOtrasComunidadesAsync();
+        Console.WriteLine("=== Finished AddCargosYPagosMantenimientoParaOtrasComunidades ===");
     }
 
     private async Task AddVehiclesPetsAndVisitsToAllResidents()
@@ -1998,7 +1985,7 @@ public class DummySeeder : IDataSeeder
                         {
                             vehicleCount = random.Next(1, 4); // 1 to 3
                         }
-                        var vehicles = new List<Vehicle>();
+                        List<Vehicle> vehicles = [];
 
                         for (int i = 0; i < vehicleCount; i++)
                         {
@@ -2045,7 +2032,7 @@ public class DummySeeder : IDataSeeder
                         {
                             petCount = random.Next(1, 4); // 1 to 3
                         }
-                        var pets = new List<Pet>();
+                        List<Pet> pets = [];
 
                         for (int i = 0; i < petCount; i++)
                         {
@@ -2093,7 +2080,7 @@ public class DummySeeder : IDataSeeder
                     if (!hasVisits)
                     {
                         var visitCount = random.Next(1, 6); // 1 to 5
-                        var visits = new List<ResidentVisit>();
+                        List<ResidentVisit> visits = [];
                         var today = DateTime.UtcNow;
 
                         for (int i = 0; i < visitCount; i++)
@@ -2175,6 +2162,282 @@ public class DummySeeder : IDataSeeder
         }
     }
 
+    private static readonly string[] MesesNombres = { "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" };
+
+    /// <summary>
+    /// Adds maintenance cargos for 2025 (800) and 2026 (1000) on the 1st of each month for all residents of Residencial El Pueblito.
+    /// Then adds payments for all residents covering 2025 cargos, with random dates (1 to end of month), concept "Mantenimiento Mes Año - Monto",
+    /// including combined payments (several months in one) and dates after current month.
+    /// </summary>
+    private async Task AddCargosYPagosMantenimientoPueblitoAsync()
+    {
+        var pueblitoId = new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87"); // Residencial El Pueblito
+        var residents = await _context.Residents
+            .Where(r => r.CommunityId == pueblitoId)
+            .ToListAsync();
+        if (residents.Count == 0) return;
+
+        var anyAlreadyHasMantenimiento = await _context.CargosResidente
+            .AnyAsync(c => c.Descripcion.Contains("Mantenimiento") && residents.Select(r => r.Id).Contains(c.ResidentId));
+        if (anyAlreadyHasMantenimiento)
+        {
+            Console.WriteLine("AddCargosYPagosMantenimientoPueblito: Cargos mantenimiento already exist, skipping.");
+            return;
+        }
+
+        var random = new Random();
+        const decimal monto2025 = 800m;
+        const decimal monto2026 = 1000m;
+
+        foreach (var resident in residents)
+        {
+            List<CargoResidente> cargos = [];
+            for (int mes = 1; mes <= 12; mes++)
+            {
+                var fecha2025 = new DateTime(2025, mes, 1, 0, 0, 0, DateTimeKind.Utc);
+                cargos.Add(new CargoResidente
+                {
+                    Id = Guid.NewGuid(),
+                    ResidentId = resident.Id,
+                    Fecha = fecha2025,
+                    Descripcion = $"Mantenimiento {MesesNombres[mes - 1]} 2025",
+                    Monto = monto2025,
+                    Estatus = EstatusCargoResidente.Activo,
+                    CreatedAt = DateTime.UtcNow
+                });
+                var fecha2026 = new DateTime(2026, mes, 1, 0, 0, 0, DateTimeKind.Utc);
+                cargos.Add(new CargoResidente
+                {
+                    Id = Guid.NewGuid(),
+                    ResidentId = resident.Id,
+                    Fecha = fecha2026,
+                    Descripcion = $"Mantenimiento {MesesNombres[mes - 1]} 2026",
+                    Monto = monto2026,
+                    Estatus = EstatusCargoResidente.Activo,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+            await _context.CargosResidente.AddRangeAsync(cargos);
+        }
+        await _context.SaveChangesAsync();
+        Console.WriteLine($"AddCargosYPagosMantenimientoPueblito: Added {residents.Count * 24} maintenance cargos (12x2025 + 12x2026) for {residents.Count} residents.");
+
+        // Pagos para cubrir 2025: 12 * 800 = 9600 por residente. Pagos con fechas aleatorias (1 a fin de mes), algunos combinados y/o después del mes corriente.
+        foreach (var resident in residents)
+        {
+            int numPagos = random.Next(4, 11); // Entre 4 y 10 pagos (algunos combinados)
+            List<List<int>> mesesPorPago = [];
+            List<int> splitPoints = [0];
+            for (int i = 0; i < numPagos - 1; i++)
+            {
+                int p;
+                do { p = random.Next(1, 12); } while (splitPoints.Contains(p));
+                splitPoints.Add(p);
+            }
+            splitPoints.Add(12);
+            splitPoints.Sort();
+            for (int i = 0; i < splitPoints.Count - 1; i++)
+            {
+                List<int> meses = [];
+                for (int m = splitPoints[i] + 1; m <= splitPoints[i + 1]; m++)
+                    meses.Add(m);
+                if (meses.Count > 0)
+                    mesesPorPago.Add(meses);
+            }
+
+            List<PagoResidente> pagos = [];
+            foreach (var meses in mesesPorPago)
+            {
+                decimal montoPago = meses.Count * monto2025;
+                string conceptoMeses = string.Join(", ", meses.Select(m => $"{MesesNombres[m - 1]} 2025"));
+                string concepto = $"Mantenimiento {conceptoMeses} - {montoPago:N0}";
+
+                int mesPago = meses[random.Next(meses.Count)];
+                int anioPago = 2025;
+                if (random.Next(0, 10) < 3)
+                {
+                    mesPago = random.Next(1, 13);
+                    anioPago = random.Next(0, 10) < 2 ? 2026 : 2025;
+                }
+                int diasEnMes = DateTime.DaysInMonth(anioPago, mesPago);
+                int dia = random.Next(1, diasEnMes + 1);
+                var fechaPago = new DateTime(anioPago, mesPago, dia, 0, 0, 0, DateTimeKind.Utc);
+
+                pagos.Add(new PagoResidente
+                {
+                    Id = Guid.NewGuid(),
+                    ResidenteId = resident.Id,
+                    FechaPago = fechaPago,
+                    Monto = montoPago,
+                    Status = StatusPagoResidente.Aplicado,
+                    Concepto = concepto,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+            await _context.PagosResidente.AddRangeAsync(pagos);
+        }
+        await _context.SaveChangesAsync();
+        Console.WriteLine("AddCargosYPagosMantenimientoPueblito: Added 2025 coverage payments for all Pueblito residents.");
+    }
+
+    /// <summary>
+    /// Adds maintenance cargos (last 6 months) and some applied payments for residents of communities that are not Pueblito and do not yet have maintenance cargos.
+    /// Ensures dashboard metrics (IngresosDelMes, RecaudacionMensual, Morosos, SaldoActualEnBanco) have data for all test communities.
+    /// </summary>
+    private async Task AddCargosYPagosMantenimientoParaOtrasComunidadesAsync()
+    {
+        var pueblitoId = new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87");
+        var now = DateTime.UtcNow;
+        var random = new Random();
+        const decimal montoMensual = 800m;
+
+        var communityIdsConResidentes = await _context.Residents
+            .Where(r => r.CommunityId != null && r.CommunityId != pueblitoId)
+            .Select(r => r.CommunityId!.Value)
+            .Distinct()
+            .ToListAsync();
+
+        foreach (var communityId in communityIdsConResidentes)
+        {
+            var residents = await _context.Residents.Where(r => r.CommunityId == communityId).ToListAsync();
+            if (residents.Count == 0) continue;
+
+            var residentIds = residents.Select(r => r.Id).ToList();
+            var yaTienenCargos = await _context.CargosResidente
+                .AnyAsync(c => c.Descripcion.Contains("Mantenimiento") && residentIds.Contains(c.ResidentId));
+            if (yaTienenCargos) continue;
+
+            for (int m = 0; m < 6; m++)
+            {
+                var fechaCargo = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc).AddMonths(-5 + m);
+                foreach (var resident in residents)
+                {
+                    _context.CargosResidente.Add(new CargoResidente
+                    {
+                        Id = Guid.NewGuid(),
+                        ResidentId = resident.Id,
+                        Fecha = fechaCargo,
+                        Descripcion = $"Mantenimiento {MesesNombres[fechaCargo.Month - 1]} {fechaCargo.Year}",
+                        Monto = montoMensual,
+                        Estatus = EstatusCargoResidente.Activo,
+                        CreatedAt = DateTime.UtcNow
+                    });
+                }
+            }
+            await _context.SaveChangesAsync();
+
+            foreach (var resident in residents)
+            {
+                int numPagos = random.Next(2, 5);
+                for (int i = 0; i < numPagos; i++)
+                {
+                    var mesPago = now.AddMonths(-random.Next(0, 4));
+                    int dia = random.Next(1, Math.Min(28, DateTime.DaysInMonth(mesPago.Year, mesPago.Month)) + 1);
+                    var fechaPago = new DateTime(mesPago.Year, mesPago.Month, dia, 0, 0, 0, DateTimeKind.Utc);
+                    var monto = montoMensual * random.Next(1, 3);
+                    _context.PagosResidente.Add(new PagoResidente
+                    {
+                        Id = Guid.NewGuid(),
+                        ResidenteId = resident.Id,
+                        FechaPago = fechaPago,
+                        Monto = monto,
+                        Status = StatusPagoResidente.Aplicado,
+                        Concepto = $"Mantenimiento {MesesNombres[mesPago.Month - 1]} {mesPago.Year} - {monto:N0}",
+                        CreatedAt = DateTime.UtcNow
+                    });
+                }
+            }
+            await _context.SaveChangesAsync();
+            Console.WriteLine($"AddCargosYPagosMantenimientoParaOtrasComunidades: Added cargos and payments for community {communityId} ({residents.Count} residents).");
+        }
+    }
+
+    /// <summary>
+    /// Seeds tickets for dashboard: Pueblito gets one per category (Nuevo) plus a few Resuelto; other communities get a mix of Nuevo/Resuelto.
+    /// </summary>
+    private async Task SeedTicketsParaTodasLasComunidadesAsync()
+    {
+        var pueblitoCommunity = await _context.Communities.FirstOrDefaultAsync(c => c.Nombre == "Residencial El Pueblito");
+        var categorias = await _context.CategoriasTicket.OrderBy(c => c.Id).ToListAsync();
+        var statusNuevo = await _context.StatusTickets.FirstOrDefaultAsync(s => s.Code == "Nuevo");
+        var statusResuelto = await _context.StatusTickets.FirstOrDefaultAsync(s => s.Code == "Resuelto");
+        if (categorias.Count == 0 || statusNuevo == null) return;
+
+        if (pueblitoCommunity != null)
+        {
+            var pueblitoResident = await _context.Residents.FirstOrDefaultAsync(r => r.CommunityId == pueblitoCommunity.Id);
+            if (pueblitoResident != null)
+            {
+                foreach (var categoria in categorias)
+                {
+                    var alreadyHasTicket = await _context.Tickets
+                        .AnyAsync(t => t.CommunityId == pueblitoCommunity.Id && t.ResidentId == pueblitoResident.Id && t.CategoriaTicketId == categoria.Id);
+                    if (!alreadyHasTicket)
+                    {
+                        _context.Tickets.Add(new Ticket
+                        {
+                            CommunityId = pueblitoCommunity.Id,
+                            ResidentId = pueblitoResident.Id,
+                            CategoriaTicketId = categoria.Id,
+                            StatusId = statusNuevo.Id,
+                            FechaReporte = DateTime.UtcNow.AddDays(-categorias.IndexOf(categoria)),
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                }
+                if (statusResuelto != null)
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        var cat = categorias[i % categorias.Count];
+                        if (!await _context.Tickets.AnyAsync(t => t.CommunityId == pueblitoCommunity.Id && t.ResidentId == pueblitoResident.Id && t.CategoriaTicketId == cat.Id && t.StatusId == statusResuelto.Id))
+                        {
+                            _context.Tickets.Add(new Ticket
+                            {
+                                CommunityId = pueblitoCommunity.Id,
+                                ResidentId = pueblitoResident.Id,
+                                CategoriaTicketId = cat.Id,
+                                StatusId = statusResuelto.Id,
+                                FechaReporte = DateTime.UtcNow.AddDays(-10 - i),
+                                CreatedAt = DateTime.UtcNow
+                            });
+                        }
+                    }
+                }
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        var random = new Random();
+        var otrasComunidades = await _context.Communities
+            .Where(c => c.Nombre != "Residencial El Pueblito")
+            .ToListAsync();
+        foreach (var community in otrasComunidades)
+        {
+            var resident = await _context.Residents.FirstOrDefaultAsync(r => r.CommunityId == community.Id);
+            if (resident == null) continue;
+            var existingCount = await _context.Tickets.CountAsync(t => t.CommunityId == community.Id);
+            if (existingCount >= 4) continue;
+
+            for (int i = 0; i < 3; i++)
+            {
+                var categoria = categorias[random.Next(categorias.Count)];
+                var status = (statusResuelto != null && random.Next(0, 2) == 1) ? statusResuelto : statusNuevo;
+                _context.Tickets.Add(new Ticket
+                {
+                    CommunityId = community.Id,
+                    ResidentId = resident.Id,
+                    CategoriaTicketId = categoria.Id,
+                    StatusId = status.Id,
+                    FechaReporte = DateTime.UtcNow.AddDays(-random.Next(1, 30)),
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+            await _context.SaveChangesAsync();
+        }
+        Console.WriteLine("SeedTicketsParaTodasLasComunidades: Tickets seeded for all communities (Nuevo + Resuelto).");
+    }
+
     /// <summary>
     /// Loads CommunityConfigurationBase.json (embedded resource) and creates one CommunityConfiguration per template for each community that does not have any config yet.
     /// </summary>
@@ -2196,7 +2459,7 @@ public class DummySeeder : IDataSeeder
             return;
 
         var communityIds = await _context.Communities.Select(c => c.Id).ToListAsync();
-        var configsToAdd = new List<CommunityConfiguration>();
+        List<CommunityConfiguration> configsToAdd = [];
 
         foreach (var communityId in communityIds)
         {
@@ -2267,7 +2530,7 @@ public class DummySeeder : IDataSeeder
             return;
 
         var communityIds = await _context.Communities.Select(c => c.Id).ToListAsync();
-        var pricesToAdd = new List<CommunityPrice>();
+        List<CommunityPrice> pricesToAdd = [];
 
         foreach (var communityId in communityIds)
         {
@@ -2294,6 +2557,130 @@ public class DummySeeder : IDataSeeder
             await _context.CommunityPrices.AddRangeAsync(pricesToAdd);
             await _context.SaveChangesAsync();
         }
+    }
+
+    /// <summary>
+    /// Asegura que cada comunidad tenga configuraciones BANCO y CTA_BANCO; si no existen o están vacías, las agrega o actualiza.
+    /// </summary>
+    private async Task EnsureBancoConfigurationsForCommunitiesAsync()
+    {
+        var communities = await _context.Communities.Select(c => c.Id).ToListAsync();
+        var bankNames = new[] { "BBVA", "Banamex", "Santander", "Scotiabank" };
+        int bankIndex = 0;
+
+        foreach (var communityId in communities)
+        {
+            var configs = await _context.CommunityConfigurations
+                .Where(cc => cc.CommunityId == communityId && (cc.Codigo == "BANCO" || cc.Codigo == "CTA_BANCO"))
+                .ToListAsync();
+
+            var bancoConfig = configs.FirstOrDefault(c => c.Codigo == "BANCO");
+            var ctaConfig = configs.FirstOrDefault(c => c.Codigo == "CTA_BANCO");
+
+            if (bancoConfig == null)
+            {
+                var bancoName = bankNames[bankIndex % bankNames.Length];
+                bankIndex++;
+                _context.CommunityConfigurations.Add(new CommunityConfiguration
+                {
+                    Id = Guid.NewGuid(),
+                    CommunityId = communityId,
+                    Codigo = "BANCO",
+                    Titulo = "Banco",
+                    Descripcion = "Nombre del banco de la comunidad",
+                    Valor = bancoName,
+                    TipoDato = "string",
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+            else if (string.IsNullOrWhiteSpace(bancoConfig.Valor))
+            {
+                bancoConfig.Valor = bankNames[bankIndex % bankNames.Length];
+                bankIndex++;
+            }
+
+            if (ctaConfig == null)
+            {
+                var fakeClabe = "0121800" + communityId.ToString("N")[..8] + "0";
+                _context.CommunityConfigurations.Add(new CommunityConfiguration
+                {
+                    Id = Guid.NewGuid(),
+                    CommunityId = communityId,
+                    Codigo = "CTA_BANCO",
+                    Titulo = "Cuenta bancaria de la comunidad",
+                    Descripcion = "Número de cuenta bancaria de la comunidad",
+                    Valor = fakeClabe.Length > 18 ? fakeClabe[..18] : fakeClabe,
+                    TipoDato = "string",
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+            else if (string.IsNullOrWhiteSpace(ctaConfig.Valor))
+            {
+                ctaConfig.Valor = "0121800" + communityId.ToString("N")[..8] + "0";
+                if (ctaConfig.Valor.Length > 18)
+                    ctaConfig.Valor = ctaConfig.Valor[..18];
+            }
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Para cada comunidad, obtiene Banco y Cuenta de las configuraciones y crea saldos de cuenta bancaria
+    /// para los últimos 12 meses si no existen ya para ese (comunidad, banco, cuenta, mes).
+    /// </summary>
+    private async Task SeedSaldosCuentaBancariaUltimos12MesesAsync()
+    {
+        var communities = await _context.Communities.ToListAsync();
+        var configsByCommunity = await _context.CommunityConfigurations
+            .Where(cc => cc.Codigo == "BANCO" || cc.Codigo == "CTA_BANCO")
+            .ToListAsync();
+
+        var now = DateTime.UtcNow;
+        var endMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var random = new Random(31);
+
+        foreach (var community in communities)
+        {
+            var bancoConfig = configsByCommunity.FirstOrDefault(c => c.CommunityId == community.Id && c.Codigo == "BANCO");
+            var ctaConfig = configsByCommunity.FirstOrDefault(c => c.CommunityId == community.Id && c.Codigo == "CTA_BANCO");
+
+            var banco = (bancoConfig?.Valor ?? "").Trim();
+            var cuenta = (ctaConfig?.Valor ?? "").Trim();
+            if (string.IsNullOrEmpty(banco)) banco = "BBVA";
+            if (string.IsNullOrEmpty(cuenta)) cuenta = "0121800" + community.Id.ToString("N")[..8] + "0";
+
+            for (int i = 0; i < 12; i++)
+            {
+                var monthStart = endMonth.AddMonths(-i);
+                var lastDayOfMonth = monthStart.AddMonths(1).AddDays(-1);
+                var fechaSaldo = lastDayOfMonth;
+
+                var exists = await _context.SaldosCuentaBancaria.AnyAsync(s =>
+                    s.CommunityId == community.Id
+                    && s.Banco == banco
+                    && s.Cuenta == cuenta
+                    && s.FechaSaldo.Year == fechaSaldo.Year
+                    && s.FechaSaldo.Month == fechaSaldo.Month);
+
+                if (exists)
+                    continue;
+
+                var monto = 80_000m + (random.Next(0, 50) * 1000m) + (i * 500m);
+                _context.SaldosCuentaBancaria.Add(new SaldoCuentaBancaria
+                {
+                    CommunityId = community.Id,
+                    Community = community,
+                    Banco = banco,
+                    Cuenta = cuenta.Length > 50 ? cuenta[..50] : cuenta,
+                    FechaSaldo = fechaSaldo,
+                    Monto = monto,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
+        }
+
+        await _context.SaveChangesAsync();
     }
 
     private sealed class CommunityConfigurationBaseItem

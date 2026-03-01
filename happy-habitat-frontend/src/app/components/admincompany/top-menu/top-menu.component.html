@@ -52,7 +52,7 @@
       @for (item of mainMenuItems; track item.route) {
         @if (item.route === 'reportes') {
           <li>
-            <details class="dropdown" [attr.open]="isReportesActive() ? true : null">
+            <details class="dropdown" [attr.open]="reportesDropdownOpen() ? true : null" (toggle)="reportesDropdownOpen.set($any($event).target?.open ?? false)">
               <summary
                 class="btn rounded-btn"
                 [class.btn-secondary]="isReportesActive()"

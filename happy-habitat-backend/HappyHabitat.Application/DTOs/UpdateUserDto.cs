@@ -9,7 +9,7 @@ public class UpdateUserDto
     
     // Multiple roles support - at least one role is required
     [Required(ErrorMessage = "At least one role is required")]
-    public List<Guid> RoleIds { get; set; } = new List<Guid>();
+    public List<Guid> RoleIds { get; set; } = [];
 
     [Required]
     public string FirstName { get; set; } = string.Empty;
@@ -31,10 +31,10 @@ public class UpdateUserDto
     public ResidentUpdateDto? ResidentInfo { get; set; }
     
     // Community IDs (for roles that need communities - RESIDENT, COMITEE_MEMBER, VIGILANCE)
-    public List<Guid> CommunityIds { get; set; } = new List<Guid>();
+    public List<Guid> CommunityIds { get; set; } = [];
     
     // User Community IDs (for any user role)
-    public List<Guid> UserCommunityIds { get; set; } = new List<Guid>();
+    public List<Guid> UserCommunityIds { get; set; } = [];
 }
 
 public class ResidentUpdateDto

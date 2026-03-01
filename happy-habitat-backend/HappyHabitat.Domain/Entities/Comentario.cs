@@ -16,5 +16,5 @@ public class Comentario : AuditBase
 
     public Resident? Resident { get; set; }
     public Comentario? ParentComment { get; set; }
-    public ICollection<Comentario> Replies { get; set; } = new List<Comentario>();
+    public ICollection<Comentario> Replies { get; set; } = [];
 }

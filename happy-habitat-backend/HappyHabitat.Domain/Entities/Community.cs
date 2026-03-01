@@ -17,17 +17,18 @@ public class Community
     public string CreatedAt { get; set; } = string.Empty; // ISO date string
     
     // Navigation properties
-    public ICollection<Resident> Residents { get; set; } = new List<Resident>();
-    public ICollection<Banner> Banners { get; set; } = new List<Banner>();
-    public ICollection<Comunicado> Comunicados { get; set; } = new List<Comunicado>();
-    public ICollection<Amenity> Amenities { get; set; } = new List<Amenity>();
-    public ICollection<UserCommunity> UserCommunities { get; set; } = new List<UserCommunity>();
-    public ICollection<Contrato> Contratos { get; set; } = new List<Contrato>();
-    public ICollection<CommunityProvider> CommunityProviders { get; set; } = new List<CommunityProvider>();
-    public ICollection<Document> Documents { get; set; } = new List<Document>();
-    public ICollection<CommunityConfiguration> CommunityConfigurations { get; set; } = new List<CommunityConfiguration>();
-    public ICollection<Encuesta> Encuestas { get; set; } = new List<Encuesta>();
-    public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
-    public ICollection<CommunityPrice> CommunityPrices { get; set; } = new List<CommunityPrice>();
+    public ICollection<Resident> Residents { get; set; } = [];
+    public ICollection<Banner> Banners { get; set; } = [];
+    public ICollection<Comunicado> Comunicados { get; set; } = [];
+    public ICollection<Amenity> Amenities { get; set; } = [];
+    public ICollection<UserCommunity> UserCommunities { get; set; } = [];
+    public ICollection<Contrato> Contratos { get; set; } = [];
+    public ICollection<CommunityProvider> CommunityProviders { get; set; } = [];
+    public ICollection<Document> Documents { get; set; } = [];
+    public ICollection<CommunityConfiguration> CommunityConfigurations { get; set; } = [];
+    public ICollection<Encuesta> Encuestas { get; set; } = [];
+    public ICollection<Ticket> Tickets { get; set; } = [];
+    public ICollection<CommunityPrice> CommunityPrices { get; set; } = [];
+    public ICollection<SaldoCuentaBancaria> SaldosCuentaBancaria { get; set; } = [];
 }
 

@@ -14,14 +14,14 @@ public class Resident : AuditBase
     // Navigation properties
     public User User { get; set; } = null!;
     public Community? Community { get; set; } // Navigation property to Community
-    public ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
-    public ICollection<Pet> Pets { get; set; } = new List<Pet>();
-    public ICollection<ResidentVisit> Visits { get; set; } = new List<ResidentVisit>();
-    public ICollection<ResidentConfiguration> ResidentConfigurations { get; set; } = new List<ResidentConfiguration>();
-    public ICollection<RespuestaResidente> RespuestasEncuestas { get; set; } = new List<RespuestaResidente>();
-    public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
-    public ICollection<Comentario> Comentarios { get; set; } = new List<Comentario>();
-    public ICollection<CargoResidente> CargosResidente { get; set; } = new List<CargoResidente>();
-    public ICollection<PagoResidente> PagosResidente { get; set; } = new List<PagoResidente>();
+    public ICollection<Vehicle> Vehicles { get; set; } = [];
+    public ICollection<Pet> Pets { get; set; } = [];
+    public ICollection<ResidentVisit> Visits { get; set; } = [];
+    public ICollection<ResidentConfiguration> ResidentConfigurations { get; set; } = [];
+    public ICollection<RespuestaResidente> RespuestasEncuestas { get; set; } = [];
+    public ICollection<Ticket> Tickets { get; set; } = [];
+    public ICollection<Comentario> Comentarios { get; set; } = [];
+    public ICollection<CargoResidente> CargosResidente { get; set; } = [];
+    public ICollection<PagoResidente> PagosResidente { get; set; } = [];
 }
 
