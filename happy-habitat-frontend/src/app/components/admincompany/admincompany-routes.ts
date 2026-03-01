@@ -36,6 +36,8 @@ import { PagoResidenteFormComponent } from '../pagos-residente/pago-residente-fo
 import { PagoResidenteDetailComponent } from '../pagos-residente/pago-residente-detail/pago-residente-detail.component';
 import { MorososListComponent } from './morosos/morosos-list.component';
 import { HistorialPagosResidenteComponent } from './historial-pagos-residente/historial-pagos-residente.component';
+import { SaldoBancoListComponent } from './saldo-banco/saldo-banco-list.component';
+import { SaldoBancoFormComponent } from './saldo-banco/saldo-banco-form.component';
 
 export const admincompanyRoutes: Routes = [
     {
@@ -225,6 +227,18 @@ export const admincompanyRoutes: Routes = [
             {
                 path: 'pagos-residente/:id',
                 component: PagoResidenteDetailComponent
+            },
+            {
+                path: 'saldo-banco',
+                component: SaldoBancoListComponent
+            },
+            {
+                path: 'saldo-banco/nuevo/:communityId',
+                component: SaldoBancoFormComponent
+            },
+            {
+                path: 'saldo-banco/editar/:id',
+                component: SaldoBancoFormComponent
             },
             {
                 path: 'reportes/morosos',

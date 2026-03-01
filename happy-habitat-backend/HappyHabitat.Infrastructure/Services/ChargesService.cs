@@ -25,7 +25,7 @@ public class ChargesService : IChargesService
 
         if (!contratos.Any())
         {
-            return new StatementDto { Cargos = new List<CargoComunidadDto>(), Pagos = new List<PagoComunidadDto>() };
+            return new StatementDto { Cargos = [], Pagos = [] };
         }
 
         // Obtener cargos de todos los contratos relacionados

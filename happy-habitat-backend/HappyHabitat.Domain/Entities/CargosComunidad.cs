@@ -15,5 +15,5 @@ public class CargosComunidad : AuditBase
     // Navigation properties
     public Contrato Contrato { get; set; } = null!;
     public Community Comunidad { get; set; } = null!;
-    public ICollection<PagoCargoComunidad> PagoCargos { get; set; } = new List<PagoCargoComunidad>();
+    public ICollection<PagoCargoComunidad> PagoCargos { get; set; } = [];
 }

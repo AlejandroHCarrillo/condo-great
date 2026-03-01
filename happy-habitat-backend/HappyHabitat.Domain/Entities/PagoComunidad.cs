@@ -10,5 +10,5 @@ public class PagoComunidad : AuditBase
 
     // Navigation properties
     public User? UpdatedByUser { get; set; }
-    public ICollection<PagoCargoComunidad> PagoCargos { get; set; } = new List<PagoCargoComunidad>();
+    public ICollection<PagoCargoComunidad> PagoCargos { get; set; } = [];
 }

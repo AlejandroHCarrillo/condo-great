@@ -8,5 +8,5 @@ public class CategoriaTicket
     public int Id { get; set; }
     public string Categoria { get; set; } = string.Empty;
 
-    public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+    public ICollection<Ticket> Tickets { get; set; } = [];
 }

@@ -14,6 +14,6 @@ public class Encuesta : AuditBase
     public bool IsActive { get; set; } = true;
 
     public Community? Community { get; set; }
-    public ICollection<PreguntaEncuesta> Preguntas { get; set; } = new List<PreguntaEncuesta>();
-    public ICollection<RespuestaResidente> RespuestasResidentes { get; set; } = new List<RespuestaResidente>();
+    public ICollection<PreguntaEncuesta> Preguntas { get; set; } = [];
+    public ICollection<RespuestaResidente> RespuestasResidentes { get; set; } = [];
 }

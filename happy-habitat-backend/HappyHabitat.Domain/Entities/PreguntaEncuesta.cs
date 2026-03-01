@@ -11,6 +11,6 @@ public class PreguntaEncuesta : AuditBase
     public string Pregunta { get; set; } = string.Empty;
 
     public Encuesta? Encuesta { get; set; }
-    public ICollection<OpcionRespuesta> OpcionesRespuesta { get; set; } = new List<OpcionRespuesta>();
-    public ICollection<RespuestaResidente> RespuestasResidentes { get; set; } = new List<RespuestaResidente>();
+    public ICollection<OpcionRespuesta> OpcionesRespuesta { get; set; } = [];
+    public ICollection<RespuestaResidente> RespuestasResidentes { get; set; } = [];
 }

@@ -115,7 +115,7 @@ public class ResidentService : IResidentService
             .Where(r => r.CommunityId != null && ids.Contains(r.CommunityId.Value) && r.User != null && r.User.IsActive)
             .ToListAsync();
 
-        var byUserId = new Dictionary<Guid, ResidentDto>();
+        Dictionary<Guid, ResidentDto> byUserId = [];
         foreach (var r in residents)
         {
             if (r.UserId != Guid.Empty && !byUserId.ContainsKey(r.UserId))
@@ -156,7 +156,7 @@ public class ResidentService : IResidentService
             .Where(r => r.CommunityId != null && ids.Contains(r.CommunityId!.Value) && pagedUserIds.Contains(r.UserId))
             .ToListAsync();
 
-        var byUserId = new Dictionary<Guid, ResidentDto>();
+        Dictionary<Guid, ResidentDto> byUserId = [];
         foreach (var r in residents)
         {
             if (r.UserId != Guid.Empty && !byUserId.ContainsKey(r.UserId))
@@ -270,7 +270,7 @@ public class ResidentService : IResidentService
             Phone = r.Phone,
             Number = r.Number,
             Address = r.Address,
-            CommunityIds = r.CommunityId.HasValue ? new List<Guid> { r.CommunityId.Value } : new List<Guid>(),
+            CommunityIds = r.CommunityId.HasValue ? [r.CommunityId.Value] : [],
             CreatedAt = r.CreatedAt.ToString("O")
         };
     }

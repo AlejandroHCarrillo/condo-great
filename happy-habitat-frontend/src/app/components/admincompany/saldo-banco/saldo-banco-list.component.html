@@ -1,0 +1,140 @@
+<div class="p-4">
+  <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-building-columns text-primary"></i>
+      Saldos de cuenta bancaria
+    </h1>
+    <div class="flex items-center gap-2">
+      <hh-community-filter
+        [communities]="comunidadesAsociadas()"
+        [selectedId]="selectedComunidadId()"
+        (selectedIdChange)="onComunidadChange($event)"
+      />
+      <a
+        [routerLink]="selectedComunidadId() ? ['/admincompany/saldo-banco/nuevo', selectedComunidadId()] : null"
+        class="btn btn-primary btn-sm btn-square text-white"
+        [class.btn-disabled]="!selectedComunidadId()"
+        [attr.aria-disabled]="!selectedComunidadId()"
+        (click)="!selectedComunidadId() && $event.preventDefault()"
+        title="Nuevo saldo"
+      >
+        <i class="fa-solid fa-plus"></i>
+      </a>
+    </div>
+  </div>
+
+  @if (comunidadesAsociadas().length === 0) {
+    <div class="alert alert-warning mb-6">
+      <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+      <span>No tienes comunidades asociadas. Contacta al administrador del sistema.</span>
+    </div>
+  }
+
+  @if (!selectedComunidadId()) {
+    <div class="alert alert-info mb-6">
+      <i class="fa-solid fa-info-circle mr-2"></i>
+      <span>Selecciona una comunidad para ver los saldos de las cuentas bancarias.</span>
+    </div>
+  }
+
+  @if (selectedComunidadId() && errorMessage()) {
+    <div class="alert alert-error mb-6">
+      <i class="fa-solid fa-circle-exclamation mr-2"></i>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (selectedComunidadId() && isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando saldos...</span>
+    </div>
+  }
+
+  @if (selectedComunidadId() && !isLoading()) {
+    @if (saldos().length === 0) {
+      <div class="alert alert-info">
+        <i class="fa-solid fa-info-circle mr-2"></i>
+        <span>No hay saldos registrados para esta comunidad.</span>
+        <a
+          [routerLink]="['/admincompany/saldo-banco/nuevo', selectedComunidadId()]"
+          class="btn btn-sm btn-primary ml-4 text-white"
+        >
+          Registrar primer saldo
+        </a>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="table table-zebra w-full">
+          <thead class="bg-secondary text-white [&_th]:rounded-none [&_th]:text-white">
+            <tr>
+              <th class="w-12">#</th>
+              <th>Banco</th>
+              <th>Cuenta</th>
+              <th>Fecha saldo</th>
+              <th class="text-right">Monto</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of saldos(); track item.id; let index = $index) {
+              <tr class="hover:bg-base-200 transition-colors">
+                <td><span class="text-sm">{{ index + 1 }}</span></td>
+                <td class="font-medium">{{ item.banco || '—' }}</td>
+                <td class="font-mono">{{ item.cuenta || '—' }}</td>
+                <td class="whitespace-nowrap">{{ formatDate(item.fechaSaldo) }}</td>
+                <td class="text-right font-mono">{{ formatCurrency(item.monto) }}</td>
+                <td>
+                  <div class="flex gap-1">
+                    <button
+                      type="button"
+                      class="btn btn-ghost btn-sm"
+                      (click)="goToEdit(item)"
+                      title="Editar"
+                    >
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-ghost btn-sm text-error"
+                      (click)="openDeleteModal(item)"
+                      title="Eliminar"
+                    >
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>
+
+<!-- Modal confirmación eliminar -->
+<dialog id="deleteSaldoModal" class="modal modal-bottom sm:modal-middle">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+      <i class="fa-solid fa-triangle-exclamation text-error"></i>
+      <span>Confirmar eliminación</span>
+    </h3>
+    @if (saldoToDelete(); as saldo) {
+      <p class="py-4">
+        ¿Eliminar el registro de saldo <strong>{{ saldo.banco }}</strong> – {{ saldo.cuenta }} ({{ formatDate(saldo.fechaSaldo) }})?
+      </p>
+      <p class="text-sm text-base-content/70 mb-4">Esta acción no se puede deshacer.</p>
+    }
+    <div class="modal-action">
+      <button type="button" class="btn btn-ghost" (click)="closeDeleteModal()">Cancelar</button>
+      <button type="button" class="btn bg-red-500 text-white min-w-28" (click)="confirmDelete()">
+        <i class="fa-solid fa-trash mr-2"></i>
+        Eliminar
+      </button>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button type="button" (click)="closeDeleteModal()">Cerrar</button>
+  </form>
+</dialog>

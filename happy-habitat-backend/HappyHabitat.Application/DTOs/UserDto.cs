@@ -7,9 +7,9 @@ public class UserDto
     public Guid? RoleId { get; set; }
     public string? RoleCode { get; set; }
     // Multiple roles support
-    public List<RoleDto> Roles { get; set; } = new List<RoleDto>();
-    public List<Guid> RoleIds { get; set; } = new List<Guid>();
-    public List<string> RoleCodes { get; set; } = new List<string>();
+    public List<RoleDto> Roles { get; set; } = [];
+    public List<Guid> RoleIds { get; set; } = [];
+    public List<string> RoleCodes { get; set; } = [];
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;
@@ -21,7 +21,7 @@ public class UserDto
     public ResidentInfoDto? ResidentInfo { get; set; }
     
     // User Communities (for any user role)
-    public List<Guid> UserCommunityIds { get; set; } = new List<Guid>();
+    public List<Guid> UserCommunityIds { get; set; } = [];
 }
 
 public class RoleDto
@@ -40,6 +40,6 @@ public class ResidentInfoDto
     public string? Number { get; set; }
     public string Address { get; set; } = string.Empty;
     public Guid? CommunityId { get; set; }
-    public List<Guid> CommunityIds { get; set; } = new List<Guid>(); // For compatibility with frontend
+    public List<Guid> CommunityIds { get; set; } = []; // For compatibility with frontend
 }
 

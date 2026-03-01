@@ -10,5 +10,5 @@ public class StatusTicket
     public string Descripcion { get; set; } = string.Empty;
     public string Color { get; set; } = string.Empty;
 
-    public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+    public ICollection<Ticket> Tickets { get; set; } = [];
 }
