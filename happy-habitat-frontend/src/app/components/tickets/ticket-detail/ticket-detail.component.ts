@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit, DestroyRef, ViewChild } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, DestroyRef, ViewChild, ElementRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -66,6 +66,10 @@ export class TicketDetailComponent implements OnInit {
   commentFiles = signal<File[]>([]);
 
   @ViewChild('commentFileUpload') commentFileUploadRef?: FileUploadComponent;
+  @ViewChild('imageModal') imageModalRef?: ElementRef<HTMLDialogElement>;
+
+  /** URL de la imagen mostrada en el modal (null = cerrado). */
+  imageModalUrl = signal<string | null>(null);
 
   /** Parámetros para el file-upload de comentarios: 2 archivos, imagen o video, 5 MB / 10 MB. */
   readonly commentUploadMaxFiles = 2;
@@ -366,5 +370,15 @@ export class TicketDetailComponent implements OnInit {
         parent.appendChild(msg);
       }
     }
+  }
+
+  openImageModal(relativePath: string): void {
+    this.imageModalUrl.set(this.getImageUrl(relativePath));
+    setTimeout(() => this.imageModalRef?.nativeElement?.showModal(), 0);
+  }
+
+  closeImageModal(): void {
+    this.imageModalUrl.set(null);
+    this.imageModalRef?.nativeElement?.close();
   }
 }

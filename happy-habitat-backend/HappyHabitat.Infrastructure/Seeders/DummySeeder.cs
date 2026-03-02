@@ -1148,6 +1148,50 @@ public class DummySeeder : IDataSeeder
                 await _context.Comunicados.AddRangeAsync(comunicados);
                 await _context.SaveChangesAsync();
             }
+
+            // Comunicados adicionales para Residencial El Pueblito (sin referencias a Condovive)
+            var pueblitoComunidad = await _context.Communities.FirstOrDefaultAsync(c => c.Nombre == "Residencial El Pueblito");
+            if (pueblitoComunidad != null)
+            {
+                var comunicadosPueblito = new[]
+                {
+                    new { Titulo = "Happy Habitat: la nueva app para gestionar el coto", Subtitulo = "Comunicado Importante", Contenido = "Comunicado Importante\n\nA partir del 6 de enero de 2025, en el coto se implementará el uso obligatorio de la aplicación Happy Habitat para mejorar la comunicación y gestión interna. Descarga la app y únete a esta innovadora forma de estar conectados. ¡Tu participación es fundamental para fortalecer nuestra comunidad!\n\nAtentamente", Fecha = new DateTime(2025, 3, 3) },
+                    new { Titulo = "Registro de pagos de mantenimiento: envío por WhatsApp o carga en la plataforma", Subtitulo = "Comunicado Importante", Contenido = "Comunicado Importante\n\nPara poder registrar sus pagos de mantenimiento de manera oportuna, les recordamos que es necesario enviar los comprobantes por WhatsApp al número 442-777-5131 o cargarlos directamente en la plataforma.\n\nAgradecemos su colaboración para mantener al día las cuentas del condominio.\n\n¡Su participación es fundamental para el buen funcionamiento de nuestra comunidad en Residencial El Pueblito!\n\nAtentamente", Fecha = new DateTime(2025, 3, 3) },
+                    new { Titulo = "Uso adecuado de estacionamientos en el coto", Subtitulo = "Comunicado Importante", Contenido = "Comunicado Importante\n\nSe ha observado estacionamiento no autorizado en la comunidad. Los estacionamientos de visitas son exclusivos para visitantes, no para residentes, conforme a los artículos 23 al 25 del reglamento interno. El incumplimiento puede derivar en sanciones, incluyendo el arrastre por parte de la Secretaría de Movilidad. Ante dudas, acudan con la administración.\n\nAgradecemos su comprensión y apoyo en el cumplimiento de estas normas.", Fecha = new DateTime(2025, 3, 3) },
+                    new { Titulo = "Reserva tu lugar en la casa club", Subtitulo = "Comunicado Importante", Contenido = "Comunicado Importante\n\nLes informamos que a partir de ahora, las reservas de la casa club podrán realizarse de manera más ágil y sencilla a través de la plataforma. Esta nueva modalidad facilitará la organización de eventos y actividades en nuestras instalaciones. Aprovechen esta herramienta para disfrutar al máximo de los espacios comunes del condominio.\n\n¡Gracias por su atención!", Fecha = new DateTime(2025, 3, 3) },
+                    new { Titulo = "Comunicados de administración ahora en Avisos Generales", Subtitulo = "Comunicado Importante", Contenido = "Comunicado Importante\n\nEstimados residentes del coto, les informamos que a partir de ahora, todos los comunicados enviados al grupo de administración estarán disponibles en el área de avisos generales de la plataforma.\n\nEsta medida busca mantenerlos informados de manera más accesible y oportuna.\n\nAgradecemos su atención y colaboración.\n\n¡Saludos cordiales!", Fecha = new DateTime(2025, 3, 3) },
+                    new { Titulo = "Actualización: Nueva fecha para poda y jardinería en el coto", Subtitulo = "Importante Anuncio: Nueva Fecha para Poda y Trabajos de Jardinería en el Coto", Contenido = "Importante Anuncio: Nueva Fecha para Poda y Trabajos de Jardinería en el Coto\n\nSe informa a todos los residentes que la fecha para la poda y trabajos de jardinería en el coto ha sido reprogramada para el 14 de marzo de 2025.\n\nAgradecemos su comprensión y colaboración en este proceso de embellecimiento de nuestro hogar.\n\n¡Cuidemos juntos nuestro entorno!", Fecha = new DateTime(2025, 3, 5) },
+                    new { Titulo = "Reglamentación de obras y cambios estructurales dentro de unidades privativas", Subtitulo = "Comunicado Importante", Contenido = "COMUNICADO IMPORTANTE\n\nSe informa a todos los residentes de Residencial El Pueblito que es obligatorio obtener permisos del Comité de Arquitectura para cualquier obra, modificación o ingreso de materiales en unidad privativa o condominio. Estos permisos son necesarios para garantizar la seguridad y armonía de la comunidad. Para más información y asesoría, acudan con la administración.\n\n¡Gracias por su colaboración!\n\nAdministración de Residencial El Pueblito", Fecha = new DateTime(2025, 3, 13) },
+                    new { Titulo = "Día de descanso oficial: 17 de Marzo 2025", Subtitulo = "Comunicado Importante", Contenido = "COMUNICADO IMPORTANTE\n\nSe informa a todos los residentes de Residencial El Pueblito que el día 17 de Marzo de 2025 ha sido declarado como día no laborable, en conmemoración al Natalicio de Benito Juárez. Por favor, planifiquen sus actividades considerando esta disposición.\n\n¡Gracias por su atención!\n\nAdministración de Residencial El Pueblito", Fecha = new DateTime(2025, 3, 13) },
+                    new { Titulo = "Normas de convivencia: Mascotas en condominio, responsabilidad compartida", Subtitulo = "Comunicado Importante", Contenido = "De acuerdo al artículo 121 del reglamento interno, se informa a todos los residentes que está prohibido que los animales domésticos circulen por las vialidades y andadores sin correa y placa de identificación.\n\nAsimismo, se les recuerda que es responsabilidad de cada propietario recoger los desechos de las mascotas.\n\nAgradecemos su colaboración para mantener nuestro condominio limpio y ordenado. Esperamos contar con su apoyo.", Fecha = new DateTime(2025, 3, 19) },
+                    new { Titulo = "Normas de convivencia en el coto", Subtitulo = "Comunicado Importante", Contenido = "De acuerdo al artículo 99 del reglamento interno, todos los residentes están obligados a utilizar las unidades privadas de forma ordenada y pacífica, respetando la ley, la moral y las buenas costumbres.\n\nQueda prohibido utilizar las áreas designadas para fines no autorizados en el reglamento.\n\nDe conformidad con el artículo 104, se prohíbe el uso de equipos de sonido y audiovisuales a volumen alto, especialmente después de las 19:00 horas. Se considera volumen alto aquel que sea audible en otras unidades privadas.\n\nAgradecemos la colaboración de todos los residentes para mantener un ambiente armónico y respetuoso en el coto.", Fecha = new DateTime(2025, 3, 19) },
+                    new { Titulo = "Paquetería", Subtitulo = "Comunicado Importante", Contenido = "Se informa a todos los residentes que, debido a los problemas recientes con la recepción de la paquetería, se ha decidido retomar el protocolo original.\n\nA partir de ahora, no se aceptará la entrega de paquetes si el residente no contesta para autorizar su recepción.\n\nAgradecemos su comprensión y colaboración en este proceso.", Fecha = new DateTime(2025, 3, 19) },
+                    new { Titulo = "Importancia de utilizar la salida peatonal en el coto", Subtitulo = "Comunicado Importante", Contenido = "Se les recuerda a todos los residentes que, por motivos de seguridad, está estrictamente prohibido salir del coto a través de los accesos de las plumas vehiculares.\n\nPor favor, utilice exclusivamente la salida peatonal para evitar posibles sanciones.\n\nSu colaboración es fundamental para mantener la integridad de nuestra comunidad.\n\n¡Gracias por su comprensión y cooperación!", Fecha = new DateTime(2025, 3, 20) },
+                    new { Titulo = "Manejo de residuos en el coto", Subtitulo = "Comunicado Importante", Contenido = "De acuerdo con el artículo 119 del reglamento interno, es obligatorio separar los residuos en las categorías indicadas: cartón, plástico, vidrio y orgánicos.\n\nLos residuos deberán ir en bolsas de plástico resistentes y clasificadas; en el caso de cajas, deberán depositarse plegadas y amarradas.\n\nCualquier objeto que no cumpla estas especificaciones generará un costo extra de recolección para el residente, por lo que será necesario notificar a la administración.\n\nEviten sanciones innecesarias y notifiquen en caso de incumplimiento.\n\n¡Gracias por su colaboración!", Fecha = new DateTime(2025, 3, 21) },
+                    new { Titulo = "Actas Administrativas Municipales por abandono de Mascotas", Subtitulo = "Comunicado Importante", Contenido = "Comunicado Importante\n\nEl día de hoy se encontró un gato abandonado en el área de los contenedores de basura.\n\nSe investiga si algún residente del coto lo dejó en esta situación.\n\nEl IPAM está al tanto y, de encontrarse al responsable, se informará a la institución para que el Gobierno Municipal de Querétaro tome las medidas correspondientes.\n\nEl gato ha sido resguardado por el grupo de protección animal de Capital Sur para una futura adopción. Cuidemos a nuestras mascotas del coto.\n\n¡Tu colaboración es fundamental para garantizar el bienestar de todos los seres vivos en nuestra comunidad!", Fecha = new DateTime(2025, 3, 25) }
+                };
+
+                foreach (var item in comunicadosPueblito)
+                {
+                    var yaExiste = await _context.Comunicados.AnyAsync(c => c.CommunityId == pueblitoComunidad.Id && c.Titulo == item.Titulo);
+                    if (!yaExiste)
+                    {
+                        await _context.Comunicados.AddAsync(new Comunicado
+                        {
+                            Id = Guid.NewGuid(),
+                            CommunityId = pueblitoComunidad.Id,
+                            Titulo = item.Titulo,
+                            Subtitulo = item.Subtitulo,
+                            Contenido = item.Contenido,
+                            Fecha = item.Fecha,
+                            Imagen = null,
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                }
+                await _context.SaveChangesAsync();
+            }
         }
 
         // Seed entre 2 y 5 amenidades por cada comunidad (contenido basado en amenidades.data.ts)
@@ -1225,6 +1269,14 @@ public class DummySeeder : IDataSeeder
                 new { BusinessName = "Tortillería y Molino La Guadalupana", TaxId = "TMG890722IJK", Category = "Alimentos", Products = "Tortillas de maíz y harina, masa, nixtamal.", PaymentMethods = "Contado", Rating = (decimal?)4.7m }
             };
 
+            var contactNames = new[]
+            {
+                "María González", "Carlos López", "Ana Martínez", "Roberto Sánchez", "Laura Hernández",
+                "Miguel Rodríguez", "Patricia García", "José Fernández", "Carmen Díaz", "Francisco Pérez",
+                "Rosa Ramírez", "Antonio Torres", "Elena Flores", "Javier Rivera", "Sandra Gómez",
+                "Daniel Morales", "Lucía Reyes", "Pedro Cruz", "Mónica Ortiz", "Ricardo Chávez"
+            };
+
             var rndProvider = new Random();
             var allCommunitiesForProviders = await _context.Communities.ToListAsync();
             List<CommunityProvider> providerList = [];
@@ -1241,6 +1293,7 @@ public class DummySeeder : IDataSeeder
                     var createdAt = DateTime.UtcNow.AddDays(-rndProvider.Next(30, 400));
                     var slugRaw = new string(t.BusinessName.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
                     var slug = string.IsNullOrEmpty(slugRaw) ? "proveedor" + idx : slugRaw[..Math.Min(12, slugRaw.Length)];
+                    var contactName = contactNames[rndProvider.Next(contactNames.Length)];
                     providerList.Add(new CommunityProvider
                     {
                         Id = Guid.NewGuid(),
@@ -1251,7 +1304,7 @@ public class DummySeeder : IDataSeeder
                         ContactPhones = "442 " + rndProvider.Next(100, 999) + " " + rndProvider.Next(1000, 9999),
                         PrimaryEmail = "contacto@" + slug + ".mx",
                         WebsiteOrSocialMedia = "https://www.ejemplo.mx",
-                        PrimaryContactName = "Contacto principal",
+                        PrimaryContactName = contactName,
                         DirectPhone = "442" + rndProvider.Next(1000000, 9999999),
                         MobilePhone = "442" + rndProvider.Next(1000000, 9999999),
                         ContactEmail = "ventas@" + slug + ".mx",
@@ -2222,9 +2275,13 @@ public class DummySeeder : IDataSeeder
         await _context.SaveChangesAsync();
         Console.WriteLine($"AddCargosYPagosMantenimientoPueblito: Added {residents.Count * 24} maintenance cargos (12x2025 + 12x2026) for {residents.Count} residents.");
 
-        // Pagos para cubrir 2025: 12 * 800 = 9600 por residente. Pagos con fechas aleatorias (1 a fin de mes), algunos combinados y/o después del mes corriente.
-        foreach (var resident in residents)
+        // Pagos para cubrir 2025: 12 * 800 = 9600 por residente. Dejamos sin pagos a los primeros 2 residentes para tener morosos de prueba.
+        const int residentesSinPagosParaMorosos = 2;
+        for (int idx = 0; idx < residents.Count; idx++)
         {
+            var resident = residents[idx];
+            if (idx < residentesSinPagosParaMorosos)
+                continue; // Sin pagos → balance alto = moroso
             int numPagos = random.Next(4, 11); // Entre 4 y 10 pagos (algunos combinados)
             List<List<int>> mesesPorPago = [];
             List<int> splitPoints = [0];
@@ -2277,7 +2334,7 @@ public class DummySeeder : IDataSeeder
             await _context.PagosResidente.AddRangeAsync(pagos);
         }
         await _context.SaveChangesAsync();
-        Console.WriteLine("AddCargosYPagosMantenimientoPueblito: Added 2025 coverage payments for all Pueblito residents.");
+        Console.WriteLine($"AddCargosYPagosMantenimientoPueblito: Added 2025 coverage payments (skipped {residentesSinPagosParaMorosos} residents as morosos).");
     }
 
     /// <summary>
@@ -2326,8 +2383,13 @@ public class DummySeeder : IDataSeeder
             }
             await _context.SaveChangesAsync();
 
-            foreach (var resident in residents)
+            // Dejamos sin pagos a los primeros 2 residentes por comunidad para tener morosos de prueba.
+            const int residentesSinPagosParaMorosos = 2;
+            for (int rIdx = 0; rIdx < residents.Count; rIdx++)
             {
+                var resident = residents[rIdx];
+                if (rIdx < residentesSinPagosParaMorosos)
+                    continue; // Sin pagos → balance = 6×800 = 4800 >= 2×800, moroso
                 int numPagos = random.Next(2, 5);
                 for (int i = 0; i < numPagos; i++)
                 {
@@ -2348,7 +2410,7 @@ public class DummySeeder : IDataSeeder
                 }
             }
             await _context.SaveChangesAsync();
-            Console.WriteLine($"AddCargosYPagosMantenimientoParaOtrasComunidades: Added cargos and payments for community {communityId} ({residents.Count} residents).");
+            Console.WriteLine($"AddCargosYPagosMantenimientoParaOtrasComunidades: Added cargos and payments for community {communityId} ({residents.Count} residents, {residentesSinPagosParaMorosos} left as morosos).");
         }
     }
 

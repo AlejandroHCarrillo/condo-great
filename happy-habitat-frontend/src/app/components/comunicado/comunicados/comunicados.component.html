@@ -46,6 +46,17 @@
                 <thead class="bg-secondary text-white [&_th]:rounded-none [&_th]:text-white">
                     <tr>
                         <th class="w-12">#</th>
+                        <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('fecha')">
+                            <span class="flex items-center gap-1">
+                                Fecha
+                                @if (sortColumn() === 'fecha') {
+                                    <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
+                                } @else {
+                                    <i class="fa-solid fa-sort text-white/70 text-xs"></i>
+                                }
+                            </span>
+                        </th>
+                        @if (selectedComunidadId() === 'all') {
                         <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('comunidad')">
                             <span class="flex items-center gap-1">
                                 Comunidad
@@ -56,6 +67,7 @@
                                 }
                             </span>
                         </th>
+                        }
                         <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('titulo')">
                             <span class="flex items-center gap-1">
                                 Título
@@ -67,23 +79,13 @@
                             </span>
                         </th>
                         <th>Subtítulo</th>
-                        <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('fecha')">
-                            <span class="flex items-center gap-1">
-                                Fecha
-                                @if (sortColumn() === 'fecha') {
-                                    <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
-                                } @else {
-                                    <i class="fa-solid fa-sort text-white/70 text-xs"></i>
-                                }
-                            </span>
-                        </th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (comunicadosPaginados().length === 0) {
                         <tr>
-                            <td colspan="5" class="text-center py-8 text-gray-500">
+                            <td [attr.colspan]="selectedComunidadId() === 'all' ? 6 : 5" class="text-center py-8 text-gray-500">
                                 <i class="fa-solid fa-inbox mr-2"></i>
                                 No se encontraron comunicados
                             </td>
@@ -92,10 +94,12 @@
                         @for (comunicado of comunicadosPaginados(); track comunicado.id; let index = $index) {
                             <tr class="cursor-pointer hover:bg-base-200 transition-colors" (click)="viewComunicadoDetail(comunicado)">
                                 <td><span class="text-sm">{{ (currentPage() - 1) * pageSize() + index + 1 }}</span></td>
+                                <td>{{ formatFecha(comunicado.fecha) }}</td>
+                                @if (selectedComunidadId() === 'all') {
                                 <td>{{ getComunidadNombre(comunicado) }}</td>
+                                }
                                 <td class="font-medium max-w-[200px] truncate" [title]="comunicado.titulo">{{ comunicado.titulo }}</td>
                                 <td class="max-w-[180px] truncate" [title]="comunicado.subtitulo">{{ comunicado.subtitulo || '-' }}</td>
-                                <td>{{ formatFecha(comunicado.fecha) }}</td>
                                 <td>
                                     <div class="flex gap-1 items-center">
                                         <a

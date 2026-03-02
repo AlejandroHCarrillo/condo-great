@@ -146,11 +146,18 @@ export class TicketsComponent implements OnInit {
     }
   }
 
+  /** Formato: dd/MMM/yyyy HH:mm (ej. 19/Feb/2025 14:30). */
   formatDate(value: string | undefined): string {
     if (!value) return '—';
     try {
       const d = new Date(value);
-      return isNaN(d.getTime()) ? value : d.toLocaleDateString('es', { dateStyle: 'short' }) + ' ' + d.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+      if (isNaN(d.getTime())) return value;
+      const dd = String(d.getDate()).padStart(2, '0');
+      const MMM = d.toLocaleDateString('es-MX', { month: 'short' });
+      const yyyy = d.getFullYear();
+      const HH = String(d.getHours()).padStart(2, '0');
+      const mm = String(d.getMinutes()).padStart(2, '0');
+      return `${dd}/${MMM}/${yyyy} ${HH}:${mm}`;
     } catch {
       return value;
     }

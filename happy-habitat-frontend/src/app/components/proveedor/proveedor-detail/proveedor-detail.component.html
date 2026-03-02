@@ -79,18 +79,16 @@
             </div>
           }
 
-          <div class="divider">Contacto principal</div>
+          <div class="divider">Contacto</div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            @if (provider()!.primaryContactName) {
-              <div>
-                <label class="label"><span class="label-text font-semibold">Nombre</span></label>
-                <p class="text-lg">{{ provider()!.primaryContactName }}</p>
-              </div>
-            }
-            @if (provider()!.directPhone || provider()!.mobilePhone) {
+            <div>
+              <label class="label"><span class="label-text font-semibold">Contacto principal</span></label>
+              <p class="text-lg">{{ provider()!.primaryContactName || '—' }}</p>
+            </div>
+            @if (provider()!.directPhone || provider()!.mobilePhone || provider()!.contactPhones) {
               <div>
                 <label class="label"><span class="label-text font-semibold">Teléfono directo / Móvil</span></label>
-                <p class="text-lg">{{ provider()!.directPhone || provider()!.mobilePhone || '-' }}</p>
+                <p class="text-lg font-mono">{{ formatPhone(provider()!.directPhone || provider()!.mobilePhone || provider()!.contactPhones) }}</p>
               </div>
             }
             @if (provider()!.contactEmail) {
@@ -118,7 +116,19 @@
           @if (provider()!.rating != null) {
             <div>
               <label class="label"><span class="label-text font-semibold">Calificación</span></label>
-              <p class="text-lg">{{ formatRating(provider()!.rating) }}</p>
+              @let stars = getRatingStars(provider()!.rating);
+              <p class="text-lg inline-flex items-center gap-0.5">
+                @for (i of [1,2,3,4,5]; track i) {
+                  @if (i <= stars.full) {
+                    <i class="fa-solid fa-star text-warning"></i>
+                  } @else if (i === stars.full + 1 && stars.half) {
+                    <i class="fa-solid fa-star-half-stroke text-warning"></i>
+                  } @else {
+                    <i class="fa-regular fa-star text-base-content/30"></i>
+                  }
+                }
+                <span class="ml-2 text-base-content/80">{{ provider()!.rating!.toFixed(1) }} / 5</span>
+              </p>
             </div>
           }
 

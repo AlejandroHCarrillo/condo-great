@@ -85,12 +85,11 @@
               <label class="label"><span class="label-text font-semibold">Fotos actuales</span></label>
               <div class="flex flex-wrap gap-3">
                 @for (url of ticket()!.imageUrls; track url) {
-                  <a
-                    [href]="getImageUrl(url)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="block rounded-lg overflow-hidden border border-base-300 hover:opacity-90"
+                  <button
+                    type="button"
+                    class="block rounded-lg overflow-hidden border border-base-300 hover:opacity-90 cursor-pointer p-0 text-left"
                     title="Ver imagen"
+                    (click)="openImageModal(url)"
                   >
                     <img
                       [src]="getImageUrl(url)"
@@ -99,7 +98,7 @@
                       loading="lazy"
                       (error)="onImageError($event)"
                     />
-                  </a>
+                  </button>
                 }
               </div>
             </div>
@@ -167,12 +166,11 @@
               <p class="text-sm text-base-content/70 mb-2">Haz clic en una imagen para verla en tamaño completo.</p>
               <div class="flex flex-wrap gap-3">
                 @for (url of ticket()!.imageUrls; track url) {
-                  <a
-                    [href]="getImageUrl(url)"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="block rounded-lg overflow-hidden border border-base-300 hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary"
+                  <button
+                    type="button"
+                    class="block rounded-lg overflow-hidden border border-base-300 hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer p-0 text-left"
                     title="Ver imagen"
+                    (click)="openImageModal(url)"
                   >
                     <img
                       [src]="getImageUrl(url)"
@@ -181,7 +179,7 @@
                       loading="lazy"
                       (error)="onImageError($event)"
                     />
-                  </a>
+                  </button>
                 }
               </div>
             </div>
@@ -210,11 +208,11 @@
                 @if (commentUrls.length > 0) {
                   <div class="flex flex-wrap gap-2 mt-2">
                     @for (url of commentUrls; track url) {
-                      <a
-                        [href]="getImageUrl(url)"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="block rounded border border-base-300 overflow-hidden hover:opacity-90"
+                      <button
+                        type="button"
+                        class="block rounded border border-base-300 overflow-hidden hover:opacity-90 cursor-pointer p-0 text-left"
+                        title="Ver imagen"
+                        (click)="openImageModal(url)"
                       >
                         <img
                           [src]="getImageUrl(url)"
@@ -223,7 +221,7 @@
                           loading="lazy"
                           (error)="onImageError($event)"
                         />
-                      </a>
+                      </button>
                     }
                   </div>
                 }
@@ -278,4 +276,28 @@
       <span>No se pudo cargar el ticket.</span>
     </div>
   }
+
+  <!-- Modal para ver imagen en tamaño completo -->
+  <dialog #imageModal class="modal" (close)="imageModalUrl.set(null)">
+    <div class="modal-box max-w-4xl max-h-[90vh] p-2 bg-transparent shadow-none" (click)="$event.stopPropagation()">
+      @if (imageModalUrl()) {
+        <img
+          [src]="imageModalUrl()"
+          alt="Imagen ampliada"
+          class="w-full h-auto max-h-[85vh] object-contain rounded-lg bg-base-300"
+        />
+        <button
+          type="button"
+          class="btn btn-circle btn-ghost btn-sm absolute right-2 top-2 bg-base-100/90 hover:bg-base-100"
+          title="Cerrar"
+          (click)="closeImageModal()"
+        >
+          <i class="fa-solid fa-times"></i>
+        </button>
+      }
+    </div>
+    <form method="dialog" class="modal-backdrop bg-black/70 cursor-pointer">
+      <button type="button" (click)="closeImageModal()">Cerrar</button>
+    </form>
+  </dialog>
 </div>
