@@ -41,6 +41,6 @@ testem.log
 .DS_Store
 Thumbs.db
 
-# private docs
-/whatsapp-berlin-contactos
-/whatsapp-berlin-chat
+# Documentación privada (WhatsApp Berlin)
+documentacion/whatsapp-berlin-chat/
+documentacion/whatsapp-berlin-contactos/
