@@ -401,3 +401,7 @@ FodyWeavers.xsd
 
 # API uploads (user-generated documents; do not commit)
 happy-habitat-backend/HappyHabitat.API/uploads/
+
+# Documentación privada (WhatsApp Berlin)
+documentacion/whatsapp-berlin-chat/
+documentacion/whatsapp-berlin-contactos/
