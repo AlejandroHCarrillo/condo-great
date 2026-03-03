@@ -9,7 +9,7 @@ export interface AdmincompanyMenuItem {
   icon: string;
 }
 
-const GESTIONAR_ROUTES = ['comunicados', 'residentes', 'amenidades', 'proveedores', 'documentos', 'cargos-residente', 'pagos-residente', 'saldo-banco'] as const;
+const GESTIONAR_ROUTES = ['comunicados', 'residentes', 'amenidades', 'proveedores', 'proveedores-servicios', 'documentos', 'cargos-residente', 'pagos-residente', 'saldo-banco'] as const;
 
 @Component({
   selector: 'hh-top-menu',
@@ -52,7 +52,8 @@ export class TopMenuComponent implements OnInit, OnDestroy {
     { route: 'pagos-residente', label: 'Pagos', icon: 'fa-solid fa-money-bill-1-wave' },
     { route: 'saldo-banco', label: 'Saldo banco', icon: 'fa-solid fa-building-columns' },
     { route: 'amenidades', label: 'Amenidades', icon: 'fa-solid fa-people-roof' },
-    { route: 'proveedores', label: 'Proveedores', icon: 'fa-solid fa-phone-volume' }, 
+    { route: 'proveedores', label: 'Proveedores', icon: 'fa-solid fa-phone-volume' },
+    { route: 'proveedores-servicios', label: 'Directorio de servicios', icon: 'fa-solid fa-address-book' },
     { route: 'documentos', label: 'Documentos', icon: 'fa-solid fa-file-lines' },
   ];
 

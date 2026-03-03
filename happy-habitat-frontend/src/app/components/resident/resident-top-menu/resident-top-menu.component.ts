@@ -15,6 +15,7 @@ export class ResidentTopMenuComponent {
     { route: 'encuestas', label: 'Encuestas', icon: 'fa-solid fa-clipboard-list' },
     { route: 'pagos', label: 'Pagos', icon: 'fa-solid fa-money-bill-1-wave' },
     { route: 'tickets', label: 'Tickets', icon: 'fa-solid fa-ticket' },
+    { route: 'directorio-servicios', label: 'Directorio de servicios', icon: 'fa-solid fa-address-book' },
     { route: 'reservaciones', label: 'Reservar', icon: 'fa-regular fa-address-book' }
   ];
 }

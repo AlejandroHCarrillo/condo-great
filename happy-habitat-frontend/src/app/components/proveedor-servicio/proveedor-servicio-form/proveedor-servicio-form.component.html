@@ -1,0 +1,79 @@
+<div class="p-4 max-w-2xl mx-auto">
+  <div class="flex items-center justify-between gap-4 mb-6">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-address-book text-primary"></i>
+      {{ title() }}
+    </h1>
+    <button type="button" class="btn btn-secondary text-white" (click)="cancel()">Regresar</button>
+  </div>
+
+  <div class="bg-base-200 rounded-lg p-6">
+    @if (isLoading()) {
+      <div class="flex justify-center items-center py-12">
+        <span class="loading loading-spinner loading-lg"></span>
+        <span class="ml-4">Cargando...</span>
+      </div>
+    } @else {
+      @if (errorMessage()) {
+        <div class="alert alert-error mb-4"><span>{{ errorMessage() }}</span></div>
+      }
+
+      <form class="space-y-6" (ngSubmit)="save()">
+      <div class="form-control w-full">
+        <label class="label" for="communityId"><span class="label-text font-medium">Comunidad</span></label>
+        <select id="communityId" class="select select-bordered w-full" [(ngModel)]="form.communityId" name="communityId" required [disabled]="isCommunitySelectDisabled()">
+          <option value="">Seleccione una comunidad</option>
+          @for (c of comunidadesAsociadas(); track c.id) {
+            <option [value]="c.id">{{ c.nombre }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-control w-full">
+        <label class="label" for="giro"><span class="label-text font-medium">Giro / Tipo de servicio</span></label>
+        <input id="giro" type="text" class="input input-bordered w-full" [(ngModel)]="form.giro" name="giro" required placeholder="Ej. Plomeria, Electricidad" />
+      </div>
+      <div class="form-control w-full">
+        <label class="label" for="nombre"><span class="label-text font-medium">Nombre</span></label>
+        <input id="nombre" type="text" class="input input-bordered w-full" [(ngModel)]="form.nombre" name="nombre" required placeholder="Nombre del proveedor" />
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="form-control w-full">
+          <label class="label" for="telefono"><span class="label-text font-medium">Teléfono</span></label>
+          <input id="telefono" type="text" class="input input-bordered w-full" [value]="form.telefono | phoneFormat" (input)="onPhoneInput($any($event).target.value)" name="telefono" placeholder="442-12-3456" inputmode="numeric" />
+        </div>
+        <div class="form-control w-full">
+          <label class="label" for="email"><span class="label-text font-medium">Email</span></label>
+          <input id="email" type="email" class="input input-bordered w-full" [(ngModel)]="form.email" name="email" placeholder="opcional@ejemplo.com" #emailRef="ngModel" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" />
+          @if (emailRef.invalid && emailRef.touched && emailRef.value) {
+            <p class="text-error text-sm mt-1">Email no válido.</p>
+          }
+        </div>
+      </div>
+      <div class="form-control w-full">
+        <label class="label" for="descripcion"><span class="label-text font-medium">Descripcion</span></label>
+        <textarea id="descripcion" class="textarea textarea-bordered w-full" [(ngModel)]="form.descripcion" name="descripcion" rows="3" placeholder="Breve descripcion del servicio"></textarea>
+      </div>
+      <div class="form-control w-full">
+        <label class="label" for="paginaWeb"><span class="label-text font-medium">Pagina web</span></label>
+        <input id="paginaWeb" type="url" class="input input-bordered w-full" [(ngModel)]="form.paginaWeb" name="paginaWeb" placeholder="https://..." />
+      </div>
+      <div class="form-control w-full">
+        <label class="label" for="rating"><span class="label-text font-medium">Calificación inicial (0–5)</span></label>
+        <div class="flex items-center gap-4">
+          <input id="rating" type="range" class="range range-primary flex-1" min="0" max="5" step="0.5" [ngModel]="form.rating ?? 0" (ngModelChange)="form.rating = $event" name="rating" />
+          <span class="text-base font-mono min-w-[3rem]">{{ form.rating != null ? form.rating.toFixed(1) : '—' }}</span>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <button type="submit" class="btn btn-primary text-white" [disabled]="isSaving()">
+          @if (isSaving()) { <span class="loading loading-spinner loading-sm"></span> }
+          Guardar
+        </button>
+        <button type="button" class="btn btn-ghost" (click)="cancel()">Cancelar</button>
+      </div>
+    </form>
+    }
+  </div>
+</div>

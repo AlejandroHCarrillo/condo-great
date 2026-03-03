@@ -1325,6 +1325,59 @@ public class DummySeeder : IDataSeeder
             await _context.SaveChangesAsync();
         }
 
+        // Seed ProveedorServicio (Directorio de servicios): 2-5 por comunidad
+        if (!await _context.ProveedorServicios.AnyAsync())
+        {
+            var proveedorTemplates = new[]
+            {
+                new { Giro = "Plomería", Nombre = "Plomería y Gas El Tubo", Telefono = "442 123 4567", Email = "contacto@tubo.mx", Descripcion = "Instalación y reparación de tuberías, fugas. Emergencias 24h.", PaginaWeb = "https://www.ejemplo.mx", Rating = (decimal?)4.6m },
+                new { Giro = "Electricidad", Nombre = "Electricidad Querétaro", Telefono = "442 234 5678", Email = "info@elec.mx", Descripcion = "Instalaciones eléctricas, mantenimiento, reparación de cortos.", PaginaWeb = (string?)null, Rating = (decimal?)4.8m },
+                new { Giro = "Jardinería", Nombre = "Jardinería Verde", Telefono = "442 345 6789", Email = (string?)null, Descripcion = "Poda, riego, mantenimiento de áreas verdes.", PaginaWeb = (string?)null, Rating = (decimal?)4.5m },
+                new { Giro = "Limpieza", Nombre = "Limpieza Profesional", Telefono = "442 456 7890", Email = "limpieza@pro.mx", Descripcion = "Limpieza residencial y de áreas comunes.", PaginaWeb = "https://limpieza.ejemplo.mx", Rating = (decimal?)4.7m },
+                new { Giro = "Fumigación", Nombre = "Fumigación y Control de Plagas", Telefono = "442 567 8901", Email = "fumiga@mail.mx", Descripcion = "Fumigación residencial, control de plagas.", PaginaWeb = (string?)null, Rating = (decimal?)4.4m },
+                new { Giro = "Veterinaria", Nombre = "Veterinaria Mascotas Felices", Telefono = "442 678 9012", Email = "vet@mascotas.mx", Descripcion = "Consulta, vacunas, esterilización.", PaginaWeb = (string?)null, Rating = (decimal?)4.7m },
+                new { Giro = "Cerrajería", Nombre = "Cerrajería Express", Telefono = "442 789 0123", Email = (string?)null, Descripcion = "Cambio de chapas, cerraduras, abrir autos y casas.", PaginaWeb = (string?)null, Rating = (decimal?)4.2m },
+                new { Giro = "Pintura", Nombre = "Pinturas y Recubrimientos Pro", Telefono = "442 890 1234", Email = "pintura@pro.mx", Descripcion = "Pintura interior y exterior, impermeabilizantes.", PaginaWeb = (string?)null, Rating = (decimal?)4.6m }
+            };
+
+            var roleIdAdminCompany = new Guid("22222222-2222-2222-2222-222222222222");
+            var seedUser = await _context.Users.FirstOrDefaultAsync(u => u.RoleId == roleIdAdminCompany);
+            var allCommunitiesForPs = await _context.Communities.ToListAsync();
+            var rndPs = new Random();
+            var listPs = new List<ProveedorServicio>();
+
+            foreach (var community in allCommunitiesForPs)
+            {
+                var count = rndPs.Next(2, 6);
+                var used = new HashSet<int>();
+                for (int i = 0; i < count; i++)
+                {
+                    int idx;
+                    do { idx = rndPs.Next(proveedorTemplates.Length); } while (!used.Add(idx));
+                    var t = proveedorTemplates[idx];
+                    var createdAt = DateTime.UtcNow.AddDays(-rndPs.Next(10, 200));
+                    listPs.Add(new ProveedorServicio
+                    {
+                        Id = Guid.NewGuid(),
+                        Community = community,
+                        Giro = t.Giro,
+                        Nombre = t.Nombre,
+                        Telefono = t.Telefono,
+                        Email = t.Email,
+                        Descripcion = t.Descripcion,
+                        PaginaWeb = t.PaginaWeb,
+                        Rating = t.Rating,
+                        IsActive = true,
+                        CreatedByUserId = seedUser?.Id,
+                        CreatedAt = createdAt
+                    });
+                }
+            }
+
+            await _context.ProveedorServicios.AddRangeAsync(listPs);
+            await _context.SaveChangesAsync();
+        }
+
         // Seed Encuestas: 1 encuesta por comunidad con todos los tipos de pregunta (Texto, Sí/No, Opción única, Opción múltiple)
         if (!await _context.Encuestas.AnyAsync())
         {

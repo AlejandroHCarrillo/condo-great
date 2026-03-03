@@ -130,6 +130,7 @@ builder.Services.AddScoped<IBannerService, BannerService>();
 builder.Services.AddScoped<IComunicadoService, ComunicadoService>();
 builder.Services.AddScoped<IAmenityService, AmenityService>();
 builder.Services.AddScoped<ICommunityProviderService, CommunityProviderService>();
+builder.Services.AddScoped<IProveedorServicioService, ProveedorServicioService>();
 builder.Services.AddScoped<ICommunityConfigurationService, CommunityConfigurationService>();
 builder.Services.AddScoped<ICommunityPriceService, CommunityPriceService>();
 builder.Services.AddScoped<IEncuestaService, EncuestaService>();

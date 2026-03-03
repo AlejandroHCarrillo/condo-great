@@ -22,5 +22,7 @@ public class User : AuditBase
     public ICollection<PaymentHistory> UpdatedPaymentHistories { get; set; } = [];
     public ICollection<CommunityProvider> CreatedByCommunityProviders { get; set; } = [];
     public ICollection<CommunityProvider> UpdatedByCommunityProviders { get; set; } = [];
+    public ICollection<ProveedorServicio> CreatedByProveedorServicios { get; set; } = [];
+    public ICollection<ProveedorServicio> UpdatedByProveedorServicios { get; set; } = [];
 }
 

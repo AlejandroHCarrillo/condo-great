@@ -44,6 +44,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<CargoResidente> CargosResidente { get; set; }
     public DbSet<PagoResidente> PagosResidente { get; set; }
     public DbSet<SaldoCuentaBancaria> SaldosCuentaBancaria { get; set; }
+    public DbSet<ProveedorServicio> ProveedorServicios { get; set; }
+    public DbSet<ProveedorServicioCalificacion> ProveedorServicioCalificaciones { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -449,6 +451,58 @@ public class ApplicationDbContext : DbContext
                 .WithMany(u => u.UpdatedByCommunityProviders)
                 .HasForeignKey(e => e.UpdatedByUserId)
                 .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        // Configure ProveedorServicio entity (FK CommunityId como propiedad sombra)
+        modelBuilder.Entity<ProveedorServicio>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Giro).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Nombre).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Telefono).HasMaxLength(50);
+            entity.Property(e => e.Email).HasMaxLength(200);
+            entity.Property(e => e.Descripcion).HasMaxLength(2000);
+            entity.Property(e => e.PaginaWeb).HasMaxLength(500);
+            entity.Property(e => e.Rating).HasColumnType("decimal(3,2)");
+            entity.Property(e => e.CreatedAt).IsRequired().HasColumnType("datetime2");
+            entity.Property(e => e.UpdatedAt).HasColumnType("datetime2");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+
+            entity.HasOne(e => e.Community)
+                .WithMany(c => c.ProveedorServicios)
+                .HasForeignKey("CommunityId")
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.CreatedByUser)
+                .WithMany(u => u.CreatedByProveedorServicios)
+                .HasForeignKey(e => e.CreatedByUserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            entity.HasOne(e => e.UpdatedByUser)
+                .WithMany(u => u.UpdatedByProveedorServicios)
+                .HasForeignKey(e => e.UpdatedByUserId)
+                .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        // Configure ProveedorServicioCalificacion
+        modelBuilder.Entity<ProveedorServicioCalificacion>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Puntuacion).HasColumnType("decimal(3,2)");
+            entity.Property(e => e.CreatedAt).IsRequired().HasColumnType("datetime2");
+
+            entity.HasOne(e => e.ProveedorServicio)
+                .WithMany(p => p.Calificaciones)
+                .HasForeignKey(e => e.ProveedorServicioId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => new { e.ProveedorServicioId, e.UserId }).IsUnique();
         });
 
         // Configure UserCommunity entity

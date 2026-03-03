@@ -38,6 +38,9 @@ import { MorososListComponent } from './morosos/morosos-list.component';
 import { HistorialPagosResidenteComponent } from './historial-pagos-residente/historial-pagos-residente.component';
 import { SaldoBancoListComponent } from './saldo-banco/saldo-banco-list.component';
 import { SaldoBancoFormComponent } from './saldo-banco/saldo-banco-form.component';
+import { ProveedoresServiciosListComponent } from '../proveedor-servicio/proveedores-servicios-list/proveedores-servicios-list.component';
+import { ProveedorServicioFormComponent } from '../proveedor-servicio/proveedor-servicio-form/proveedor-servicio-form.component';
+import { ProveedorServicioDetailComponent } from '../proveedor-servicio/proveedor-servicio-detail/proveedor-servicio-detail.component';
 
 export const admincompanyRoutes: Routes = [
     {
@@ -123,6 +126,22 @@ export const admincompanyRoutes: Routes = [
             {
                 path: 'proveedores',
                 component: ProveedoresComponent
+            },
+            {
+                path: 'proveedores-servicios',
+                component: ProveedoresServiciosListComponent
+            },
+            {
+                path: 'proveedores-servicios/nuevo/:communityId',
+                component: ProveedorServicioFormComponent
+            },
+            {
+                path: 'proveedores-servicios/editar/:id',
+                component: ProveedorServicioFormComponent
+            },
+            {
+                path: 'proveedores-servicios/:id',
+                component: ProveedorServicioDetailComponent
             },
             {
                 path: 'documentos',

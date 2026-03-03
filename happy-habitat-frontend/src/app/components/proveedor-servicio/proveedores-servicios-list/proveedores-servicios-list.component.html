@@ -1,0 +1,132 @@
+<div class="p-4">
+  <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-address-book text-primary"></i>
+      Directorio de servicios
+    </h1>
+    <hh-community-filter
+      [communities]="comunidadesAsociadas()"
+      [selectedId]="selectedComunidadId()"
+      (selectedIdChange)="onComunidadChange($event)"
+    />
+    <a
+      [routerLink]="selectedComunidadId() ? ['/admincompany/proveedores-servicios/nuevo', selectedComunidadId()] : null"
+      class="btn btn-primary btn-sm btn-square flex items-center justify-center text-white"
+      [class.btn-disabled]="!selectedComunidadId()"
+      [attr.aria-disabled]="!selectedComunidadId()"
+      (click)="!selectedComunidadId() && $event.preventDefault()"
+    >
+      <i class="fa-solid fa-plus"></i>
+    </a>
+  </div>
+
+  @if (comunidadesAsociadas().length === 0) {
+    <div class="alert alert-warning mb-6">
+      <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+      No tienes comunidades asociadas.
+    </div>
+  }
+
+  @if (!selectedComunidadId()) {
+    <div class="alert alert-info mb-6">
+      <i class="fa-solid fa-info-circle mr-2"></i>
+      Selecciona una comunidad para ver el directorio de servicios.
+    </div>
+  }
+
+  @if (selectedComunidadId() && isLoading()) {
+    <div class="flex justify-center items-center py-8">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando...</span>
+    </div>
+  } @else if (selectedComunidadId()) {
+    <div class="overflow-x-auto">
+      <table class="table table-zebra w-full">
+        <thead class="bg-secondary text-white [&_th]:rounded-none [&_th]:text-white">
+          <tr>
+            <th class="w-12">#</th>
+            <th (click)="setSort('giro')" class="cursor-pointer select-none">Giro</th>
+            <th (click)="setSort('nombre')" class="cursor-pointer select-none">Nombre</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th (click)="setSort('rating')" class="cursor-pointer select-none">Calificación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (itemsPaginados().length === 0) {
+            <tr>
+              <td colspan="7" class="text-center py-8 text-gray-500">No hay proveedores en el directorio.</td>
+            </tr>
+          } @else {
+            @for (item of itemsPaginados(); track item.id; let i = $index) {
+              <tr class="cursor-pointer hover:bg-base-200" (click)="viewDetail(item)">
+                <td>{{ (currentPage() - 1) * pageSize() + i + 1 }}</td>
+                <td class="font-medium">{{ item.giro }}</td>
+                <td class="whitespace-normal align-top max-w-[14rem]">{{ item.nombre }}</td>
+                <td class="font-mono text-sm whitespace-nowrap">{{ item.telefono || '—' }}</td>
+                <td>{{ item.email || '—' }}</td>
+                <td>
+                  @let stars = getRatingStars(item.rating);
+                  <span class="inline-flex items-center gap-0.5">
+                    @for (j of [1,2,3,4,5]; track j) {
+                      @if (j <= stars.full) {
+                        <i class="fa-solid fa-star text-warning"></i>
+                      } @else if (j === stars.full + 1 && stars.half) {
+                        <i class="fa-solid fa-star-half-stroke text-warning"></i>
+                      } @else {
+                        <i class="fa-regular fa-star text-base-content/30"></i>
+                      }
+                    }
+                    @if (item.rating != null) {
+                      <span class="ml-1 text-sm">{{ item.rating.toFixed(1) }}</span>
+                    }
+                  </span>
+                </td>
+                <td (click)="$event.stopPropagation()">
+                  <a [routerLink]="['/admincompany/proveedores-servicios/editar', item.id]" [queryParams]="selectedComunidadId() ? { comunidad: selectedComunidadId() } : {}" class="btn btn-ghost btn-sm btn-square bg-yellow-500" title="Editar"><i class="fa-solid fa-pen"></i></a>
+                  <button type="button" class="btn btn-ghost btn-sm btn-square bg-red-500 text-white" (click)="openDeleteModal(item)" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalPages() > 0) {
+      <div class="flex items-center gap-4 mt-4 flex-wrap">
+        <p class="text-sm text-base-content/70">Mostrando {{ itemsPaginados().length }} de {{ totalCount() }}</p>
+        <div class="join">
+          <button type="button" class="join-item btn btn-sm" [class.btn-disabled]="currentPage() <= 1" (click)="goToPage(currentPage() - 1)">« Anterior</button>
+          @for (p of paginasVisibles(); track p) {
+            <button type="button" class="join-item btn btn-sm" [class.btn-active]="p === currentPage()" (click)="goToPage(p)">{{ p }}</button>
+          }
+          <button type="button" class="join-item btn btn-sm" [class.btn-disabled]="currentPage() >= totalPages()" (click)="goToPage(currentPage() + 1)">Siguiente »</button>
+        </div>
+        <label class="flex items-center gap-2 text-sm">
+          <span>Mostrar:</span>
+          <select class="select select-bordered select-sm w-20" [ngModel]="pageSize()" (ngModelChange)="onPageSizeChange($event)">
+            @for (opt of pageSizeOptions; track opt) {
+              <option [value]="opt">{{ opt }}</option>
+            }
+          </select>
+        </label>
+      </div>
+    }
+  }
+
+  <dialog id="deleteProveedorServicioModal" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">Confirmar eliminación</h3>
+      @if (itemToDelete()) {
+        <p class="py-4">¿Eliminar a <strong>{{ itemToDelete()!.nombre }}</strong> del directorio?</p>
+      }
+      <div class="modal-action">
+        <button class="btn btn-ghost" (click)="closeDeleteModal()">Cancelar</button>
+        <button type="button" class="btn btn-error text-white" (click)="confirmDelete()">Eliminar</button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button type="button" (click)="closeDeleteModal()">Cerrar</button></form>
+  </dialog>
+</div>
