@@ -21,6 +21,7 @@
                   <a
                     class="btn btn-ghost btn-sm justify-start"
                     [routerLink]="sub.route"
+                    queryParamsHandling="preserve"
                     [routerLinkActive]="'btn-secondary text-white'"
                     [routerLinkActiveOptions]="{ exact: true }"
                   >
@@ -66,6 +67,7 @@
                   <li>
                     <a
                       [routerLink]="sub.route"
+                      queryParamsHandling="preserve"
                       [routerLinkActive]="'bg-base-200 font-semibold'"
                       [routerLinkActiveOptions]="{ exact: true }"
                       class="gap-2 rounded-btn"

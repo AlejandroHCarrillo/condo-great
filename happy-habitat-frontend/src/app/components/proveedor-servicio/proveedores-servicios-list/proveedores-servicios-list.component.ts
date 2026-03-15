@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { rxResource } from '../../../utils/rx-resource.util';
 import { AuthService } from '../../../services/auth.service';
+import { AdminCompanyContextService } from '../../../services/admin-company-context.service';
 import { ProveedorServicioService } from '../../../services/proveedor-servicio.service';
 import { CommunityFilterComponent } from '../../../shared/components/community-filter/community-filter.component';
 import type { ProveedorServicio as ProveedorServicioModel } from '../../../shared/interfaces/proveedor-servicio.interface';
@@ -19,6 +20,7 @@ import { PAGE_SIZE_OPTIONS } from '../../../constants/pagination.constants';
 })
 export class ProveedoresServiciosListComponent implements OnInit {
   private authService = inject(AuthService);
+  private adminContext = inject(AdminCompanyContextService);
   private service = inject(ProveedorServicioService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -86,18 +88,30 @@ export class ProveedoresServiciosListComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    // Inicializar desde la URL para conservar la comunidad al volver o recargar
-    const initial = this.route.snapshot.queryParams['comunidad'];
-    if (initial) this.selectedComunidadId.set(initial);
-
     this.route.queryParams.subscribe((params) => {
       const comunidadId = params['comunidad'];
-      this.selectedComunidadId.set(comunidadId ?? '');
+      if (comunidadId) {
+        this.selectedComunidadId.set(comunidadId);
+        this.adminContext.setSelectedCommunityId(comunidadId);
+      } else {
+        const stored = this.adminContext.getSelectedCommunityId();
+        if (stored) {
+          this.selectedComunidadId.set(stored);
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { comunidad: stored },
+            queryParamsHandling: 'merge'
+          });
+        } else {
+          this.selectedComunidadId.set('');
+        }
+      }
     });
   }
 
   onComunidadChange(comunidadId: string): void {
     this.selectedComunidadId.set(comunidadId);
+    this.adminContext.setSelectedCommunityId(comunidadId);
     this.currentPage.set(1);
     this.refreshTrigger.update((v) => v + 1);
     this.router.navigate([], { queryParams: { comunidad: comunidadId || null }, queryParamsHandling: 'merge' });

@@ -1,0 +1,73 @@
+<div class="p-4">
+  <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-ticket text-primary"></i>
+      Reporte de tickets
+    </h1>
+    <div class="flex flex-wrap items-center gap-4">
+      <hh-report-period-filter
+        [selectedPeriod]="selectedPeriod()"
+        (selectedPeriodChange)="onPeriodChange($event)"
+      />
+      <hh-community-filter
+        [communities]="comunidadesAsociadas()"
+        [selectedId]="selectedComunidadId()"
+        (selectedIdChange)="onComunidadChange($event)"
+      />
+    </div>
+  </div>
+  @if (!selectedComunidadId()) {
+    <div class="alert alert-info">Selecciona una comunidad.</div>
+  }
+  @if (selectedComunidadId() && isLoading()) {
+    <div class="flex justify-center py-12"><span class="loading loading-spinner loading-lg"></span></div>
+  }
+  @if (selectedComunidadId() && errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  }
+  @if (selectedComunidadId() && !isLoading() && !errorMessage()) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      @for (e of ticketsPorEstado(); track e.name) {
+        <div class="stats shadow bg-base-200">
+          <div class="stat">
+            <div class="stat-title">{{ e.name }}</div>
+            <div class="stat-value">{{ e.count }}</div>
+          </div>
+        </div>
+      }
+      @if (ticketsPorEstado().length === 0 && filteredTickets().length === 0) {
+        <div class="stats shadow bg-base-200"><div class="stat"><div class="stat-title">Total</div><div class="stat-value">0</div></div></div>
+      }
+    </div>
+    <div class="card bg-base-200 shadow">
+      <div class="card-body">
+        <h3 class="card-title">Listado de tickets ({{ selectedYear() }}) — {{ filteredTickets().length }}</h3>
+        <div class="overflow-x-auto">
+          <table class="table table-zebra table-sm w-full">
+            <thead><tr><th>#</th><th>Residente</th><th>Categoria</th><th>Estado</th><th>Fecha</th><th></th></tr></thead>
+            <tbody>
+              @for (t of filteredTickets(); track t.id; let i = $index) {
+                <tr>
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ t.residentName ?? '—' }} @if (t.residentNumber) { ({{ t.residentNumber }}) }</td>
+                  <td>{{ t.categoriaTicketNombre ?? '—' }}</td>
+                  <td><span class="badge" [style.background-color]="t.statusColor ?? '#6b7280'">{{ t.statusDescripcion ?? t.statusCode }}</span></td>
+                  <td>{{ formatDate(t.fechaReporte) }}</td>
+                  <td><a [routerLink]="['/admincompany/residentes/tickets', t.id]" class="btn btn-ghost btn-sm">Ver</a></td>
+                </tr>
+              }
+              @if (filteredTickets().length === 0) {
+                <tr><td colspan="6" class="text-center text-base-content/70">No hay tickets en este período</td></tr>
+              }
+              @if (filteredTickets().length > 0) {
+                <tr class="bg-base-300 font-semibold">
+                  <td colspan="6">Total: {{ filteredTickets().length }} registro(s)</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  }
+</div>

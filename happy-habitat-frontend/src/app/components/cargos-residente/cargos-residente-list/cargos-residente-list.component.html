@@ -26,12 +26,12 @@
         }
       </select>
       <a
-        [routerLink]="selectedResidentId() && selectedResidentId() !== 'all' ? ['/admincompany/cargos-residente/nuevo', selectedResidentId()] : null"
+        [routerLink]="selectedComunidadId() && selectedResidentId() ? (selectedResidentId() === 'all' ? ['/admincompany/cargos-residente/nuevo'] : ['/admincompany/cargos-residente/nuevo', selectedResidentId()]) : null"
         [queryParams]="selectedComunidadId() ? { comunidad: selectedComunidadId(), residente: selectedResidentId() } : null"
         class="btn btn-primary btn-sm btn-square flex items-center justify-center text-white shrink-0"
-        [class.btn-disabled]="!selectedResidentId() || selectedResidentId() === 'all'"
-        [attr.aria-disabled]="!selectedResidentId() || selectedResidentId() === 'all'"
-        (click)="(!selectedResidentId() || selectedResidentId() === 'all') && $event.preventDefault()"
+        [class.btn-disabled]="!selectedComunidadId() || !selectedResidentId()"
+        [attr.aria-disabled]="!selectedComunidadId() || !selectedResidentId()"
+        (click)="(!selectedComunidadId() || !selectedResidentId()) && $event.preventDefault()"
         title="Nuevo cargo"
       >
         <i class="fa-solid fa-plus"></i>

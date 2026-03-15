@@ -63,14 +63,17 @@
             <div class="prose max-w-none whitespace-pre-wrap">{{ comunicado()!.contenido || '-' }}</div>
           </div>
 
-          @if (comunicado()!.imagen) {
-            <div>
-              <label class="label">
-                <span class="label-text font-semibold">Imagen</span>
-              </label>
-              <img [src]="getImagenUrl(comunicado()!.imagen)" alt="Imagen del comunicado" class="max-w-full rounded-lg shadow" />
-            </div>
-          }
+          <div>
+            <label class="label">
+              <span class="label-text font-semibold">Imagen</span>
+            </label>
+            <img
+              [src]="getComunicadoImageSrc(comunicado())"
+              alt="Imagen del comunicado"
+              class="max-w-full rounded-lg shadow object-cover bg-base-200"
+              (error)="onImageError($event)"
+            />
+          </div>
         </div>
       </div>
     </div>

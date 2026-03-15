@@ -41,6 +41,12 @@ import { SaldoBancoFormComponent } from './saldo-banco/saldo-banco-form.componen
 import { ProveedoresServiciosListComponent } from '../proveedor-servicio/proveedores-servicios-list/proveedores-servicios-list.component';
 import { ProveedorServicioFormComponent } from '../proveedor-servicio/proveedor-servicio-form/proveedor-servicio-form.component';
 import { ProveedorServicioDetailComponent } from '../proveedor-servicio/proveedor-servicio-detail/proveedor-servicio-detail.component';
+import { ReportesResumenComponent } from './reportes/reportes-resumen/reportes-resumen.component';
+import { ReportesFinanzasComponent } from './reportes/reportes-finanzas/reportes-finanzas.component';
+import { ReportesIngresosComponent } from './reportes/reportes-ingresos/reportes-ingresos.component';
+import { ReportesGastosComponent } from './reportes/reportes-gastos/reportes-gastos.component';
+import { ReportesTicketsComponent } from './reportes/reportes-tickets/reportes-tickets.component';
+import { ReportesPagoProveedoresComponent } from './reportes/reportes-pago-proveedores/reportes-pago-proveedores.component';
 
 export const admincompanyRoutes: Routes = [
     {
@@ -265,27 +271,27 @@ export const admincompanyRoutes: Routes = [
             },
             {
                 path: 'reportes/finanzas',
-                component: NotFoundPageComponent
+                component: ReportesFinanzasComponent
             },
             {
                 path: 'reportes/tickets',
-                component: NotFoundPageComponent
+                component: ReportesTicketsComponent
             },
             {
                 path: 'reportes/pago-proveedores',
-                component: NotFoundPageComponent
+                component: ReportesPagoProveedoresComponent
             },
             {
                 path: 'reportes/ingresos',
-                component: NotFoundPageComponent
+                component: ReportesIngresosComponent
             },
             {
                 path: 'reportes/gastos',
-                component: NotFoundPageComponent
+                component: ReportesGastosComponent
             },
             {
                 path: 'reportes/resumen',
-                component: NotFoundPageComponent
+                component: ReportesResumenComponent
             },
             {
                 path: '**',

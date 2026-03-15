@@ -6,6 +6,7 @@ import { forkJoin, of } from 'rxjs';
 import { switchMap, catchError, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { PagosResidenteService } from '../../../services/pagos-residente.service';
+import { CargosResidenteService } from '../../../services/cargos-residente.service';
 import { ResidentsService } from '../../../services/residents.service';
 import { AuthService } from '../../../services/auth.service';
 import { AdminCompanyContextService } from '../../../services/admin-company-context.service';
@@ -34,6 +35,7 @@ import type { CreatePagosResidenteDto, UpdatePagosResidenteDto } from '../../../
 })
 export class PagoResidenteFormComponent implements OnInit, OnDestroy {
   private pagosService = inject(PagosResidenteService);
+  private cargosService = inject(CargosResidenteService);
   private residentsService = inject(ResidentsService);
   private authService = inject(AuthService);
   private adminContext = inject(AdminCompanyContextService);
@@ -64,6 +66,8 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
   isEditMode = signal(false);
   pagoId = signal<string | null>(null);
   residentIdFromRoute = signal<string | null>(null);
+  /** Si se llegó desde "Generar pago" en detalle de cargo, al guardar se marca el cargo como Pagado. */
+  cargoIdFromCargo = signal<string | null>(null);
   isLoading = signal(false);
   isSaving = signal(false);
   errorMessage = signal<string | null>(null);
@@ -111,6 +115,7 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
         this.isEditMode.set(true);
         this.pagoId.set(id);
         this.residentIdFromRoute.set(null);
+        this.cargoIdFromCargo.set(null);
         this.loadPago(id);
       } else if (residentId) {
         this.isEditMode.set(false);
@@ -118,9 +123,19 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
         this.residentIdFromRoute.set(residentId);
         this.form.residenteId = residentId;
         this.form.fechaPago = new Date().toISOString().slice(0, 10);
-        this.form.monto = 0;
+        const cargoId = qp['cargoId'];
+        const cargoMonto = qp['cargoMonto'];
+        const cargoConcepto = qp['cargoConcepto'];
+        if (cargoId) {
+          this.cargoIdFromCargo.set(cargoId);
+          this.form.monto = typeof cargoMonto === 'string' ? parseFloat(cargoMonto) : Number(cargoMonto) || 0;
+          this.form.concepto = (cargoConcepto ?? '').toString().trim();
+        } else {
+          this.cargoIdFromCargo.set(null);
+          this.form.monto = 0;
+          this.form.concepto = '';
+        }
         this.form.status = 'Aplicado';
-        this.form.concepto = '';
         this.form.urlComprobante = '';
         this.form.nota = '';
         if (comunidadId) {
@@ -133,6 +148,7 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
         this.isEditMode.set(false);
         this.pagoId.set(null);
         this.residentIdFromRoute.set(null);
+        this.cargoIdFromCargo.set(null);
         this.form.residenteId = 'all';
         this.form.fechaPago = new Date().toISOString().slice(0, 10);
         this.form.monto = 0;
@@ -145,6 +161,7 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
         this.loadCommunityName(comunidadId);
         this.loadResidentsForCommunityFromId(comunidadId);
       } else {
+        this.cargoIdFromCargo.set(null);
         const cid = comunidadId || this.adminContext.getSelectedCommunityId() || this.comunidadesAsociadas()[0]?.id;
         if (cid) {
           this.selectedComunidadId.set(cid);
@@ -399,7 +416,7 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
         ).subscribe({
           next: () => {
             this.isSaving.set(false);
-            this.router.navigate(['/admincompany/pagos-residente'], this.getNavigateBackOptions());
+            this.markCargoAsPagadoAndNavigate();
           },
           error: () => {
             this.errorMessage.set('Error al crear el pago o subir el comprobante.');
@@ -432,6 +449,36 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
     if (comunidad) q.comunidad = comunidad;
     if (residente) q.residente = residente;
     return Object.keys(q).length ? { queryParams: q } : {};
+  }
+
+  private markCargoAsPagadoAndNavigate(): void {
+    const cargoId = this.cargoIdFromCargo();
+    if (!cargoId) {
+      this.router.navigate(['/admincompany/pagos-residente'], this.getNavigateBackOptions());
+      return;
+    }
+    this.cargosService.getById(cargoId).subscribe({
+      next: (cargo) => {
+        if (cargo) {
+          this.cargosService.update(cargoId, {
+            residentId: cargo.residentId,
+            fecha: cargo.fecha,
+            descripcion: cargo.descripcion,
+            monto: cargo.monto,
+            estatus: 'Pagado',
+            updatedByUserId: this.authService.currentUser()?.id ?? undefined
+          }).subscribe({
+            next: () => this.router.navigate(['/admincompany/pagos-residente'], this.getNavigateBackOptions()),
+            error: () => {
+              this.errorMessage.set('Pago creado. No se pudo actualizar el cargo a Pagado.');
+            }
+          });
+        } else {
+          this.router.navigate(['/admincompany/pagos-residente'], this.getNavigateBackOptions());
+        }
+      },
+      error: () => this.router.navigate(['/admincompany/pagos-residente'], this.getNavigateBackOptions())
+    });
   }
 
   cancel(): void {

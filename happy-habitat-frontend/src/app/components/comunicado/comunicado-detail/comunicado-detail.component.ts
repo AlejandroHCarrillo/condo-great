@@ -59,9 +59,27 @@ export class ComunicadoDetailComponent {
     }
   }
 
+  /** Imagen placeholder cuando no hay imagen o falla la carga. */
+  readonly placeholderImage = 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150" viewBox="0 0 200 150">' +
+    '<rect width="200" height="150" fill="#e2e8f0"/>' +
+    '<path d="M70 45h60v60H70V45zm2 2v56h56V47H72zm20 8a8 8 0 1 1 0 16 8 8 0 0 1 0-16zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12zm-18 22l12-14 8 10 12-16 14 20H72l2-10z" fill="#94a3b8"/>' +
+    '</svg>'
+  );
+
   getImagenUrl(relativePath: string | null | undefined): string {
     if (!relativePath?.trim()) return '';
     return this.imageUrlService.getImageUrl(relativePath);
+  }
+
+  getComunicadoImageSrc(comunicado: Comunicado | null): string {
+    if (!comunicado?.imagen) return this.placeholderImage;
+    return this.getImagenUrl(comunicado.imagen);
+  }
+
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img) img.src = this.placeholderImage;
   }
 
   goBack(): void {

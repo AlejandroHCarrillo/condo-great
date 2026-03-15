@@ -1,49 +1,80 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { ComunicadosService } from '../../services/comunicados.service';
+import { AuthService } from '../../services/auth.service';
 import { Comunicado } from '../../shared/interfaces/comunicado.interface';
-import { catchError, of, tap } from 'rxjs';
+import { catchError, of } from 'rxjs';
 import { DatePipe } from '@angular/common';
+import { CommunityFilterComponent } from '../../shared/components/community-filter/community-filter.component';
 
 @Component({
   selector: 'hh-comunicados-list',
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, RouterLink, CommunityFilterComponent],
   templateUrl: './comunicados-list.component.html',
   styles: ``
 })
-export class ComunicadosListComponent {
+export class ComunicadosListComponent implements OnInit {
   private comunicadosService = inject(ComunicadosService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
-  // Signal para rastrear el estado de carga
-  private isLoadingState = signal(true);
+  selectedComunidadId = signal<string>('');
+  private comunicadosState = signal<Comunicado[]>([]);
+  private isLoadingState = signal(false);
 
-  // Usar toSignal para convertir el observable a una señal
-  // Obtiene los primeros 20 comunicados ordenados del más reciente al más antiguo
-  private comunicadosResource = toSignal(
-    this.comunicadosService.getComunicadosPaginated(1, 20).pipe(
-      catchError((error) => {
-        console.error('Error loading comunicados', error);
-        this.isLoadingState.set(false);
-        return of([]);
-      }),
-      tap(() => {
-        // Cuando el observable emite un valor, la carga está completa
-        this.isLoadingState.set(false);
-      })
-    ),
-    { initialValue: [] as Comunicado[] }
+  comunidadesAsociadas = computed(
+    () => (this.authService.currentUser()?.communities ?? []) as { id?: string; nombre: string }[]
   );
 
-  // Comunicados obtenidos del resource
-  comunicados = computed(() => {
-    return this.comunicadosResource() ?? [];
-  });
+  comunicados = computed(() => this.comunicadosState());
+  isLoading = computed(() => this.isLoadingState());
 
-  // Estado de carga basado en el signal de estado
-  isLoading = computed(() => {
-    return this.isLoadingState();
-  });
+  constructor() {
+    effect(() => {
+      const id = this.selectedComunidadId();
+      if (id) {
+        this.loadByCommunity(id);
+      } else {
+        this.comunicadosState.set([]);
+      }
+    });
+  }
+
+  ngOnInit(): void {
+    const initial = this.route.snapshot.queryParams['comunidad'];
+    if (initial) this.selectedComunidadId.set(initial);
+    this.route.queryParams.subscribe((params) => {
+      this.selectedComunidadId.set(params['comunidad'] ?? '');
+    });
+  }
+
+  onComunidadChange(comunidadId: string): void {
+    this.selectedComunidadId.set(comunidadId);
+    this.router.navigate([], { queryParams: { comunidad: comunidadId || null }, queryParamsHandling: 'merge' });
+  }
+
+  private loadByCommunity(communityId: string): void {
+    this.isLoadingState.set(true);
+    this.comunicadosService.getComunicadosByCommunityId(communityId).pipe(
+      catchError((err) => {
+        console.error('Error loading comunicados', err);
+        return of([]);
+      })
+    ).subscribe((list) => {
+      this.comunicadosState.set(list ?? []);
+      this.isLoadingState.set(false);
+    });
+  }
+
+  /** Imagen placeholder cuando el comunicado no tiene imagen o falla la carga. */
+  readonly placeholderImage = 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">' +
+    '<rect width="80" height="80" fill="#e2e8f0"/>' +
+    '<path d="M25 22h30v36H25V22zm2 2v32h26V24H27zm4 4h18v4H31v-4zm0 6h18v4H31v-4zm0 6h12v4H31v-4z" fill="#94a3b8"/>' +
+    '</svg>'
+  );
 
   /**
    * Obtiene la ruta correcta de la imagen
@@ -51,12 +82,15 @@ export class ComunicadosListComponent {
    */
   getImagePath(path: string | null | undefined): string {
     if (!path) return '';
-    // Si la ruta ya comienza con /, la devolvemos tal cual
-    if (path.startsWith('/')) {
-      return path;
-    }
-    // Si no, agregamos el / al inicio
+    if (path.startsWith('/')) return path;
     return `/${path}`;
+  }
+
+  /**
+   * Devuelve la URL de la imagen del comunicado o la imagen placeholder si no hay.
+   */
+  getComunicadoImageSrc(comunicado: Comunicado): string {
+    return comunicado?.imagen ? this.getImagePath(comunicado.imagen) : this.placeholderImage;
   }
 
   /**
@@ -68,14 +102,12 @@ export class ComunicadosListComponent {
   }
 
   /**
-   * Maneja errores al cargar imágenes
+   * Maneja errores al cargar imágenes; muestra el placeholder.
    */
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
     if (img) {
-      console.warn('Error loading comunicado image:', img.src);
-      // Ocultar la imagen si falla
-      img.style.display = 'none';
+      img.src = this.placeholderImage;
     }
   }
 }
