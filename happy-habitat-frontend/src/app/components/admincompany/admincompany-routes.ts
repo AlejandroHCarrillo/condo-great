@@ -47,6 +47,7 @@ import { ReportesIngresosComponent } from './reportes/reportes-ingresos/reportes
 import { ReportesGastosComponent } from './reportes/reportes-gastos/reportes-gastos.component';
 import { ReportesTicketsComponent } from './reportes/reportes-tickets/reportes-tickets.component';
 import { ReportesPagoProveedoresComponent } from './reportes/reportes-pago-proveedores/reportes-pago-proveedores.component';
+import { ReservacionesListComponent } from './reservaciones/reservaciones-list.component';
 
 export const admincompanyRoutes: Routes = [
     {
@@ -100,6 +101,10 @@ export const admincompanyRoutes: Routes = [
             {
                 path: 'historial-pagos-residente/:residentId',
                 component: HistorialPagosResidenteComponent
+            },
+            {
+                path: 'reservaciones',
+                component: ReservacionesListComponent
             },
             {
                 path: 'amenidades',

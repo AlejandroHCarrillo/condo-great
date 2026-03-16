@@ -13,6 +13,7 @@ public class AmenityDto
     public string? CommunityName { get; set; }
     public int? CapacidadMaxima { get; set; }
     public int? NumeroReservacionesSimultaneas { get; set; }
+    public bool RequiereAprobacion { get; set; }
     public string CreatedAt { get; set; } = string.Empty;
 }
 
@@ -27,6 +28,7 @@ public class CreateAmenityDto
     public Guid CommunityId { get; set; }
     public int? CapacidadMaxima { get; set; }
     public int? NumeroReservacionesSimultaneas { get; set; }
+    public bool RequiereAprobacion { get; set; }
     public Guid? CreatedByUserId { get; set; }
 }
 
@@ -41,4 +43,5 @@ public class UpdateAmenityDto
     public Guid CommunityId { get; set; }
     public int? CapacidadMaxima { get; set; }
     public int? NumeroReservacionesSimultaneas { get; set; }
+    public bool RequiereAprobacion { get; set; }
 }

@@ -107,6 +107,7 @@
         <a
           class="btn btn-ghost btn-sm gap-2 border-2 border-transparent rounded-btn"
           [routerLink]="item.route"
+          queryParamsHandling="preserve"
           [class.border-primary]="activeSecondaryKey() === item.route"
           [class.text-primary]="activeSecondaryKey() === item.route"
           [class.font-semibold]="activeSecondaryKey() === item.route"

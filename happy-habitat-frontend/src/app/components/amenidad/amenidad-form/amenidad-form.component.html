@@ -139,6 +139,19 @@
         }
       </div>
 
+      <div class="form-control w-full">
+        <label class="label cursor-pointer justify-start gap-3">
+          <input
+            type="checkbox"
+            class="checkbox checkbox-primary"
+            [(ngModel)]="form.requiereAprobacion"
+            name="requiereAprobacion"
+          />
+          <span class="label-text font-medium">Requiere aprobación</span>
+        </label>
+        <p class="text-sm text-base-content/70 mt-1">Si está activo, las reservaciones de esta amenidad deberán ser aprobadas antes de confirmarse.</p>
+      </div>
+
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="form-control w-full">
           <label class="label" for="capacidadMaxima">

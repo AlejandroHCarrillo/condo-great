@@ -82,6 +82,12 @@
                 <p class="text-lg">{{ amenidad()!.numeroReservacionesSimultaneas }}</p>
               </div>
             }
+            <div>
+              <label class="label">
+                <span class="label-text font-bold">Requiere aprobación</span>
+              </label>
+              <p class="text-lg">{{ amenidad()!.requiereAprobacion ? 'Sí' : 'No' }}</p>
+            </div>
           </div>
 
           @if (amenidad()!.imagen) {

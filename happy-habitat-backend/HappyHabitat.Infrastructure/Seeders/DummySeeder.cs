@@ -1198,14 +1198,14 @@ public class DummySeeder : IDataSeeder
         var allCommunitiesForAmenities = await _context.Communities.ToListAsync();
         var amenityTemplates = new[]
         {
-            new { Nombre = "Casa club eventos", Descripcion = "Casa club para eventos", Reglas = "Fines de semana y días festivos reservar por cuatro horas con un costo de 1500 pesos. Uso de asador con costo de 500 pesos extra.", Costo = 1500m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-casa-club.png", CapacidadMaxima = (int?)35, NumeroReservacionesSimultaneas = (int?)1 },
-            new { Nombre = "Alberca", Descripcion = "Alberca de la comunidad.", Reglas = "Capacidad máxima 35 personas. 5 personas por casa. Máximo 3 horas por reservación por día. No se permiten bebidas embriagantes.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-alberca.jpg", CapacidadMaxima = (int?)35, NumeroReservacionesSimultaneas = (int?)7 },
-            new { Nombre = "Casa club residentes", Descripcion = "Casa club para residentes", Reglas = "Lunes a viernes se puede reservar sin costo durante 2 horas.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-casa-club.png", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)1 },
-            new { Nombre = "Escalera", Descripcion = "Escalera de aluminio", Reglas = "Todo residente puede usarla registrándose en el sistema por 48 horas.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-escalera.png", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)1 },
-            new { Nombre = "Cancha de pádel", Descripcion = "Cancha de pádel", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null },
-            new { Nombre = "Cancha de fútbol rápido", Descripcion = "Cancha de fútbol rápido", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null },
-            new { Nombre = "Cancha de basquetbol", Descripcion = "Cancha de basquetbol", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null },
-            new { Nombre = "Gimnasio", Descripcion = "Gimnasio de la comunidad", Reglas = "Próximamente.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null }
+            new { Nombre = "Casa club eventos", Descripcion = "Casa club para eventos", Reglas = "Fines de semana y días festivos reservar por cuatro horas con un costo de 1500 pesos. Uso de asador con costo de 500 pesos extra.", Costo = 1500m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-casa-club.png", CapacidadMaxima = (int?)35, NumeroReservacionesSimultaneas = (int?)1, RequiereAprobacion = true },
+            new { Nombre = "Alberca", Descripcion = "Alberca de la comunidad.", Reglas = "Capacidad máxima 35 personas. 5 personas por casa. Máximo 3 horas por reservación por día. No se permiten bebidas embriagantes.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-alberca.jpg", CapacidadMaxima = (int?)35, NumeroReservacionesSimultaneas = (int?)7, RequiereAprobacion = true },
+            new { Nombre = "Casa club residentes", Descripcion = "Casa club para residentes", Reglas = "Lunes a viernes se puede reservar sin costo durante 2 horas.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-casa-club.png", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)1, RequiereAprobacion = false },
+            new { Nombre = "Escalera", Descripcion = "Escalera de aluminio", Reglas = "Todo residente puede usarla registrándose en el sistema por 48 horas.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-escalera.png", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)1, RequiereAprobacion = true },
+            new { Nombre = "Cancha de pádel", Descripcion = "Cancha de pádel", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, RequiereAprobacion = false },
+            new { Nombre = "Cancha de fútbol rápido", Descripcion = "Cancha de fútbol rápido", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, RequiereAprobacion = false },
+            new { Nombre = "Cancha de basquetbol", Descripcion = "Cancha de basquetbol", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, RequiereAprobacion = false },
+            new { Nombre = "Gimnasio", Descripcion = "Gimnasio de la comunidad", Reglas = "Próximamente.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, RequiereAprobacion = false }
         };
 
         if (allCommunitiesForAmenities.Count > 0)
@@ -1215,31 +1215,151 @@ public class DummySeeder : IDataSeeder
             {
                 var rnd = new Random();
                 List<Amenity> amenityList = [];
+                var pueblitoId = new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87"); // Residencial El Pueblito
                 foreach (var community in allCommunitiesForAmenities)
                 {
-                    var count = rnd.Next(2, 6); // 2 a 5 inclusive
-                    for (var i = 0; i < count; i++)
+                    if (community.Id == pueblitoId)
                     {
-                        var t = amenityTemplates[rnd.Next(amenityTemplates.Length)];
-                        amenityList.Add(new Amenity
+                        // Residencial El Pueblito: todas las amenidades del grid (amenidades/grid)
+                        foreach (var t in amenityTemplates)
                         {
-                            Id = Guid.NewGuid(),
-                            Community = community,
-                            Nombre = t.Nombre,
-                            Descripcion = t.Descripcion,
-                            Reglas = t.Reglas,
-                            Costo = t.Costo,
-                            FechaAlta = t.FechaAlta,
-                            Imagen = t.Imagen,
-                            CapacidadMaxima = t.CapacidadMaxima,
-                            NumeroReservacionesSimultaneas = t.NumeroReservacionesSimultaneas,
-                            CreatedAt = DateTime.UtcNow
-                        });
+                            amenityList.Add(new Amenity
+                            {
+                                Id = Guid.NewGuid(),
+                                Community = community,
+                                Nombre = t.Nombre,
+                                Descripcion = t.Descripcion,
+                                Reglas = t.Reglas,
+                                Costo = t.Costo,
+                                FechaAlta = t.FechaAlta,
+                                Imagen = t.Imagen,
+                                CapacidadMaxima = t.CapacidadMaxima,
+                                NumeroReservacionesSimultaneas = t.NumeroReservacionesSimultaneas,
+                                RequiereAprobacion = t.RequiereAprobacion,
+                                CreatedAt = DateTime.UtcNow
+                            });
+                        }
+                    }
+                    else
+                    {
+                        var count = rnd.Next(2, 6); // 2 a 5 inclusive para el resto
+                        for (var i = 0; i < count; i++)
+                        {
+                            var t = amenityTemplates[rnd.Next(amenityTemplates.Length)];
+                            amenityList.Add(new Amenity
+                            {
+                                Id = Guid.NewGuid(),
+                                Community = community,
+                                Nombre = t.Nombre,
+                                Descripcion = t.Descripcion,
+                                Reglas = t.Reglas,
+                                Costo = t.Costo,
+                                FechaAlta = t.FechaAlta,
+                                Imagen = t.Imagen,
+                                CapacidadMaxima = t.CapacidadMaxima,
+                                NumeroReservacionesSimultaneas = t.NumeroReservacionesSimultaneas,
+                                RequiereAprobacion = t.RequiereAprobacion,
+                                CreatedAt = DateTime.UtcNow
+                            });
+                        }
                     }
                 }
                 await _context.Amenities.AddRangeAsync(amenityList);
                 await _context.SaveChangesAsync();
             }
+            else
+            {
+                // Asegurar que Residencial El Pueblito tenga las 8 amenidades del grid (llenar si tiene menos)
+                var pueblitoId = new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87");
+                var pueblitoAmenitiesCount = await _context.Amenities.CountAsync(a => a.Community != null && a.Community.Id == pueblitoId);
+                if (pueblitoAmenitiesCount < amenityTemplates.Length)
+                {
+                    var pueblitoCommunity = await _context.Communities.FirstOrDefaultAsync(c => c.Id == pueblitoId);
+                    if (pueblitoCommunity != null)
+                    {
+                        var existingNames = await _context.Amenities
+                            .Where(a => a.Community != null && a.Community.Id == pueblitoId)
+                            .Select(a => a.Nombre)
+                            .ToListAsync();
+                        var toAdd = amenityTemplates.Where(t => !existingNames.Contains(t.Nombre)).ToList();
+                        if (toAdd.Count > 0)
+                        {
+                            var newAmenities = toAdd.Select(t => new Amenity
+                            {
+                                Id = Guid.NewGuid(),
+                                Community = pueblitoCommunity,
+                                Nombre = t.Nombre,
+                                Descripcion = t.Descripcion,
+                                Reglas = t.Reglas,
+                                Costo = t.Costo,
+                                FechaAlta = t.FechaAlta,
+                                Imagen = t.Imagen,
+                                CapacidadMaxima = t.CapacidadMaxima,
+                                NumeroReservacionesSimultaneas = t.NumeroReservacionesSimultaneas,
+                                RequiereAprobacion = t.RequiereAprobacion,
+                                CreatedAt = DateTime.UtcNow
+                            }).ToList();
+                            await _context.Amenities.AddRangeAsync(newAmenities);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                }
+            }
+        }
+
+        // Seed 10 reservaciones de amenidades para Residencial El Pueblito (tabla AmenityReservations debe existir; si falla, se omite)
+        try
+        {
+            var pueblitoIdReservas = new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87");
+            if (!await _context.AmenityReservations.AnyAsync())
+            {
+                var pueblitoAmenities = await _context.Amenities
+                    .Where(a => EF.Property<Guid>(a, "CommunityId") == pueblitoIdReservas)
+                    .ToListAsync();
+                var pueblitoResidents = await _context.Residents
+                    .Where(r => r.CommunityId == pueblitoIdReservas)
+                    .ToListAsync();
+                if (pueblitoAmenities.Count > 0 && pueblitoResidents.Count > 0)
+                {
+                    var rndRes = new Random();
+                    var statuses = new[] { "En proceso", "Reservada", "Reservada", "Reservada" };
+                    var reservas = new List<AmenityReservation>();
+                    var horariosBase = new[]
+                    {
+                        new DateTime(2025, 2, 15, 10, 0, 0),
+                        new DateTime(2025, 2, 16, 12, 0, 0),
+                        new DateTime(2025, 2, 17, 14, 0, 0),
+                        new DateTime(2025, 2, 18, 9, 0, 0),
+                        new DateTime(2025, 2, 19, 16, 0, 0),
+                        new DateTime(2025, 2, 20, 11, 0, 0),
+                        new DateTime(2025, 2, 21, 15, 0, 0),
+                        new DateTime(2025, 2, 22, 10, 30, 0),
+                        new DateTime(2025, 2, 23, 13, 0, 0),
+                        new DateTime(2025, 2, 24, 17, 0, 0)
+                    };
+                    for (var i = 0; i < 10; i++)
+                    {
+                        var amenity = pueblitoAmenities[rndRes.Next(pueblitoAmenities.Count)];
+                        var resident = pueblitoResidents[rndRes.Next(pueblitoResidents.Count)];
+                        reservas.Add(new AmenityReservation
+                        {
+                            Id = Guid.NewGuid(),
+                            AmenityId = amenity.Id,
+                            ResidentId = resident.Id,
+                            Horario = horariosBase[i],
+                            NumPersonas = rndRes.Next(1, 8),
+                            Status = statuses[rndRes.Next(statuses.Length)],
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                    await _context.AmenityReservations.AddRangeAsync(reservas);
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // Tabla AmenityReservations puede no existir si no se aplicó la migración; se omite este bloque
         }
 
         // Seed CommunityProviders: entre 3 y 7 proveedores por comunidad

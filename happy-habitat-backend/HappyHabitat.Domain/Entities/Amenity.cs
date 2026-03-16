@@ -12,6 +12,8 @@ public class Amenity : AuditBase
     public int? CapacidadMaxima { get; set; }
     public int? NumeroReservacionesSimultaneas { get; set; }
     public bool IsActive { get; set; } = true;
+    /// <summary>Si true, las reservaciones de esta amenidad requieren aprobación antes de confirmarse.</summary>
+    public bool RequiereAprobacion { get; set; }
 
     // Navigation property
     public Community? Community { get; set; }

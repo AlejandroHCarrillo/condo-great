@@ -93,9 +93,10 @@ export class ReservacionesComponent {
       return this.sanitizer.bypassSecurityTrustHtml(htmlString);
   }
 
-  getReservationsByDate(fechaBuscada : Date): number {
-    const num =  this.reservaciones().reduce((total, r) => {
-      const mismaHora = r.horario.getTime() === fechaBuscada.getTime(); // compara fechas exactas
+  getReservationsByDate(fechaBuscada: Date): number {
+    const num = this.reservaciones().reduce((total, r) => {
+      const horarioDate = typeof r.horario === 'string' ? new Date(r.horario) : r.horario;
+      const mismaHora = horarioDate.getTime() === fechaBuscada.getTime();
       return total + (mismaHora ? r.numPersonas ?? 0 : 0);
     }, 0);
     return num;

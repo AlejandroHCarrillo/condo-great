@@ -81,7 +81,8 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
     fechaAlta: '',
     imagen: '' as string | undefined,
     capacidadMaxima: null as number | null,
-    numeroReservacionesSimultaneas: 1 as number | null
+    numeroReservacionesSimultaneas: 1 as number | null,
+    requiereAprobacion: false
   };
 
   ngOnInit(): void {
@@ -122,6 +123,7 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
     this.form.imagen = '';
     this.form.capacidadMaxima = null;
     this.form.numeroReservacionesSimultaneas = 1;
+    this.form.requiereAprobacion = false;
     this.imagePathSignal.set('');
     this.clearImageSelection();
   }
@@ -193,6 +195,7 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
           this.form.imagen = amenidad.imagen ?? '';
           this.form.capacidadMaxima = amenidad.capacidadMaxima ?? null;
           this.form.numeroReservacionesSimultaneas = amenidad.numeroReservacionesSimultaneas ?? 1;
+          this.form.requiereAprobacion = amenidad.requiereAprobacion ?? false;
           this.imagePathSignal.set(this.form.imagen ?? '');
           this.clearImageSelection();
         } else {
@@ -269,7 +272,8 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
         imagen: this.form.imagen?.trim() || null,
         communityId,
         capacidadMaxima: this.form.capacidadMaxima,
-        numeroReservacionesSimultaneas: this.form.numeroReservacionesSimultaneas
+        numeroReservacionesSimultaneas: this.form.numeroReservacionesSimultaneas,
+        requiereAprobacion: this.form.requiereAprobacion
       };
       this.amenidadesService.updateAmenity(id, dto).subscribe({
         next: () => {
@@ -293,6 +297,7 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
         communityId,
         capacidadMaxima: this.form.capacidadMaxima,
         numeroReservacionesSimultaneas: this.form.numeroReservacionesSimultaneas,
+        requiereAprobacion: this.form.requiereAprobacion,
         createdByUserId: currentUser?.id ?? undefined
       };
       this.amenidadesService.createAmenity(dto).subscribe({
