@@ -5,11 +5,12 @@ import { AmenidadesService } from '../../../services/amenidades.service';
 import { ImageUrlService } from '../../../services/image-url.service';
 import { Amenidad } from '../../../shared/interfaces/amenidad.interface';
 import { AuthService } from '../../../services/auth.service';
+import { AmenitySchedulesEditorComponent } from '../../../shared/components/amenity-schedules-editor/amenity-schedules-editor.component';
 
 @Component({
   selector: 'hh-amenidad-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AmenitySchedulesEditorComponent],
   templateUrl: './amenidad-detail.component.html'
 })
 export class AmenidadDetailComponent {

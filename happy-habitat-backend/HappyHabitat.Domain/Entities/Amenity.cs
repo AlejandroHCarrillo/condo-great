@@ -15,6 +15,7 @@ public class Amenity : AuditBase
     /// <summary>Si true, las reservaciones de esta amenidad requieren aprobación antes de confirmarse.</summary>
     public bool RequiereAprobacion { get; set; }
 
-    // Navigation property
+    // Navigation properties
     public Community? Community { get; set; }
+    public ICollection<AmenitySchedule> Schedules { get; set; } = new List<AmenitySchedule>();
 }

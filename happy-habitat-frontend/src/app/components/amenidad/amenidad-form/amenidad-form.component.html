@@ -201,6 +201,17 @@
         </button>
       </div>
     </form>
+
+    @if (isEditMode() && amenidadId()) {
+      <div class="mt-8 pt-6 border-t border-base-content/10">
+        <hh-amenity-schedules-editor
+          [amenityId]="amenidadId()!"
+          title="Modificar horarios"
+          addButtonLabel="Agregar periodo"
+          emptyMessage="No hay horarios definidos. Agrega periodos para definir el horario de la amenidad."
+        />
+      </div>
+    }
     </div>
   }
 </div>

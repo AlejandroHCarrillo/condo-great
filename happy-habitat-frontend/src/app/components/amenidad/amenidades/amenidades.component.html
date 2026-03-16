@@ -46,6 +46,7 @@
                 <thead class="bg-secondary text-white [&_th]:rounded-none [&_th]:text-white">
                     <tr>
                         <th class="w-12">#</th>
+                        <th class="w-14">Imagen</th>
                         <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('nombre')">
                             <span class="flex items-center gap-1">
                                 Nombre
@@ -56,7 +57,16 @@
                                 }
                             </span>
                         </th>
-                        <th>Descripción</th>
+                        <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('descripcion')">
+                            <span class="flex items-center gap-1">
+                                Descripción
+                                @if (sortColumn() === 'descripcion') {
+                                    <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
+                                } @else {
+                                    <i class="fa-solid fa-sort text-white/70 text-xs"></i>
+                                }
+                            </span>
+                        </th>
                         <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('costo')">
                             <span class="flex items-center gap-1">
                                 Costo
@@ -83,7 +93,7 @@
                 <tbody>
                     @if (amenidadesPaginadas().length === 0) {
                         <tr>
-                            <td colspan="5" class="text-center py-8 text-gray-500">
+                            <td colspan="7" class="text-center py-8 text-gray-500">
                                 <i class="fa-solid fa-inbox mr-2"></i>
                                 No se encontraron amenidades
                             </td>
@@ -92,6 +102,14 @@
                         @for (amenidad of amenidadesPaginadas(); track amenidad.id; let index = $index) {
                             <tr class="cursor-pointer hover:bg-base-200 transition-colors" (click)="viewAmenidadDetail(amenidad)">
                                 <td><span class="text-sm">{{ (currentPage() - 1) * pageSize() + index + 1 }}</span></td>
+                                <td>
+                                    <img
+                                        [src]="getAmenidadThumbnailUrl(amenidad)"
+                                        [alt]="amenidad.nombre"
+                                        class="w-10 h-10 object-cover rounded"
+                                        (error)="$any($event.target).src = defaultAmenidadImage"
+                                    />
+                                </td>
                                 <td class="font-medium max-w-[180px] truncate" [title]="amenidad.nombre">{{ amenidad.nombre }}</td>
                                 <td class="max-w-[200px] truncate" [title]="amenidad.descripcion">{{ amenidad.descripcion || '-' }}</td>
                                 <td>{{ formatCosto(amenidad.costo) }}</td>

@@ -22,6 +22,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Banner> Banners { get; set; }
     public DbSet<Comunicado> Comunicados { get; set; }
     public DbSet<Amenity> Amenities { get; set; }
+    public DbSet<AmenitySchedule> AmenitySchedules { get; set; }
     public DbSet<AmenityReservation> AmenityReservations { get; set; }
     public DbSet<UserCommunity> UserCommunities { get; set; }
     public DbSet<Contrato> Contratos { get; set; }
@@ -388,6 +389,18 @@ public class ApplicationDbContext : DbContext
                 .HasForeignKey("CommunityId")
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<AmenitySchedule>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.HoraInicio).HasMaxLength(5).IsRequired();
+            entity.Property(e => e.HoraFin).HasMaxLength(5).IsRequired();
+            entity.Property(e => e.Nota).HasMaxLength(500);
+            entity.HasOne(e => e.Amenity)
+                .WithMany(a => a.Schedules)
+                .HasForeignKey(e => e.AmenityId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<AmenityReservation>(entity =>

@@ -129,6 +129,7 @@ builder.Services.AddScoped<IResidentVisitService, ResidentVisitService>();
 builder.Services.AddScoped<IBannerService, BannerService>();
 builder.Services.AddScoped<IComunicadoService, ComunicadoService>();
 builder.Services.AddScoped<IAmenityService, AmenityService>();
+builder.Services.AddScoped<IAmenityScheduleService, AmenityScheduleService>();
 builder.Services.AddScoped<IAmenityReservationService, AmenityReservationService>();
 builder.Services.AddScoped<ICommunityProviderService, CommunityProviderService>();
 builder.Services.AddScoped<IProveedorServicioService, ProveedorServicioService>();

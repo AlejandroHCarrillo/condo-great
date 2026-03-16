@@ -16,11 +16,12 @@ import { RolesEnum } from '../../../enums/roles.enum';
 import { mapCommunityDtoToComunidad } from '../../../shared/mappers/community.mapper';
 import { amenidadImageUploadPath } from '../../../constants/upload-paths';
 import type { CreateAmenityDto, UpdateAmenityDto } from '../../../shared/interfaces/amenidad.interface';
+import { AmenitySchedulesEditorComponent } from '../../../shared/components/amenity-schedules-editor/amenity-schedules-editor.component';
 
 @Component({
   selector: 'hh-amenidad-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AmenitySchedulesEditorComponent],
   templateUrl: './amenidad-form.component.html'
 })
 export class AmenidadFormComponent implements OnInit, OnDestroy {

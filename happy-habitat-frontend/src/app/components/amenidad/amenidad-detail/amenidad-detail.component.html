@@ -101,6 +101,12 @@
         </div>
       </div>
     </div>
+
+    <div class="card bg-base-100 shadow-xl mt-6">
+      <div class="card-body">
+        <hh-amenity-schedules-editor [amenityId]="amenidad()!.id" />
+      </div>
+    </div>
   } @else {
     <div class="alert alert-error">
       <i class="fa-solid fa-exclamation-triangle mr-2"></i>

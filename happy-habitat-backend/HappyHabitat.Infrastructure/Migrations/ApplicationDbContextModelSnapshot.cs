@@ -89,6 +89,68 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.HasIndex("CommunityId");
 
                     b.ToTable("Amenities");
+
+                    b.Navigation("Schedules");
+                });
+
+            modelBuilder.Entity("HappyHabitat.Domain.Entities.AmenitySchedule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AmenityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("int");
+
+                    b.Property<string>("HoraFin")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.Property<string>("HoraInicio")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.Property<bool>("IsOpen")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Nota")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AmenityId");
+
+                    b.ToTable("AmenitySchedules");
+                });
+
+            modelBuilder.Entity("HappyHabitat.Domain.Entities.AmenitySchedule", b =>
+                {
+                    b.HasOne("HappyHabitat.Domain.Entities.Amenity", "Amenity")
+                        .WithMany("Schedules")
+                        .HasForeignKey("AmenityId")
+                        .OnDelete(Microsoft.EntityFrameworkCore.DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Amenity");
                 });
 
             modelBuilder.Entity("HappyHabitat.Domain.Entities.AmenityReservation", b =>

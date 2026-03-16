@@ -1307,6 +1307,74 @@ public class DummySeeder : IDataSeeder
             }
         }
 
+        // Seed horarios de amenidades para Residencial El Pueblito (Alberca, Casa club residentes, Casa club eventos) según horario-amenidades.data.ts
+        try
+        {
+            if (!await _context.AmenitySchedules.AnyAsync())
+            {
+                var pueblitoId = new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87");
+                var pueblitoAmenities = await _context.Amenities
+                    .Where(a => EF.Property<Guid>(a, "CommunityId") == pueblitoId)
+                    .ToListAsync();
+                var alberca = pueblitoAmenities.FirstOrDefault(a => a.Nombre == "Alberca");
+                var casaClubResidentes = pueblitoAmenities.FirstOrDefault(a => a.Nombre == "Casa club residentes");
+                var casaClubEventos = pueblitoAmenities.FirstOrDefault(a => a.Nombre == "Casa club eventos");
+
+                var scheduleList = new List<AmenitySchedule>();
+                // DayOfWeek: 1=Lunes, 2=Martes, 3=Miércoles, 4=Jueves, 5=Viernes, 6=Sábado, 7=Domingo
+
+                if (alberca != null)
+                {
+                    scheduleList.AddRange(new[]
+                    {
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 1, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Cerrada por mantenimiento", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 2, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 3, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 4, HoraInicio = "06:00", HoraFin = "10:00", IsOpen = false, Nota = "Cerrada por mantenimiento", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 4, HoraInicio = "10:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 5, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 6, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 7, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                    });
+                }
+                if (casaClubResidentes != null)
+                {
+                    scheduleList.AddRange(new[]
+                    {
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubResidentes.Id, DayOfWeek = 1, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubResidentes.Id, DayOfWeek = 2, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubResidentes.Id, DayOfWeek = 3, HoraInicio = "10:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubResidentes.Id, DayOfWeek = 4, HoraInicio = "10:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubResidentes.Id, DayOfWeek = 5, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubResidentes.Id, DayOfWeek = 6, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Reservada con costo para eventos privados de los residentes.", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubResidentes.Id, DayOfWeek = 7, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Reservada con costo para eventos privados de los residentes.", CreatedAt = DateTime.UtcNow },
+                    });
+                }
+                if (casaClubEventos != null)
+                {
+                    scheduleList.AddRange(new[]
+                    {
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubEventos.Id, DayOfWeek = 1, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Reservada para uso de los residentes.", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubEventos.Id, DayOfWeek = 2, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Reservada para uso de los residentes.", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubEventos.Id, DayOfWeek = 3, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Reservada para uso de los residentes.", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubEventos.Id, DayOfWeek = 4, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Reservada para uso de los residentes.", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubEventos.Id, DayOfWeek = 5, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Reservada para uso de los residentes.", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubEventos.Id, DayOfWeek = 6, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubEventos.Id, DayOfWeek = 7, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                    });
+                }
+                if (scheduleList.Count > 0)
+                {
+                    await _context.AmenitySchedules.AddRangeAsync(scheduleList);
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // Tabla AmenitySchedules puede no existir si no se aplicó la migración; se omite
+        }
+
         // Seed 10 reservaciones de amenidades para Residencial El Pueblito (tabla AmenityReservations debe existir; si falla, se omite)
         try
         {
