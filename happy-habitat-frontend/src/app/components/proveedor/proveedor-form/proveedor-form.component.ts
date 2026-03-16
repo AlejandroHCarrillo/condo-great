@@ -16,11 +16,12 @@ import type {
   CreateCommunityProviderDto,
   UpdateCommunityProviderDto
 } from '../../../shared/interfaces/community-provider.interface';
+import { PhoneFormatPipe } from '../../../shared/pipes/phone-format.pipe';
 
 @Component({
   selector: 'hh-proveedor-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PhoneFormatPipe],
   templateUrl: './proveedor-form.component.html'
 })
 export class ProveedorFormComponent implements OnInit, OnDestroy {
@@ -265,5 +266,15 @@ export class ProveedorFormComponent implements OnInit, OnDestroy {
 
   cancel(): void {
     this.router.navigate(['/admincompany/proveedores'], this.getNavigateBackOptions());
+  }
+
+  onPhoneInput(field: 'contactPhones' | 'directPhone' | 'mobilePhone', e: Event): void {
+    const value = (e.target as HTMLInputElement).value;
+    const digits = value.replace(/\D/g, '').slice(0, 15);
+    (this.form as Record<string, string | null>)[field] = digits || null;
+  }
+
+  setRating(value: unknown): void {
+    this.form.rating = value != null && value !== '' ? Number(value) : null;
   }
 }

@@ -1,0 +1,90 @@
+<div class="p-4">
+  <h1 class="text-2xl font-bold flex items-center gap-2 mb-6">
+    <i class="fa-solid fa-address-book text-primary"></i>
+    Directorio de servicios
+  </h1>
+
+  @if (errorMessage()) {
+    <div class="alert alert-warning mb-4">
+      <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando directorio...</span>
+    </div>
+  } @else if (groupedByGiro().length === 0) {
+    <p class="text-base-content/70">No hay proveedores en el directorio de tu comunidad.</p>
+  } @else {
+    <div class="space-y-8">
+      @for (group of groupedByGiro(); track group[0]) {
+        <section>
+          <h2 class="text-lg font-semibold text-primary mb-3">{{ group[0] }}</h2>
+          <div class="overflow-x-auto">
+            <table class="table table-zebra table-sm w-full">
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Telefono</th>
+                  <th>Email</th>
+                  <th>Calificacion</th>
+                  <th>Valorar</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of group[1]; track p.id) {
+                  <tr>
+                    <td class="font-medium">{{ p.nombre }}</td>
+                    <td class="font-mono text-sm">{{ p.telefono || '—' }}</td>
+                    <td>
+                      @if (p.email) {
+                        <a [href]="'mailto:' + p.email" class="link link-primary text-sm">{{ p.email }}</a>
+                      } @else {
+                        —
+                      }
+                    </td>
+                    <td>
+                      @let stars = getRatingStars(p.rating);
+                      <span class="inline-flex items-center gap-0.5">
+                        @for (i of [1,2,3,4,5]; track i) {
+                          @if (i <= stars.full) {
+                            <i class="fa-solid fa-star text-warning"></i>
+                          } @else if (i === stars.full + 1 && stars.half) {
+                            <i class="fa-solid fa-star-half-stroke text-warning"></i>
+                          } @else {
+                            <i class="fa-regular fa-star text-base-content/30"></i>
+                          }
+                        }
+                        @if (p.rating != null) {
+                          <span class="ml-1 text-sm">({{ p.rating.toFixed(1) }})</span>
+                        }
+                      </span>
+                    </td>
+                    <td>
+                      <div class="flex items-center gap-1" [class.opacity-50]="ratingInProgress() === p.id">
+                        @for (v of [1,2,3,4,5]; track v) {
+                          <button
+                            type="button"
+                            class="btn btn-ghost btn-xs btn-square p-0 min-h-0 h-6 w-6"
+                            [disabled]="ratingInProgress() === p.id"
+                            (click)="calificar(p, v)"
+                            [title]="'Valorar ' + v + ' estrellas'"
+                          >
+                            <i class="fa-regular fa-star text-warning hover:fa-solid"></i>
+                          </button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      }
+    </div>
+  }
+</div>

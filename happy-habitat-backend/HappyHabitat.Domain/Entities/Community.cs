@@ -24,6 +24,7 @@ public class Community
     public ICollection<UserCommunity> UserCommunities { get; set; } = [];
     public ICollection<Contrato> Contratos { get; set; } = [];
     public ICollection<CommunityProvider> CommunityProviders { get; set; } = [];
+    public ICollection<ProveedorServicio> ProveedorServicios { get; set; } = [];
     public ICollection<Document> Documents { get; set; } = [];
     public ICollection<CommunityConfiguration> CommunityConfigurations { get; set; } = [];
     public ICollection<Encuesta> Encuestas { get; set; } = [];

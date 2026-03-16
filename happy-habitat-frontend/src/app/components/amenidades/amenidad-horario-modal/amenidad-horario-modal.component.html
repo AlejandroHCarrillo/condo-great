@@ -1,40 +1,40 @@
 <button class="badge badge-primary" (click)="modalRef.showModal()">Horarios</button>
 <dialog #modalRef id="amenidad_modal" class="modal modal-bottom sm:modal-middle">
-<div class="modal-box">
-    <h3 class="text-lg font-bold">Horario</h3>    
-     <div class="overflow-x-auto">
-        <table class="table">
-            <!-- head -->
-            <thead>
+  <div class="modal-box">
+    <h3 class="text-lg font-bold">Horario</h3>
+    @if (horarios().length === 0) {
+      <p class="text-base-content/70 py-4">No hay horarios definidos.</p>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="table table-zebra table-sm">
+          <thead>
             <tr>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th></th>
+              <th>Día</th>
+              <th>Horario</th>
+              <th>Estado</th>
+              <th>Nota</th>
             </tr>
-            </thead>
-            <tbody>
-            @for (horario of horarios(); track horario.id; let idx = $index) {
-                <tr class="hover:bg-base-300">
-                    <th>{{idx}}</th>
-                    <td>{{horario.day}}</td>
-                    <td>de las {{horario.horainicio}} a las {{horario.horafin}} hrs.</td>
-                    <td>{{horario.isOpen?'abierto':'cerrado'}}</td>
-                    <td>{{horario.nota}}</td>
-                </tr>
+          </thead>
+          <tbody>
+            @for (horario of horarios(); track horario.id ?? $index; let idx = $index) {
+              <tr class="hover:bg-base-200">
+                <td>{{ horario.day }}</td>
+                <td>de las {{ horario.horainicio }} a las {{ horario.horafin }} hrs.</td>
+                <td>{{ horario.isOpen ? 'Abierto' : 'Cerrado' }}</td>
+                <td class="max-w-[200px]">{{ horario.nota || '—' }}</td>
+              </tr>
             }
-            </tbody>
+          </tbody>
         </table>
-    </div>
-    <p>
-        {{horarios() | json }}
-    </p>
+      </div>
+    }
     <div class="modal-action">
-    <form method="dialog">
-        <!-- if there is a button in form, it will close the modal -->
-        <button class="btn">Cerrar</button>
-    </form>
+      <form method="dialog">
+        <button type="button" class="btn">Cerrar</button>
+      </form>
     </div>
-</div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button type="button">Cerrar</button>
+  </form>
 </dialog>

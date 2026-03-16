@@ -1,0 +1,106 @@
+<div class="amenity-schedules-editor">
+  <div class="flex justify-between items-center mb-4">
+    <h3 class="text-xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-clock text-primary"></i>
+      {{ title() }}
+    </h3>
+    <button type="button" class="btn btn-primary text-white btn-sm" (click)="openAddScheduleModal()">
+      <i class="fa-solid fa-plus mr-2"></i>
+      {{ addButtonLabel() }}
+    </button>
+  </div>
+  @if (schedulesLoading()) {
+    <div class="flex justify-center py-6">
+      <span class="loading loading-spinner"></span>
+    </div>
+  } @else if (schedules().length === 0) {
+    <p class="text-base-content/70 py-4">{{ emptyMessage() }}</p>
+  } @else {
+    <div class="overflow-x-auto">
+      <table class="table table-zebra table-sm">
+        <thead>
+          <tr>
+            <th>Día</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Abierto</th>
+            <th>Nota</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of schedules(); track s.id) {
+            <tr>
+              <td>{{ getDayLabel(s.dayOfWeek) }}</td>
+              <td>{{ s.horaInicio }}</td>
+              <td>{{ s.horaFin }}</td>
+              <td>{{ s.isOpen ? 'Sí' : 'No' }}</td>
+              <td class="max-w-[200px] truncate" [title]="s.nota">{{ s.nota || '-' }}</td>
+              <td>
+                <div class="flex gap-1">
+                  <button type="button" class="btn btn-ghost btn-square btn-sm" title="Editar" (click)="openEditScheduleModal(s)">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button type="button" class="btn btn-ghost btn-square btn-sm text-error" title="Eliminar" (click)="deleteSchedule(s.id)">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <dialog [class.modal-open]="scheduleModalOpen()" class="modal modal-bottom sm:modal-middle">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">{{ scheduleEditId() ? 'Editar horario' : 'Agregar horario' }}</h3>
+      <div class="form-control mt-4">
+        <label class="label"><span class="label-text">Día</span></label>
+        <select class="select select-bordered w-full" [(ngModel)]="scheduleForm.dayOfWeek">
+          @for (d of dayOptions; track d) {
+            <option [value]="d">{{ dayLabels[d] }}</option>
+          }
+        </select>
+      </div>
+      <div class="grid grid-cols-2 gap-4 mt-2">
+        <div class="form-control">
+          <label class="label"><span class="label-text">Hora inicio</span></label>
+          <select class="select select-bordered w-full" [(ngModel)]="scheduleForm.horaInicio">
+            @for (t of timeOptions; track t) {
+              <option [value]="t">{{ t }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-control">
+          <label class="label"><span class="label-text">Hora fin</span></label>
+          <select class="select select-bordered w-full" [(ngModel)]="scheduleForm.horaFin">
+            @for (t of timeOptions; track t) {
+              <option [value]="t">{{ t }}</option>
+            }
+          </select>
+        </div>
+      </div>
+      <div class="form-control mt-2">
+        <label class="label cursor-pointer justify-start gap-2">
+          <input type="checkbox" class="checkbox" [(ngModel)]="scheduleForm.isOpen" />
+          <span class="label-text">Abierto</span>
+        </label>
+      </div>
+      <div class="form-control mt-2">
+        <label class="label"><span class="label-text">Nota</span></label>
+        <input type="text" class="input input-bordered w-full" [(ngModel)]="scheduleForm.nota" placeholder="" />
+      </div>
+      <div class="modal-action">
+        <button type="button" class="btn btn-ghost" (click)="closeScheduleModal()">Cancelar</button>
+        <button type="button" class="btn btn-primary" [class.loading]="savingSchedule()" [disabled]="savingSchedule()" (click)="saveSchedule()">
+          Guardar
+        </button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button type="button" (click)="closeScheduleModal()">Cerrar</button>
+    </form>
+  </dialog>
+</div>

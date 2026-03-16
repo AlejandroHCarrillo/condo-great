@@ -38,6 +38,16 @@ import { MorososListComponent } from './morosos/morosos-list.component';
 import { HistorialPagosResidenteComponent } from './historial-pagos-residente/historial-pagos-residente.component';
 import { SaldoBancoListComponent } from './saldo-banco/saldo-banco-list.component';
 import { SaldoBancoFormComponent } from './saldo-banco/saldo-banco-form.component';
+import { ProveedoresServiciosListComponent } from '../proveedor-servicio/proveedores-servicios-list/proveedores-servicios-list.component';
+import { ProveedorServicioFormComponent } from '../proveedor-servicio/proveedor-servicio-form/proveedor-servicio-form.component';
+import { ProveedorServicioDetailComponent } from '../proveedor-servicio/proveedor-servicio-detail/proveedor-servicio-detail.component';
+import { ReportesResumenComponent } from './reportes/reportes-resumen/reportes-resumen.component';
+import { ReportesFinanzasComponent } from './reportes/reportes-finanzas/reportes-finanzas.component';
+import { ReportesIngresosComponent } from './reportes/reportes-ingresos/reportes-ingresos.component';
+import { ReportesGastosComponent } from './reportes/reportes-gastos/reportes-gastos.component';
+import { ReportesTicketsComponent } from './reportes/reportes-tickets/reportes-tickets.component';
+import { ReportesPagoProveedoresComponent } from './reportes/reportes-pago-proveedores/reportes-pago-proveedores.component';
+import { ReservacionesListComponent } from './reservaciones/reservaciones-list.component';
 
 export const admincompanyRoutes: Routes = [
     {
@@ -93,6 +103,10 @@ export const admincompanyRoutes: Routes = [
                 component: HistorialPagosResidenteComponent
             },
             {
+                path: 'reservaciones',
+                component: ReservacionesListComponent
+            },
+            {
                 path: 'amenidades',
                 component: AmenidadesComponent
             },
@@ -123,6 +137,22 @@ export const admincompanyRoutes: Routes = [
             {
                 path: 'proveedores',
                 component: ProveedoresComponent
+            },
+            {
+                path: 'proveedores-servicios',
+                component: ProveedoresServiciosListComponent
+            },
+            {
+                path: 'proveedores-servicios/nuevo/:communityId',
+                component: ProveedorServicioFormComponent
+            },
+            {
+                path: 'proveedores-servicios/editar/:id',
+                component: ProveedorServicioFormComponent
+            },
+            {
+                path: 'proveedores-servicios/:id',
+                component: ProveedorServicioDetailComponent
             },
             {
                 path: 'documentos',
@@ -246,27 +276,27 @@ export const admincompanyRoutes: Routes = [
             },
             {
                 path: 'reportes/finanzas',
-                component: NotFoundPageComponent
+                component: ReportesFinanzasComponent
             },
             {
                 path: 'reportes/tickets',
-                component: NotFoundPageComponent
+                component: ReportesTicketsComponent
             },
             {
                 path: 'reportes/pago-proveedores',
-                component: NotFoundPageComponent
+                component: ReportesPagoProveedoresComponent
             },
             {
                 path: 'reportes/ingresos',
-                component: NotFoundPageComponent
+                component: ReportesIngresosComponent
             },
             {
                 path: 'reportes/gastos',
-                component: NotFoundPageComponent
+                component: ReportesGastosComponent
             },
             {
                 path: 'reportes/resumen',
-                component: NotFoundPageComponent
+                component: ReportesResumenComponent
             },
             {
                 path: '**',

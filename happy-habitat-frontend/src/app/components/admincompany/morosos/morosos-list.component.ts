@@ -11,11 +11,15 @@ import { ResidentsService } from '../../../services/residents.service';
 import { CargosResidenteService } from '../../../services/cargos-residente.service';
 import { PagosResidenteService } from '../../../services/pagos-residente.service';
 import { CommunityConfigurationsService } from '../../../services/community-configurations.service';
+import { CommunityPricesService } from '../../../services/community-prices.service';
 import { CommunityFilterComponent } from '../../../shared/components/community-filter/community-filter.component';
+import type { CommunityPrice } from '../../../shared/interfaces/community-price.interface';
 
-/** Código de configuración para el monto de un mantenimiento mensual (umbral moroso = 2 × este valor). */
+/** Código de configuración por si no hay precio de mantenimiento en la lista de precios. */
 const CONFIG_CODIGO_MONTO_MANTENIMIENTO = 'MONTO_MANT';
 const MONTO_MANTENIMIENTO_DEFAULT = 800;
+/** Concepto usado para buscar el monto de mensualidad en la lista de precios (insensible a mayúsculas). */
+const CONCEPTO_MANTENIMIENTO = 'mantenimiento';
 import { Residente } from '../../../shared/interfaces/residente.interface';
 import { CargoResidente } from '../../../shared/interfaces/cargo-residente.interface';
 import { PagosResidente } from '../../../shared/interfaces/pagos-residente.interface';
@@ -48,6 +52,7 @@ export class MorososListComponent implements OnInit {
   private cargosService = inject(CargosResidenteService);
   private pagosService = inject(PagosResidenteService);
   private configsService = inject(CommunityConfigurationsService);
+  private pricesService = inject(CommunityPricesService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -69,12 +74,16 @@ export class MorososListComponent implements OnInit {
   /** Monto de una mensualidad (mantenimiento) usado para el umbral; null si no hay comunidad cargada. */
   montoMantenimientoUsado = signal<number | null>(null);
 
+  /** true si el monto usado viene de la lista de precios; false si viene de configuración o por defecto. */
+  montoDesdeListaPrecios = signal<boolean>(false);
+
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       const comunidadId = params['comunidad'];
       if (comunidadId) {
         this.selectedComunidadId.set(comunidadId);
-        this.adminContext.setSelectedCommunityId(comunidadId);
+        const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === comunidadId)?.nombre ?? '';
+        this.adminContext.setSelectedCommunityId(comunidadId, name);
         this.loadMorosos(comunidadId);
       } else {
         const stored = this.adminContext.getSelectedCommunityId();
@@ -116,6 +125,7 @@ export class MorososListComponent implements OnInit {
     if (!communityId) {
       this.morosos.set([]);
       this.montoMantenimientoUsado.set(null);
+      this.montoDesdeListaPrecios.set(false);
       return;
     }
     this.isLoading.set(true);
@@ -125,11 +135,13 @@ export class MorososListComponent implements OnInit {
       residents: this.residentsService.getResidentsByCommunityId(communityId).pipe(catchError(() => of([]))),
       cargos: this.cargosService.getByCommunityId(communityId).pipe(catchError(() => of([]))),
       pagos: this.pagosService.getByCommunityId(communityId).pipe(catchError(() => of([]))),
-      configs: this.configsService.getByCommunityId(communityId).pipe(catchError(() => of([])))
+      configs: this.configsService.getByCommunityId(communityId).pipe(catchError(() => of([]))),
+      prices: this.pricesService.getByCommunityId(communityId).pipe(catchError(() => of([])))
     }).subscribe({
-      next: ({ residents, cargos, pagos, configs }) => {
-        const { monto, umbral } = this.getMontoYUmbralDesdeConfig(configs);
+      next: ({ residents, cargos, pagos, configs, prices }) => {
+        const { monto, umbral, fromPrices } = this.getMontoYUmbralDesdePreciosOConfig(prices, configs);
         this.montoMantenimientoUsado.set(monto);
+        this.montoDesdeListaPrecios.set(fromPrices);
         const morososList = this.computeMorosos(residents, cargos, pagos, umbral);
         this.morosos.set(morososList);
         this.isLoading.set(false);
@@ -138,28 +150,39 @@ export class MorososListComponent implements OnInit {
         this.errorMessage.set('No se pudo cargar la información de morosos.');
         this.morosos.set([]);
         this.montoMantenimientoUsado.set(null);
+        this.montoDesdeListaPrecios.set(false);
         this.isLoading.set(false);
       }
     });
   }
 
   /**
-   * Obtiene el monto de una mensualidad y el umbral (2 × mensualidad) desde la configuración.
-   * Lee MONTO_MANT de la comunidad; si no existe o no es válido, usa default.
+   * Obtiene el monto de mensualidad y el umbral (2 × mensualidad).
+   * Primero busca en la lista de precios un concepto que contenga "mantenimiento" (activo); si no hay, usa MONTO_MANT de configuración; si no, default.
    */
-  private getMontoYUmbralDesdeConfig(configs: { codigo?: string | null; valor?: string | null }[]): { monto: number; umbral: number } {
+  private getMontoYUmbralDesdePreciosOConfig(
+    prices: CommunityPrice[],
+    configs: { codigo?: string | null; valor?: string | null }[]
+  ): { monto: number; umbral: number; fromPrices: boolean } {
+    const mantenimientoPrice = prices.find(
+      (p) => p.isActive && (p.concepto ?? '').trim().toLowerCase().includes(CONCEPTO_MANTENIMIENTO)
+    );
+    if (mantenimientoPrice != null && Number.isFinite(mantenimientoPrice.monto) && mantenimientoPrice.monto >= 0) {
+      const monto = mantenimientoPrice.monto;
+      return { monto, umbral: 2 * monto, fromPrices: true };
+    }
     const config = configs.find((c) => (c.codigo ?? '').trim() === CONFIG_CODIGO_MONTO_MANTENIMIENTO);
     const valor = config?.valor?.trim();
     if (valor == null || valor === '') {
       const monto = MONTO_MANTENIMIENTO_DEFAULT;
-      return { monto, umbral: 2 * monto };
+      return { monto, umbral: 2 * monto, fromPrices: false };
     }
     const num = Number.parseFloat(valor.replace(',', '.'));
     if (!Number.isFinite(num) || num < 0) {
       const monto = MONTO_MANTENIMIENTO_DEFAULT;
-      return { monto, umbral: 2 * monto };
+      return { monto, umbral: 2 * monto, fromPrices: false };
     }
-    return { monto: num, umbral: 2 * num };
+    return { monto: num, umbral: 2 * num, fromPrices: false };
   }
 
   /**
@@ -216,7 +239,8 @@ export class MorososListComponent implements OnInit {
   }
 
   onComunidadChange(value: string): void {
-    this.adminContext.setSelectedCommunityId(value);
+    const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === value)?.nombre ?? '';
+    this.adminContext.setSelectedCommunityId(value, name);
     this.selectedComunidadId.set(value);
     if (value) {
       this.loadMorosos(value);

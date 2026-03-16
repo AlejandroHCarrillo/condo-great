@@ -1,0 +1,76 @@
+@let r = reservacion();
+@if (r) {
+  <div class="space-y-4">
+    <div class="flex items-center justify-between gap-2 border-b border-base-300 pb-3">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-calendar-check text-primary text-xl"></i>
+        <h2 class="text-xl font-semibold">Detalle de la reservación</h2>
+      </div>
+      <button type="button" class="btn btn-ghost btn-square btn-sm" title="Cerrar" (click)="cerrar()">
+        <i class="fa-solid fa-times"></i>
+      </button>
+    </div>
+
+    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+      <div>
+        <dt class="text-base-content/60 font-medium">Amenidad</dt>
+        <dd class="font-medium">{{ r.amenityName ?? '—' }}</dd>
+      </div>
+      <div>
+        <dt class="text-base-content/60 font-medium">Residente</dt>
+        <dd class="font-medium">{{ r.residentName ?? '—' }}</dd>
+      </div>
+      <div>
+        <dt class="text-base-content/60 font-medium">Fecha y hora</dt>
+        <dd>{{ formatFecha(r.horario) }}</dd>
+      </div>
+      <div>
+        <dt class="text-base-content/60 font-medium">Nº personas</dt>
+        <dd>{{ r.numPersonas ?? '—' }}</dd>
+      </div>
+      <div>
+        <dt class="text-base-content/60 font-medium">Estado</dt>
+        <dd>
+          <span [class]="getStatusBadgeClass(r.status)">{{ r.status ?? '—' }}</span>
+        </dd>
+      </div>
+      @if (amenidad()?.requiereAprobacion) {
+        <div class="sm:col-span-2">
+          <dt class="text-base-content/60 font-medium">Esta amenidad requiere aprobación</dt>
+          <dd class="text-sm text-base-content/70">Las reservaciones deben ser aprobadas por administración.</dd>
+        </div>
+      }
+    </dl>
+
+    @if (statusError) {
+      <div class="alert alert-error text-sm">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>{{ statusError }}</span>
+      </div>
+    }
+
+    @if (isCompanyAdmin && requiereAprobacion) {
+      <div class="rounded-lg bg-base-200/50 p-3 space-y-2">
+        <label class="text-sm font-medium text-base-content/80">Cambiar estado (administrador)</label>
+        <select
+          class="select select-bordered select-sm w-full max-w-xs"
+          [ngModel]="selectedStatus()"
+          (ngModelChange)="onStatusChange($event)"
+          [disabled]="isUpdating()"
+        >
+          <option [value]="r.status">{{ r.status }} (actual)</option>
+          @for (op of opcionesEstado; track op.value) {
+            <option [value]="op.value">{{ op.label }}</option>
+          }
+        </select>
+        @if (isUpdating()) {
+          <p class="text-xs text-base-content/70 flex items-center gap-1">
+            <span class="loading loading-spinner loading-xs"></span>
+            Actualizando...
+          </p>
+        }
+      </div>
+    }
+
+  </div>
+}

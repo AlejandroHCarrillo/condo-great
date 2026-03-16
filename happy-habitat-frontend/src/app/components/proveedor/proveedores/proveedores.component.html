@@ -66,7 +66,26 @@
                 }
               </span>
             </th>
-            <th>Contacto principal</th>
+            <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('contacto')">
+              <span class="flex items-center gap-1">
+                Contacto
+                @if (sortColumn() === 'contacto') {
+                  <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
+                } @else {
+                  <i class="fa-solid fa-sort text-white/70 text-xs"></i>
+                }
+              </span>
+            </th>
+            <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('email')">
+              <span class="flex items-center gap-1">
+                Email
+                @if (sortColumn() === 'email') {
+                  <i class="fa-solid fa-sort-{{ sortDirection() === 'asc' ? 'up' : 'down' }} text-white text-xs"></i>
+                } @else {
+                  <i class="fa-solid fa-sort text-white/70 text-xs"></i>
+                }
+              </span>
+            </th>
             <th>Teléfono</th>
             <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('rating')">
               <span class="flex items-center gap-1">
@@ -84,7 +103,7 @@
         <tbody>
           @if (providersPaginados().length === 0) {
             <tr>
-              <td colspan="6" class="text-center py-8 text-gray-500">
+              <td colspan="8" class="text-center py-8 text-gray-500">
                 <i class="fa-solid fa-inbox mr-2"></i>
                 No se encontraron proveedores
               </td>
@@ -95,9 +114,23 @@
                 <td><span class="text-sm">{{ (currentPage() - 1) * pageSize() + index + 1 }}</span></td>
                 <td class="font-medium max-w-[200px] truncate" [title]="provider.businessName">{{ provider.businessName }}</td>
                 <td class="max-w-[150px] truncate" [title]="provider.categoryOrIndustry ?? ''">{{ provider.categoryOrIndustry || '-' }}</td>
-                <td class="max-w-[160px] truncate" [title]="provider.primaryContactName ?? provider.primaryEmail ?? ''">{{ provider.primaryContactName || provider.primaryEmail || '-' }}</td>
-                <td>{{ provider.directPhone || provider.mobilePhone || provider.contactPhones || '-' }}</td>
-                <td>{{ formatRating(provider.rating) }}</td>
+                <td class="max-w-[160px] truncate" [title]="provider.primaryContactName ?? ''">{{ provider.primaryContactName || '—' }}</td>
+                <td class="max-w-[200px] truncate" [title]="provider.primaryEmail ?? ''">{{ provider.primaryEmail || '—' }}</td>
+                <td class="font-mono text-sm">{{ formatPhone(provider.directPhone || provider.mobilePhone || provider.contactPhones) }}</td>
+                <td>
+                  @let stars = getRatingStars(provider.rating);
+                  <span class="inline-flex items-center gap-0.5" [title]="provider.rating != null ? provider.rating.toFixed(1) + ' / 5' : ''">
+                    @for (i of [1,2,3,4,5]; track i) {
+                      @if (i <= stars.full) {
+                        <i class="fa-solid fa-star text-warning"></i>
+                      } @else if (i === stars.full + 1 && stars.half) {
+                        <i class="fa-solid fa-star-half-stroke text-warning"></i>
+                      } @else {
+                        <i class="fa-regular fa-star text-base-content/30"></i>
+                      }
+                    }
+                  </span>
+                </td>
                 <td>
                   <div class="flex gap-1 items-center">
                     <a

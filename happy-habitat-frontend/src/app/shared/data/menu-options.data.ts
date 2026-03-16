@@ -84,7 +84,7 @@ export const menuOptions: menuItem[] = [
 
   {
     id: UUIDV4(),
-    title: 'Comunidados',
+    title: 'Comunicados',
     path: "comunicados",
     icon: "fa-solid fa-bullhorn"
   },  

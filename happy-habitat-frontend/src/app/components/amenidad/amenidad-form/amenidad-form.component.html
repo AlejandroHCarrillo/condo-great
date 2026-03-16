@@ -15,6 +15,7 @@
       <span class="ml-4">Cargando...</span>
     </div>
   } @else {
+    <!-- Formulario principal: fondo gris -->
     <div class="bg-base-300 rounded-lg p-6">
       @if (errorMessage()) {
         <div class="alert alert-error mb-4">
@@ -23,7 +24,7 @@
         </div>
       }
 
-    <form class="space-y-4" (ngSubmit)="save()">
+      <form class="space-y-4" (ngSubmit)="save()">
       <div class="form-control w-full">
         <label class="label" for="communityId">
           <span class="label-text font-medium">Comunidad</span>
@@ -93,7 +94,7 @@
             type="number"
             min="0"
             step="0.01"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full text-right"
             [(ngModel)]="form.costo"
             name="costo"
             placeholder="0"
@@ -139,6 +140,19 @@
         }
       </div>
 
+      <div class="form-control w-full">
+        <label class="label cursor-pointer justify-start gap-3">
+          <input
+            type="checkbox"
+            class="checkbox checkbox-primary"
+            [(ngModel)]="form.requiereAprobacion"
+            name="requiereAprobacion"
+          />
+          <span class="label-text font-medium">Requiere aprobación</span>
+        </label>
+        <p class="text-sm text-base-content/70 mt-1">Si está activo, las reservaciones de esta amenidad deberán ser aprobadas antes de confirmarse.</p>
+      </div>
+
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="form-control w-full">
           <label class="label" for="capacidadMaxima">
@@ -148,10 +162,10 @@
             id="capacidadMaxima"
             type="number"
             min="0"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full text-right"
             [(ngModel)]="form.capacidadMaxima"
             name="capacidadMaxima"
-            placeholder="Opcional"
+            placeholder="0"
           />
         </div>
         <div class="form-control w-full">
@@ -162,11 +176,44 @@
             id="numeroReservacionesSimultaneas"
             type="number"
             min="0"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full text-right"
             [(ngModel)]="form.numeroReservacionesSimultaneas"
             name="numeroReservacionesSimultaneas"
-            placeholder="Opcional"
+            placeholder="0"
           />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="form-control w-full">
+          <label class="label" for="personasPorReservacion">
+            <span class="label-text font-medium">Personas por reservación</span>
+          </label>
+          <input
+            id="personasPorReservacion"
+            type="number"
+            min="0"
+            class="input input-bordered w-full text-right"
+            [(ngModel)]="form.personasPorReservacion"
+            name="personasPorReservacion"
+            placeholder="Sin límite"
+          />
+          <p class="text-sm text-base-content/70 mt-1">Máximo de personas por reserva. Vacío = sin límite.</p>
+        </div>
+        <div class="form-control w-full">
+          <label class="label" for="horasPorReservacion">
+            <span class="label-text font-medium">Horas por reservación</span>
+          </label>
+          <input
+            id="horasPorReservacion"
+            type="number"
+            min="0"
+            class="input input-bordered w-full text-right"
+            [(ngModel)]="form.horasPorReservacion"
+            name="horasPorReservacion"
+            placeholder="Sin límite"
+          />
+          <p class="text-sm text-base-content/70 mt-1">Máximo de horas por reserva. Vacío = sin límite.</p>
         </div>
       </div>
 
@@ -189,5 +236,19 @@
       </div>
     </form>
     </div>
+
+    <!-- Modificar horarios: fondo blanco, marco redondeado y sombra (solo en edición) -->
+    @if (isEditMode() && amenidadId()) {
+      <div class="card bg-base-100 shadow-xl rounded-xl mt-6 overflow-hidden">
+        <div class="card-body">
+          <hh-amenity-schedules-editor
+            [amenityId]="amenidadId()!"
+            title="Horarios"
+            addButtonLabel="Agregar periodo"
+            emptyMessage="No hay horarios definidos. Agrega periodos para definir el horario de la amenidad."
+          />
+        </div>
+      </div>
+    }
   }
 </div>

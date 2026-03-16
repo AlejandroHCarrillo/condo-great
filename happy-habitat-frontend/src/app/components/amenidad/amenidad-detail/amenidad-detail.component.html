@@ -82,6 +82,12 @@
                 <p class="text-lg">{{ amenidad()!.numeroReservacionesSimultaneas }}</p>
               </div>
             }
+            <div>
+              <label class="label">
+                <span class="label-text font-bold">Requiere aprobación</span>
+              </label>
+              <p class="text-lg">{{ amenidad()!.requiereAprobacion ? 'Sí' : 'No' }}</p>
+            </div>
           </div>
 
           @if (amenidad()!.imagen) {
@@ -93,6 +99,12 @@
             </div>
           }
         </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl mt-6">
+      <div class="card-body">
+        <hh-amenity-schedules-editor [amenityId]="amenidad()!.id" />
       </div>
     </div>
   } @else {

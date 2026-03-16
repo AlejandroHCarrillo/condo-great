@@ -64,6 +64,7 @@
             <thead class="bg-secondary text-white [&_th]:rounded-none [&_th]:text-white">
                 <tr>
                     <th class="w-12">#</th>
+                    @if (selectedComunidadId() === 'all') {
                     <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('comunidad')">
                         <span class="flex items-center gap-1">
                             Comunidad
@@ -74,6 +75,7 @@
                             }
                         </span>
                     </th>
+                    }
                     <th class="cursor-pointer select-none hover:opacity-90 transition-opacity" (click)="setSort('number')">
                         <span class="flex items-center gap-1">
                             # Casa
@@ -120,7 +122,7 @@
             <tbody>
                 @if (residentesOrdenados().length === 0) {
                     <tr>
-                        <td colspan="7" class="text-center py-8 text-gray-500">
+                        <td [attr.colspan]="selectedComunidadId() === 'all' ? 7 : 6" class="text-center py-8 text-gray-500">
                             <i class="fa-solid fa-inbox mr-2"></i>
                             No se encontraron residentes
                         </td>
@@ -129,6 +131,7 @@
                     @for (residente of residentesOrdenados(); track residente.id; let index = $index) {
                         <tr class="cursor-pointer hover:bg-base-200 transition-colors" (click)="viewResidentDetail(residente)">
                             <td><span class="text-sm">{{ (currentPage() - 1) * pageSize() + index + 1 }}</span></td>
+                            @if (selectedComunidadId() === 'all') {
                             <td>
                                 @if (residente.comunidades && residente.comunidades.length > 0) {
                                     <div class="flex flex-wrap gap-1">
@@ -140,6 +143,7 @@
                                     <span class="text-gray-400">-</span>
                                 }
                             </td>
+                            }
                             <td>
                                 @if (residente.number) {
                                     <span class="text-xsm">{{ residente.number }}</span>

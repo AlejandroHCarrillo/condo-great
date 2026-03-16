@@ -1,0 +1,12 @@
+<div class="flex items-center gap-2">
+  <span class="label-text whitespace-nowrap">Período</span>
+  <select
+    class="select select-bordered select-sm w-full max-w-[200px]"
+    [value]="selectedPeriod()"
+    (change)="onSelectionChange($any($event.target).value)"
+  >
+    @for (opt of options; track opt.value) {
+      <option [value]="opt.value">{{ opt.label }}</option>
+    }
+  </select>
+</div>

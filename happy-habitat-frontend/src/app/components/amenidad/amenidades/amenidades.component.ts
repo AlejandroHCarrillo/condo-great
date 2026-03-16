@@ -10,6 +10,7 @@ import { AdminCompanyContextService } from '../../../services/admin-company-cont
 import { UsersService } from '../../../services/users.service';
 import { AmenidadesService } from '../../../services/amenidades.service';
 import { CommunitiesService } from '../../../services/communities.service';
+import { ImageUrlService } from '../../../services/image-url.service';
 import { Amenidad } from '../../../shared/interfaces/amenidad.interface';
 import { Comunidad } from '../../../interfaces/comunidad.interface';
 import { RolesEnum } from '../../../enums/roles.enum';
@@ -29,8 +30,15 @@ export class AmenidadesComponent implements OnInit {
   private usersService = inject(UsersService);
   private amenidadesService = inject(AmenidadesService);
   private communitiesService = inject(CommunitiesService);
+  private imageUrlService = inject(ImageUrlService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+
+  /** Imagen por defecto para amenidad sin imagen (SVG placeholder) */
+  protected readonly defaultAmenidadImage =
+    'data:image/svg+xml,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="%23999" stroke-width="1.5"><rect width="24" height="24" rx="4" fill="%23f3f4f6"/><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h8M6 4h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2z"/></svg>'
+    );
 
   selectedComunidadId = signal<string>('');
   private loadedCommunitiesForAdmin = signal<Comunidad[]>([]);
@@ -98,6 +106,9 @@ export class AmenidadesComponent implements OnInit {
           break;
         case 'nombre':
           cmp = (a.nombre ?? '').localeCompare(b.nombre ?? '');
+          break;
+        case 'descripcion':
+          cmp = (a.descripcion ?? '').localeCompare(b.descripcion ?? '');
           break;
         case 'costo':
           cmp = (a.costo ?? 0) - (b.costo ?? 0);
@@ -167,12 +178,20 @@ export class AmenidadesComponent implements OnInit {
     return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(costo);
   }
 
+  /** URL de la miniatura de la amenidad; si no tiene imagen, devuelve la por defecto */
+  getAmenidadThumbnailUrl(amenidad: Amenidad): string {
+    const path = (amenidad?.imagen ?? '').toString().trim();
+    if (path) return this.imageUrlService.getImageUrl(path);
+    return this.defaultAmenidadImage;
+  }
+
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       const comunidadId = params['comunidad'];
       if (comunidadId) {
         this.selectedComunidadId.set(comunidadId);
-        this.adminContext.setSelectedCommunityId(comunidadId);
+        const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === comunidadId)?.nombre ?? '';
+        this.adminContext.setSelectedCommunityId(comunidadId, name);
       } else {
         const stored = this.adminContext.getSelectedCommunityId();
         if (stored) {
@@ -213,7 +232,8 @@ export class AmenidadesComponent implements OnInit {
 
   onComunidadChange(value: string | Event): void {
     const comunidadId = typeof value === 'string' ? value : (value.target as HTMLSelectElement).value;
-    this.adminContext.setSelectedCommunityId(comunidadId);
+    const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === comunidadId)?.nombre ?? '';
+    this.adminContext.setSelectedCommunityId(comunidadId, name);
     this.selectedComunidadId.set(comunidadId);
     this.currentPage.set(1);
     this.router.navigate([], {

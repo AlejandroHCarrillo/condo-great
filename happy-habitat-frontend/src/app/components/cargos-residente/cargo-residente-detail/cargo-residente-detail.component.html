@@ -5,15 +5,34 @@
       Volver a la lista
     </button>
     @if (cargo()) {
-      <a
-        [routerLink]="['/admincompany/cargos-residente/editar', cargo()!.id]"
-        [queryParams]="{ comunidad: route.snapshot.queryParams['comunidad'], residente: route.snapshot.queryParams['residente'] }"
-        class="btn btn-sm btn-ghost bg-yellow-500"
-        title="Editar"
-      >
-        <i class="fa-solid fa-pen mr-2"></i>
-        Editar
-      </a>
+      <div class="flex items-center gap-2">
+        @if (canShowGenerarPago()) {
+          <a
+            [routerLink]="['/admincompany/pagos-residente/nuevo', cargo()!.residentId]"
+            [queryParams]="{
+              comunidad: route.snapshot.queryParams['comunidad'],
+              residente: cargo()!.residentId,
+              cargoId: cargo()!.id,
+              cargoMonto: cargo()!.monto,
+              cargoConcepto: cargo()!.descripcion
+            }"
+            class="btn btn-sm btn-primary text-white"
+            title="Generar pago asociado a este cargo"
+          >
+            <i class="fa-solid fa-money-bill-1-wave mr-2"></i>
+            Generar pago
+          </a>
+        }
+        <a
+          [routerLink]="['/admincompany/cargos-residente/editar', cargo()!.id]"
+          [queryParams]="{ comunidad: route.snapshot.queryParams['comunidad'], residente: route.snapshot.queryParams['residente'] }"
+          class="btn btn-sm btn-ghost bg-yellow-500"
+          title="Editar"
+        >
+          <i class="fa-solid fa-pen mr-2"></i>
+          Editar
+        </a>
+      </div>
     }
   </div>
 

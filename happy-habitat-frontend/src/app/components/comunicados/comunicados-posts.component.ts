@@ -45,35 +45,33 @@ export class ComunicadosPostsComponent {
     return this.isLoadingState();
   });
 
-  /**
-   * Convierte la fecha string ISO a Date para el pipe de fecha
-   * El backend envía fechas en formato ISO string
-   */
+  /** Imagen placeholder cuando el comunicado no tiene imagen o falla la carga. */
+  readonly placeholderImage = 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="150" viewBox="0 0 200 150">' +
+    '<rect width="200" height="150" fill="#e2e8f0"/>' +
+    '<path d="M70 45h60v60H70V45zm2 2v56h56V47H72zm20 8a8 8 0 1 1 0 16 8 8 0 0 1 0-16zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12zm-18 22l12-14 8 10 12-16 14 20H72l2-10z" fill="#94a3b8"/>' +
+    '</svg>'
+  );
+
   getFechaDate(fecha: string): Date {
     return new Date(fecha);
   }
 
-  /**
-   * Obtiene la ruta correcta de la imagen
-   * Asegura que la ruta comience con / si no lo hace
-   */
   getImagePath(path: string | null | undefined): string {
     if (!path) return '';
-    // Si la ruta ya comienza con /, la devolvemos tal cual
-    if (path.startsWith('/')) {
-      return path;
-    }
-    // Si no, agregamos el / al inicio
+    if (path.startsWith('/')) return path;
     return `/${path}`;
   }
 
-  /**
-   * Maneja errores al cargar imágenes
-   */
+  /** Devuelve la URL de la imagen del comunicado o la imagen placeholder si no hay. */
+  getComunicadoImageSrc(comunicado: Comunicado): string {
+    return comunicado?.imagen ? this.getImagePath(comunicado.imagen) : this.placeholderImage;
+  }
+
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
     if (img) {
-      img.style.display = 'none';
+      img.src = this.placeholderImage;
     }
   }
 }

@@ -13,6 +13,7 @@ import { TicketDetailComponent } from '../tickets/ticket-detail/ticket-detail.co
 import { ResidentPagosListComponent } from '../pagos-residente/resident-pagos-list/resident-pagos-list.component';
 import { ResidentPagoDetailComponent } from '../pagos-residente/resident-pago-detail/resident-pago-detail.component';
 import { ResidentPagoFormComponent } from '../pagos-residente/resident-pago-form/resident-pago-form.component';
+import { DirectorioServiciosResidentComponent } from './directorio-servicios-resident/directorio-servicios-resident.component';
 
 export const residentRoutes: Routes = [
     {
@@ -70,6 +71,10 @@ export const residentRoutes: Routes = [
         {
             path: 'pagos/:id',
             component: ResidentPagoDetailComponent
+        },
+        {
+            path: 'directorio-servicios',
+            component: DirectorioServiciosResidentComponent
         },
         {
             path: '**',

@@ -1,0 +1,112 @@
+<div class="p-4">
+  <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-calendar-check text-primary"></i>
+      Gestión de reservaciones
+    </h1>
+    <hh-community-filter
+      [communities]="comunidadesAsociadas()"
+      [selectedId]="selectedComunidadId()"
+      (selectedIdChange)="onComunidadChange($event)"
+    />
+  </div>
+
+  @if (comunidadesAsociadas().length === 0) {
+    <div class="alert alert-warning">
+      <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+      No tienes comunidades asociadas.
+    </div>
+  } @else if (!selectedComunidadId()) {
+    <div class="alert alert-info">
+      <i class="fa-solid fa-info-circle mr-2"></i>
+      Selecciona una comunidad para ver las reservaciones de amenidades.
+    </div>
+  } @else if (isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando reservaciones...</span>
+    </div>
+  } @else {
+    <div class="mb-4 flex flex-wrap items-center gap-3">
+      <label class="label gap-2 py-0">
+        <span class="label-text font-medium">Filtrar por amenidad:</span>
+        <select
+          class="select select-bordered select-sm w-full max-w-xs"
+          [ngModel]="selectedAmenidadId()"
+          (ngModelChange)="onAmenidadFilterChange($event)"
+        >
+          <option value="">Todas las amenidades</option>
+          @for (a of amenidades(); track a.id) {
+            <option [value]="a.id">{{ a.nombre }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="table table-zebra w-full">
+        <thead class="bg-secondary text-white [&_th]:rounded-none [&_th]:text-white">
+          <tr>
+            <th class="w-12">#</th>
+            <th>Fecha y hora</th>
+            <th>Amenidad</th>
+            <th>Residente</th>
+            <th>Personas</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (reservacionesFiltradas().length === 0) {
+            <tr>
+              <td colspan="7" class="text-center py-8 text-base-content/70">
+                <i class="fa-solid fa-calendar-xmark mr-2"></i>
+                {{ selectedAmenidadId() ? 'No hay reservaciones para esta amenidad.' : 'No hay reservaciones en esta comunidad.' }}
+              </td>
+            </tr>
+          } @else {
+            @for (reservacion of reservacionesFiltradas(); track reservacion.id ?? $index; let i = $index) {
+              <tr>
+                <td>{{ i + 1 }}</td>
+                <td>{{ formatFecha(reservacion.horario) }}</td>
+                <td>{{ getAmenidadNombre(reservacion) }}</td>
+                <td>{{ getResidenteNombre(reservacion) }}</td>
+                <td>{{ reservacion.numPersonas ?? '—' }}</td>
+                <td>
+                  <span [class]="getStatusBadgeClass(reservacion.status)">{{ getStatusLabel(reservacion.status) }}</span>
+                </td>
+                <td>
+                  <div class="flex gap-1">
+                    <button
+                      type="button"
+                      class="btn btn-ghost btn-square btn-sm"
+                      title="Ver detalle"
+                      (click)="openDetail(reservacion)"
+                    >
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <dialog id="reservacionDetailModal" class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box max-w-lg">
+        @if (selectedReservacion(); as reservacion) {
+          <hh-reservacion-detail
+            [reservacion]="reservacion"
+            [amenidad]="selectedAmenidad()"
+            (closed)="closeDetail()"
+            (statusUpdated)="onReservacionStatusUpdated()"
+          />
+        }
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button type="button" (click)="closeDetail()">Cerrar</button>
+      </form>
+    </dialog>
+  }
+</div>

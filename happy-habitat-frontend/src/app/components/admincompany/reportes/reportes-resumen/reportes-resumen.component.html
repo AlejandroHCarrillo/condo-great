@@ -1,0 +1,121 @@
+<div class="p-4">
+  <div class="mb-6 flex items-center justify-between gap-4 flex-wrap">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="fa-solid fa-chart-pie text-primary"></i>
+      Resumen
+    </h1>
+    <div class="flex flex-wrap items-center gap-4">
+      <hh-report-period-filter
+        [selectedPeriod]="selectedPeriod()"
+        (selectedPeriodChange)="onPeriodChange($event)"
+      />
+      <hh-community-filter
+        [communities]="comunidadesAsociadas()"
+        [selectedId]="selectedComunidadId()"
+        (selectedIdChange)="onComunidadChange($event)"
+      />
+    </div>
+  </div>
+
+  @if (comunidadesAsociadas().length === 0) {
+    <div class="alert alert-warning">
+      <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+      No tienes comunidades asociadas.
+    </div>
+  }
+
+  @if (!selectedComunidadId()) {
+    <div class="alert alert-info">
+      <i class="fa-solid fa-info-circle mr-2"></i>
+      Selecciona una comunidad para ver el resumen.
+    </div>
+  }
+
+  @if (selectedComunidadId() && isLoading()) {
+    <div class="flex justify-center items-center py-12">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando...</span>
+    </div>
+  }
+
+  @if (selectedComunidadId() && errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  }
+
+  @if (selectedComunidadId() && !isLoading() && !errorMessage() && data(); as d) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="stats shadow bg-base-200">
+        <div class="stat">
+          <div class="stat-title">{{ isCurrentYear() ? 'Ingresos del mes' : 'Total ingresos del año' }}</div>
+          <div class="stat-value text-green-500 text-lg">{{ formatCurrency(ingresosDisplay()) }}</div>
+        </div>
+      </div>
+      <div class="stats shadow bg-base-200">
+        <div class="stat">
+          <div class="stat-title">{{ isCurrentYear() ? 'Egresos del mes' : 'Total gastos del año' }}</div>
+          <div class="stat-value text-red-500 text-lg">{{ formatCurrency(egresosDisplay()) }}</div>
+        </div>
+      </div>
+      <div class="stats shadow bg-base-200">
+        <div class="stat">
+          <div class="stat-title">Saldo en banco</div>
+          <div class="stat-value text-lg">{{ formatCurrency(saldoDisplay()) }}</div>
+        </div>
+      </div>
+      @if (isCurrentYear()) {
+        <div class="stats shadow bg-base-200">
+          <div class="stat">
+            <div class="stat-title">Morosos</div>
+            <div class="stat-value text-warning text-lg">{{ d.cantidadMorosos }}</div>
+            <div class="stat-desc">Monto en mora: {{ formatCurrency(d.montoEnMora) }}</div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+      @if (isCurrentYear()) {
+        <div class="card bg-base-200 shadow">
+          <div class="card-body">
+            <h3 class="card-title text-lg">Tickets</h3>
+            <p>Levantados: <strong>{{ d.ticketsLevantados }}</strong></p>
+            <p>Resueltos: <strong>{{ d.ticketsResueltos }}</strong></p>
+          </div>
+        </div>
+      }
+      <div class="card bg-base-200 shadow">
+        <div class="card-body">
+          <h3 class="card-title text-lg">Recaudación ({{ selectedYear() }})</h3>
+          <ul class="list list-disc list-inside text-sm">
+            @for (m of filteredRecaudacion(); track m.anio + '-' + m.mes) {
+              <li>{{ monthLabel(m) }}: {{ formatCurrency(m.total) }}</li>
+            }
+            @if (filteredRecaudacion().length === 0) {
+              <li class="text-base-content/70">Sin datos</li>
+            }
+            @if (filteredRecaudacion().length > 0) {
+              <li class="font-semibold border-t border-base-300 pt-2 mt-2">Total: {{ formatCurrency(ingresosDisplay()) }}</li>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-200 shadow">
+      <div class="card-body">
+        <h3 class="card-title text-lg">Gastos mensuales ({{ selectedYear() }})</h3>
+        <ul class="list list-disc list-inside text-sm">
+          @for (m of filteredGastos(); track m.anio + '-' + m.mes) {
+            <li>{{ monthLabel(m) }}: {{ formatCurrency(m.total) }}</li>
+          }
+          @if (filteredGastos().length === 0) {
+            <li class="text-base-content/70">Sin datos</li>
+          }
+          @if (filteredGastos().length > 0) {
+            <li class="font-semibold border-t border-base-300 pt-2 mt-2">Total: {{ formatCurrency(egresosDisplay()) }}</li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+</div>

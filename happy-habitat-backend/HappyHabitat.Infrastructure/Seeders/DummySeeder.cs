@@ -1111,15 +1111,15 @@ public class DummySeeder : IDataSeeder
         var comunicadosTemplates = new[]
         {
             new { Titulo = "Propuesta de reglamento revisión", Subtitulo = "Participación vecinal", Contenido = "Estimados condóminos: Durante el taller de revisión del reglamento no fue posible concluir con todas las preguntas. La administración compartirá el reglamento con el texto resaltado. Envíen sus dudas o sugerencias por Whatsapp. Fecha límite: 12 de Septiembre.", Fecha = new DateTime(2025, 9, 8), Imagen = (string?)null },
-            new { Titulo = "Mantenimiento de la alberca", Subtitulo = "Cierre temporal por limpieza", Contenido = "La alberca estará cerrada el 2025-09-12 para realizar limpieza profunda y revisión del sistema de filtrado.", Fecha = new DateTime(2025, 9, 12), Imagen = "images/anuncios/manenimiento_alberca.png" },
-            new { Titulo = "Jornada de reciclaje", Subtitulo = "Trae tus residuos separados", Contenido = "Este sábado 2025-09-14 se instalará un punto de acopio en el parque central para reciclaje de papel, plástico y electrónicos.", Fecha = new DateTime(2025, 9, 14), Imagen = "images/anuncios/jornada-reciclaje.png" },
-            new { Titulo = "Fumigación preventiva", Subtitulo = "Control de plagas en áreas comunes", Contenido = "El lunes 2025-09-16 se realizará fumigación en jardines y pasillos. Evita transitar por zonas tratadas durante ese día.", Fecha = new DateTime(2025, 9, 16), Imagen = "images/anuncios/fumigacion.png" },
-            new { Titulo = "Reunión vecinal mensual", Subtitulo = "Temas de seguridad y mantenimiento", Contenido = "La reunión se llevará a cabo el 2025-09-20 a las 18:00 hrs en el salón común. Participa y haz escuchar tu voz.", Fecha = new DateTime(2025, 9, 20), Imagen = "images/anuncios/reunion-mensual.png" },
-            new { Titulo = "Instalación de cámaras", Subtitulo = "Mejora de seguridad perimetral", Contenido = "El 2025-09-22 se instalarán nuevas cámaras en los accesos principales. Habrá personal técnico en el área.", Fecha = new DateTime(2025, 9, 22), Imagen = "images/anuncios/instalacion-camaras.png" },
-            new { Titulo = "Decoración de otoño", Subtitulo = "Convocatoria para voluntarios", Contenido = "El comité invita a decorar áreas comunes con temática otoñal el 2025-09-25. Puedes donar adornos o ayudar en el montaje.", Fecha = new DateTime(2025, 9, 25), Imagen = "images/anuncios/decoracion-otono.png" },
-            new { Titulo = "Poda de árboles", Subtitulo = "Mantenimiento de áreas verdes", Contenido = "El 2025-09-28 se realizará poda en los jardines del lado norte. Favor de retirar objetos personales cercanos.", Fecha = new DateTime(2025, 9, 28), Imagen = "images/anuncios/poda-arboles.png" },
-            new { Titulo = "Taller de compostaje", Subtitulo = "Aprende a reducir residuos orgánicos", Contenido = "El 2025-10-01 se impartirá un taller gratuito sobre compostaje en el salón común. Cupo limitado, regístrate con anticipación.", Fecha = new DateTime(2025, 10, 1), Imagen = "images/anuncios/taller-compostaje.png" },
-            new { Titulo = "Festival comunitario", Subtitulo = "Música, comida y juegos", Contenido = "El 2025-10-06 se celebrará el festival anual en el parque central. ¡Trae a tu familia y disfruta!", Fecha = new DateTime(2025, 10, 6), Imagen = "images/anuncios/festival-comunitario.png" }
+            new { Titulo = "Mantenimiento de la alberca", Subtitulo = "Cierre temporal por limpieza", Contenido = "La alberca estará cerrada el 2025-09-12 para realizar limpieza profunda y revisión del sistema de filtrado.", Fecha = new DateTime(2025, 9, 12), Imagen = (string?)"images/anuncios/mantenimiento_alberca.png" },
+            new { Titulo = "Jornada de reciclaje", Subtitulo = "Trae tus residuos separados", Contenido = "Este sábado 2025-09-14 se instalará un punto de acopio en el parque central para reciclaje de papel, plástico y electrónicos.", Fecha = new DateTime(2025, 9, 14), Imagen = (string?)"images/anuncios/jornada-reciclaje.png" },
+            new { Titulo = "Fumigación preventiva", Subtitulo = "Control de plagas en áreas comunes", Contenido = "El lunes 2025-09-16 se realizará fumigación en jardines y pasillos. Evita transitar por zonas tratadas durante ese día.", Fecha = new DateTime(2025, 9, 16), Imagen = (string?)"images/anuncios/fumigacion.png" },
+            new { Titulo = "Reunión vecinal mensual", Subtitulo = "Temas de seguridad y mantenimiento", Contenido = "La reunión se llevará a cabo el 2025-09-20 a las 18:00 hrs en el salón común. Participa y haz escuchar tu voz.", Fecha = new DateTime(2025, 9, 20), Imagen = (string?)"images/anuncios/reunion-mensual.png" },
+            new { Titulo = "Instalación de cámaras", Subtitulo = "Mejora de seguridad perimetral", Contenido = "El 2025-09-22 se instalarán nuevas cámaras en los accesos principales. Habrá personal técnico en el área.", Fecha = new DateTime(2025, 9, 22), Imagen = (string?)"images/anuncios/instalacion-camaras.png" },
+            new { Titulo = "Decoración de otoño", Subtitulo = "Convocatoria para voluntarios", Contenido = "El comité invita a decorar áreas comunes con temática otoñal el 2025-09-25. Puedes donar adornos o ayudar en el montaje.", Fecha = new DateTime(2025, 9, 25), Imagen = (string?)"images/anuncios/decoracion-otono.png" },
+            new { Titulo = "Poda de árboles", Subtitulo = "Mantenimiento de áreas verdes", Contenido = "El 2025-09-28 se realizará poda en los jardines del lado norte. Favor de retirar objetos personales cercanos.", Fecha = new DateTime(2025, 9, 28), Imagen = (string?)"images/anuncios/poda-arboles.png" },
+            new { Titulo = "Taller de compostaje", Subtitulo = "Aprende a reducir residuos orgánicos", Contenido = "El 2025-10-01 se impartirá un taller gratuito sobre compostaje en el salón común. Cupo limitado, regístrate con anticipación.", Fecha = new DateTime(2025, 10, 1), Imagen = (string?)"images/anuncios/taller-compostaje.png" },
+            new { Titulo = "Festival comunitario", Subtitulo = "Música, comida y juegos", Contenido = "El 2025-10-06 se celebrará el festival anual en el parque central. ¡Trae a tu familia y disfruta!", Fecha = new DateTime(2025, 10, 6), Imagen = (string?)"images/anuncios/festival-comunitario.png" }
         };
 
         if (allCommunitiesForComunicados.Count > 0)
@@ -1148,20 +1148,64 @@ public class DummySeeder : IDataSeeder
                 await _context.Comunicados.AddRangeAsync(comunicados);
                 await _context.SaveChangesAsync();
             }
+
+            // Comunicados adicionales para Residencial El Pueblito (sin referencias a Condovive)
+            var pueblitoComunidad = await _context.Communities.FirstOrDefaultAsync(c => c.Nombre == "Residencial El Pueblito");
+            if (pueblitoComunidad != null)
+            {
+                var comunicadosPueblito = new[]
+                {
+                    new { Titulo = "Happy Habitat: la nueva app para gestionar el coto", Subtitulo = "Comunicado Importante", Contenido = "Comunicado Importante\n\nA partir del 6 de enero de 2025, en el coto se implementará el uso obligatorio de la aplicación Happy Habitat para mejorar la comunicación y gestión interna. Descarga la app y únete a esta innovadora forma de estar conectados. ¡Tu participación es fundamental para fortalecer nuestra comunidad!\n\nAtentamente", Fecha = new DateTime(2025, 3, 3) },
+                    new { Titulo = "Registro de pagos de mantenimiento: envío por WhatsApp o carga en la plataforma", Subtitulo = "Comunicado Importante", Contenido = "Comunicado Importante\n\nPara poder registrar sus pagos de mantenimiento de manera oportuna, les recordamos que es necesario enviar los comprobantes por WhatsApp al número 442-777-5131 o cargarlos directamente en la plataforma.\n\nAgradecemos su colaboración para mantener al día las cuentas del condominio.\n\n¡Su participación es fundamental para el buen funcionamiento de nuestra comunidad en Residencial El Pueblito!\n\nAtentamente", Fecha = new DateTime(2025, 3, 3) },
+                    new { Titulo = "Uso adecuado de estacionamientos en el coto", Subtitulo = "Comunicado Importante", Contenido = "Comunicado Importante\n\nSe ha observado estacionamiento no autorizado en la comunidad. Los estacionamientos de visitas son exclusivos para visitantes, no para residentes, conforme a los artículos 23 al 25 del reglamento interno. El incumplimiento puede derivar en sanciones, incluyendo el arrastre por parte de la Secretaría de Movilidad. Ante dudas, acudan con la administración.\n\nAgradecemos su comprensión y apoyo en el cumplimiento de estas normas.", Fecha = new DateTime(2025, 3, 3) },
+                    new { Titulo = "Reserva tu lugar en la casa club", Subtitulo = "Comunicado Importante", Contenido = "Comunicado Importante\n\nLes informamos que a partir de ahora, las reservas de la casa club podrán realizarse de manera más ágil y sencilla a través de la plataforma. Esta nueva modalidad facilitará la organización de eventos y actividades en nuestras instalaciones. Aprovechen esta herramienta para disfrutar al máximo de los espacios comunes del condominio.\n\n¡Gracias por su atención!", Fecha = new DateTime(2025, 3, 3) },
+                    new { Titulo = "Comunicados de administración ahora en Avisos Generales", Subtitulo = "Comunicado Importante", Contenido = "Comunicado Importante\n\nEstimados residentes del coto, les informamos que a partir de ahora, todos los comunicados enviados al grupo de administración estarán disponibles en el área de avisos generales de la plataforma.\n\nEsta medida busca mantenerlos informados de manera más accesible y oportuna.\n\nAgradecemos su atención y colaboración.\n\n¡Saludos cordiales!", Fecha = new DateTime(2025, 3, 3) },
+                    new { Titulo = "Actualización: Nueva fecha para poda y jardinería en el coto", Subtitulo = "Importante Anuncio: Nueva Fecha para Poda y Trabajos de Jardinería en el Coto", Contenido = "Importante Anuncio: Nueva Fecha para Poda y Trabajos de Jardinería en el Coto\n\nSe informa a todos los residentes que la fecha para la poda y trabajos de jardinería en el coto ha sido reprogramada para el 14 de marzo de 2025.\n\nAgradecemos su comprensión y colaboración en este proceso de embellecimiento de nuestro hogar.\n\n¡Cuidemos juntos nuestro entorno!", Fecha = new DateTime(2025, 3, 5) },
+                    new { Titulo = "Reglamentación de obras y cambios estructurales dentro de unidades privativas", Subtitulo = "Comunicado Importante", Contenido = "COMUNICADO IMPORTANTE\n\nSe informa a todos los residentes de Residencial El Pueblito que es obligatorio obtener permisos del Comité de Arquitectura para cualquier obra, modificación o ingreso de materiales en unidad privativa o condominio. Estos permisos son necesarios para garantizar la seguridad y armonía de la comunidad. Para más información y asesoría, acudan con la administración.\n\n¡Gracias por su colaboración!\n\nAdministración de Residencial El Pueblito", Fecha = new DateTime(2025, 3, 13) },
+                    new { Titulo = "Día de descanso oficial: 17 de Marzo 2025", Subtitulo = "Comunicado Importante", Contenido = "COMUNICADO IMPORTANTE\n\nSe informa a todos los residentes de Residencial El Pueblito que el día 17 de Marzo de 2025 ha sido declarado como día no laborable, en conmemoración al Natalicio de Benito Juárez. Por favor, planifiquen sus actividades considerando esta disposición.\n\n¡Gracias por su atención!\n\nAdministración de Residencial El Pueblito", Fecha = new DateTime(2025, 3, 13) },
+                    new { Titulo = "Normas de convivencia: Mascotas en condominio, responsabilidad compartida", Subtitulo = "Comunicado Importante", Contenido = "De acuerdo al artículo 121 del reglamento interno, se informa a todos los residentes que está prohibido que los animales domésticos circulen por las vialidades y andadores sin correa y placa de identificación.\n\nAsimismo, se les recuerda que es responsabilidad de cada propietario recoger los desechos de las mascotas.\n\nAgradecemos su colaboración para mantener nuestro condominio limpio y ordenado. Esperamos contar con su apoyo.", Fecha = new DateTime(2025, 3, 19) },
+                    new { Titulo = "Normas de convivencia en el coto", Subtitulo = "Comunicado Importante", Contenido = "De acuerdo al artículo 99 del reglamento interno, todos los residentes están obligados a utilizar las unidades privadas de forma ordenada y pacífica, respetando la ley, la moral y las buenas costumbres.\n\nQueda prohibido utilizar las áreas designadas para fines no autorizados en el reglamento.\n\nDe conformidad con el artículo 104, se prohíbe el uso de equipos de sonido y audiovisuales a volumen alto, especialmente después de las 19:00 horas. Se considera volumen alto aquel que sea audible en otras unidades privadas.\n\nAgradecemos la colaboración de todos los residentes para mantener un ambiente armónico y respetuoso en el coto.", Fecha = new DateTime(2025, 3, 19) },
+                    new { Titulo = "Paquetería", Subtitulo = "Comunicado Importante", Contenido = "Se informa a todos los residentes que, debido a los problemas recientes con la recepción de la paquetería, se ha decidido retomar el protocolo original.\n\nA partir de ahora, no se aceptará la entrega de paquetes si el residente no contesta para autorizar su recepción.\n\nAgradecemos su comprensión y colaboración en este proceso.", Fecha = new DateTime(2025, 3, 19) },
+                    new { Titulo = "Importancia de utilizar la salida peatonal en el coto", Subtitulo = "Comunicado Importante", Contenido = "Se les recuerda a todos los residentes que, por motivos de seguridad, está estrictamente prohibido salir del coto a través de los accesos de las plumas vehiculares.\n\nPor favor, utilice exclusivamente la salida peatonal para evitar posibles sanciones.\n\nSu colaboración es fundamental para mantener la integridad de nuestra comunidad.\n\n¡Gracias por su comprensión y cooperación!", Fecha = new DateTime(2025, 3, 20) },
+                    new { Titulo = "Manejo de residuos en el coto", Subtitulo = "Comunicado Importante", Contenido = "De acuerdo con el artículo 119 del reglamento interno, es obligatorio separar los residuos en las categorías indicadas: cartón, plástico, vidrio y orgánicos.\n\nLos residuos deberán ir en bolsas de plástico resistentes y clasificadas; en el caso de cajas, deberán depositarse plegadas y amarradas.\n\nCualquier objeto que no cumpla estas especificaciones generará un costo extra de recolección para el residente, por lo que será necesario notificar a la administración.\n\nEviten sanciones innecesarias y notifiquen en caso de incumplimiento.\n\n¡Gracias por su colaboración!", Fecha = new DateTime(2025, 3, 21) },
+                    new { Titulo = "Actas Administrativas Municipales por abandono de Mascotas", Subtitulo = "Comunicado Importante", Contenido = "Comunicado Importante\n\nEl día de hoy se encontró un gato abandonado en el área de los contenedores de basura.\n\nSe investiga si algún residente del coto lo dejó en esta situación.\n\nEl IPAM está al tanto y, de encontrarse al responsable, se informará a la institución para que el Gobierno Municipal de Querétaro tome las medidas correspondientes.\n\nEl gato ha sido resguardado por el grupo de protección animal de Capital Sur para una futura adopción. Cuidemos a nuestras mascotas del coto.\n\n¡Tu colaboración es fundamental para garantizar el bienestar de todos los seres vivos en nuestra comunidad!", Fecha = new DateTime(2025, 3, 25) }
+                };
+
+                foreach (var item in comunicadosPueblito)
+                {
+                    var yaExiste = await _context.Comunicados.AnyAsync(c => c.CommunityId == pueblitoComunidad.Id && c.Titulo == item.Titulo);
+                    if (!yaExiste)
+                    {
+                        await _context.Comunicados.AddAsync(new Comunicado
+                        {
+                            Id = Guid.NewGuid(),
+                            CommunityId = pueblitoComunidad.Id,
+                            Titulo = item.Titulo,
+                            Subtitulo = item.Subtitulo,
+                            Contenido = item.Contenido,
+                            Fecha = item.Fecha,
+                            Imagen = null,
+                            IsActive = true,
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                }
+                await _context.SaveChangesAsync();
+            }
         }
 
         // Seed entre 2 y 5 amenidades por cada comunidad (contenido basado en amenidades.data.ts)
         var allCommunitiesForAmenities = await _context.Communities.ToListAsync();
         var amenityTemplates = new[]
         {
-            new { Nombre = "Casa club eventos", Descripcion = "Casa club para eventos", Reglas = "Fines de semana y días festivos reservar por cuatro horas con un costo de 1500 pesos. Uso de asador con costo de 500 pesos extra.", Costo = 1500m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-casa-club.png", CapacidadMaxima = (int?)35, NumeroReservacionesSimultaneas = (int?)1 },
-            new { Nombre = "Alberca", Descripcion = "Alberca de la comunidad.", Reglas = "Capacidad máxima 35 personas. 5 personas por casa. Máximo 3 horas por reservación por día. No se permiten bebidas embriagantes.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-alberca.jpg", CapacidadMaxima = (int?)35, NumeroReservacionesSimultaneas = (int?)7 },
-            new { Nombre = "Casa club residentes", Descripcion = "Casa club para residentes", Reglas = "Lunes a viernes se puede reservar sin costo durante 2 horas.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-casa-club.png", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)1 },
-            new { Nombre = "Escalera", Descripcion = "Escalera de aluminio", Reglas = "Todo residente puede usarla registrándose en el sistema por 48 horas.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-escalera.png", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)1 },
-            new { Nombre = "Cancha de pádel", Descripcion = "Cancha de pádel", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null },
-            new { Nombre = "Cancha de fútbol rápido", Descripcion = "Cancha de fútbol rápido", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null },
-            new { Nombre = "Cancha de basquetbol", Descripcion = "Cancha de basquetbol", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null },
-            new { Nombre = "Gimnasio", Descripcion = "Gimnasio de la comunidad", Reglas = "Próximamente.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null }
+            new { Nombre = "Casa club eventos", Descripcion = "Casa club para eventos", Reglas = "Fines de semana y días festivos reservar por cuatro horas con un costo de 1500 pesos. Uso de asador con costo de 500 pesos extra.", Costo = 1500m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-casa-club.png", CapacidadMaxima = (int?)35, NumeroReservacionesSimultaneas = (int?)1, PersonasPorReservacion = (int?)35, HorasPorReservacion = (int?)4, RequiereAprobacion = true },
+            new { Nombre = "Alberca", Descripcion = "Alberca de la comunidad.", Reglas = "Capacidad máxima 35 personas. 5 personas por casa. Máximo 3 horas por reservación por día. No se permiten bebidas embriagantes.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-alberca.jpg", CapacidadMaxima = (int?)35, NumeroReservacionesSimultaneas = (int?)7, PersonasPorReservacion = (int?)5, HorasPorReservacion = (int?)3, RequiereAprobacion = true },
+            new { Nombre = "Casa club residentes", Descripcion = "Casa club para residentes", Reglas = "Lunes a viernes se puede reservar sin costo durante 2 horas.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-casa-club.png", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)1, PersonasPorReservacion = (int?)20, HorasPorReservacion = (int?)2, RequiereAprobacion = false },
+            new { Nombre = "Escalera", Descripcion = "Escalera de aluminio", Reglas = "Todo residente puede usarla registrándose en el sistema por 48 horas.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-escalera.png", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)1, PersonasPorReservacion = (int?)null, HorasPorReservacion = (int?)48, RequiereAprobacion = true },
+            new { Nombre = "Cancha de pádel", Descripcion = "Cancha de pádel", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, PersonasPorReservacion = (int?)4, HorasPorReservacion = (int?)2, RequiereAprobacion = false },
+            new { Nombre = "Cancha de fútbol rápido", Descripcion = "Cancha de fútbol rápido", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, PersonasPorReservacion = (int?)14, HorasPorReservacion = (int?)2, RequiereAprobacion = false },
+            new { Nombre = "Cancha de basquetbol", Descripcion = "Cancha de basquetbol", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, PersonasPorReservacion = (int?)10, HorasPorReservacion = (int?)2, RequiereAprobacion = false },
+            new { Nombre = "Gimnasio", Descripcion = "Gimnasio de la comunidad", Reglas = "Próximamente.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, PersonasPorReservacion = (int?)null, HorasPorReservacion = (int?)null, RequiereAprobacion = false }
         };
 
         if (allCommunitiesForAmenities.Count > 0)
@@ -1171,31 +1215,268 @@ public class DummySeeder : IDataSeeder
             {
                 var rnd = new Random();
                 List<Amenity> amenityList = [];
+                var pueblitoId = new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87"); // Residencial El Pueblito
                 foreach (var community in allCommunitiesForAmenities)
                 {
-                    var count = rnd.Next(2, 6); // 2 a 5 inclusive
-                    for (var i = 0; i < count; i++)
+                    if (community.Id == pueblitoId)
                     {
-                        var t = amenityTemplates[rnd.Next(amenityTemplates.Length)];
-                        amenityList.Add(new Amenity
+                        // Residencial El Pueblito: todas las amenidades del grid (amenidades/grid)
+                        foreach (var t in amenityTemplates)
                         {
-                            Id = Guid.NewGuid(),
-                            Community = community,
-                            Nombre = t.Nombre,
-                            Descripcion = t.Descripcion,
-                            Reglas = t.Reglas,
-                            Costo = t.Costo,
-                            FechaAlta = t.FechaAlta,
-                            Imagen = t.Imagen,
-                            CapacidadMaxima = t.CapacidadMaxima,
-                            NumeroReservacionesSimultaneas = t.NumeroReservacionesSimultaneas,
-                            CreatedAt = DateTime.UtcNow
-                        });
+                            amenityList.Add(new Amenity
+                            {
+                                Id = Guid.NewGuid(),
+                                Community = community,
+                                Nombre = t.Nombre,
+                                Descripcion = t.Descripcion,
+                                Reglas = t.Reglas,
+                                Costo = t.Costo,
+                                FechaAlta = t.FechaAlta,
+                                Imagen = t.Imagen,
+                                CapacidadMaxima = t.CapacidadMaxima,
+                                NumeroReservacionesSimultaneas = t.NumeroReservacionesSimultaneas,
+                                PersonasPorReservacion = t.PersonasPorReservacion,
+                                HorasPorReservacion = t.HorasPorReservacion,
+                                RequiereAprobacion = t.RequiereAprobacion,
+                                CreatedAt = DateTime.UtcNow
+                            });
+                        }
+                    }
+                    else
+                    {
+                        var count = rnd.Next(2, 6); // 2 a 5 inclusive para el resto
+                        for (var i = 0; i < count; i++)
+                        {
+                            var t = amenityTemplates[rnd.Next(amenityTemplates.Length)];
+                            amenityList.Add(new Amenity
+                            {
+                                Id = Guid.NewGuid(),
+                                Community = community,
+                                Nombre = t.Nombre,
+                                Descripcion = t.Descripcion,
+                                Reglas = t.Reglas,
+                                Costo = t.Costo,
+                                FechaAlta = t.FechaAlta,
+                                Imagen = t.Imagen,
+                                CapacidadMaxima = t.CapacidadMaxima,
+                                NumeroReservacionesSimultaneas = t.NumeroReservacionesSimultaneas,
+                                PersonasPorReservacion = t.PersonasPorReservacion,
+                                HorasPorReservacion = t.HorasPorReservacion,
+                                RequiereAprobacion = t.RequiereAprobacion,
+                                CreatedAt = DateTime.UtcNow
+                            });
+                        }
                     }
                 }
                 await _context.Amenities.AddRangeAsync(amenityList);
                 await _context.SaveChangesAsync();
             }
+            else
+            {
+                // Asegurar que Residencial El Pueblito tenga las 8 amenidades del grid (llenar si tiene menos)
+                var pueblitoId = new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87");
+                var pueblitoAmenitiesCount = await _context.Amenities.CountAsync(a => a.Community != null && a.Community.Id == pueblitoId);
+                if (pueblitoAmenitiesCount < amenityTemplates.Length)
+                {
+                    var pueblitoCommunity = await _context.Communities.FirstOrDefaultAsync(c => c.Id == pueblitoId);
+                    if (pueblitoCommunity != null)
+                    {
+                        var existingNames = await _context.Amenities
+                            .Where(a => a.Community != null && a.Community.Id == pueblitoId)
+                            .Select(a => a.Nombre)
+                            .ToListAsync();
+                        var toAdd = amenityTemplates.Where(t => !existingNames.Contains(t.Nombre)).ToList();
+                        if (toAdd.Count > 0)
+                        {
+                            var newAmenities = toAdd.Select(t => new Amenity
+                            {
+                                Id = Guid.NewGuid(),
+                                Community = pueblitoCommunity,
+                                Nombre = t.Nombre,
+                                Descripcion = t.Descripcion,
+                                Reglas = t.Reglas,
+                                Costo = t.Costo,
+                                FechaAlta = t.FechaAlta,
+                                Imagen = t.Imagen,
+                                CapacidadMaxima = t.CapacidadMaxima,
+                                NumeroReservacionesSimultaneas = t.NumeroReservacionesSimultaneas,
+                                PersonasPorReservacion = t.PersonasPorReservacion,
+                                HorasPorReservacion = t.HorasPorReservacion,
+                                RequiereAprobacion = t.RequiereAprobacion,
+                                CreatedAt = DateTime.UtcNow
+                            }).ToList();
+                            await _context.Amenities.AddRangeAsync(newAmenities);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                }
+            }
+        }
+
+        // Seed horarios de amenidades para Residencial El Pueblito (Alberca, Casa club residentes, Casa club eventos) según horario-amenidades.data.ts
+        try
+        {
+            if (!await _context.AmenitySchedules.AnyAsync())
+            {
+                var pueblitoId = new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87");
+                var pueblitoAmenities = await _context.Amenities
+                    .Where(a => EF.Property<Guid>(a, "CommunityId") == pueblitoId)
+                    .ToListAsync();
+                var alberca = pueblitoAmenities.FirstOrDefault(a => a.Nombre == "Alberca");
+                var casaClubResidentes = pueblitoAmenities.FirstOrDefault(a => a.Nombre == "Casa club residentes");
+                var casaClubEventos = pueblitoAmenities.FirstOrDefault(a => a.Nombre == "Casa club eventos");
+
+                var scheduleList = new List<AmenitySchedule>();
+                // DayOfWeek: 1=Lunes, 2=Martes, 3=Miércoles, 4=Jueves, 5=Viernes, 6=Sábado, 7=Domingo
+
+                if (alberca != null)
+                {
+                    scheduleList.AddRange(new[]
+                    {
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 1, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Cerrada por mantenimiento", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 2, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 3, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 4, HoraInicio = "06:00", HoraFin = "10:00", IsOpen = false, Nota = "Cerrada por mantenimiento", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 4, HoraInicio = "10:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 5, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 6, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = alberca.Id, DayOfWeek = 7, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                    });
+                }
+                if (casaClubResidentes != null)
+                {
+                    scheduleList.AddRange(new[]
+                    {
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubResidentes.Id, DayOfWeek = 1, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubResidentes.Id, DayOfWeek = 2, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubResidentes.Id, DayOfWeek = 3, HoraInicio = "10:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubResidentes.Id, DayOfWeek = 4, HoraInicio = "10:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubResidentes.Id, DayOfWeek = 5, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubResidentes.Id, DayOfWeek = 6, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Reservada con costo para eventos privados de los residentes.", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubResidentes.Id, DayOfWeek = 7, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Reservada con costo para eventos privados de los residentes.", CreatedAt = DateTime.UtcNow },
+                    });
+                }
+                if (casaClubEventos != null)
+                {
+                    scheduleList.AddRange(new[]
+                    {
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubEventos.Id, DayOfWeek = 1, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Reservada para uso de los residentes.", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubEventos.Id, DayOfWeek = 2, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Reservada para uso de los residentes.", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubEventos.Id, DayOfWeek = 3, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Reservada para uso de los residentes.", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubEventos.Id, DayOfWeek = 4, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Reservada para uso de los residentes.", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubEventos.Id, DayOfWeek = 5, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = false, Nota = "Reservada para uso de los residentes.", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubEventos.Id, DayOfWeek = 6, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                        new AmenitySchedule { Id = Guid.NewGuid(), AmenityId = casaClubEventos.Id, DayOfWeek = 7, HoraInicio = "06:00", HoraFin = "22:00", IsOpen = true, Nota = "", CreatedAt = DateTime.UtcNow },
+                    });
+                }
+                if (scheduleList.Count > 0)
+                {
+                    await _context.AmenitySchedules.AddRangeAsync(scheduleList);
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // Tabla AmenitySchedules puede no existir si no se aplicó la migración; se omite
+        }
+
+        // Seed reservaciones de amenidades para Residencial El Pueblito: semana en curso (10), semana anterior y siguiente (varias)
+        try
+        {
+            var pueblitoIdReservas = new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87");
+            if (!await _context.AmenityReservations.AnyAsync())
+            {
+                var pueblitoAmenities = await _context.Amenities
+                    .Where(a => EF.Property<Guid>(a, "CommunityId") == pueblitoIdReservas)
+                    .ToListAsync();
+                var alberca = pueblitoAmenities.FirstOrDefault(a => a.Nombre == "Alberca");
+                var casaClubResidentes = pueblitoAmenities.FirstOrDefault(a => a.Nombre == "Casa club residentes");
+                var casaClubEventos = pueblitoAmenities.FirstOrDefault(a => a.Nombre == "Casa club eventos");
+                var pueblitoResidents = await _context.Residents
+                    .Where(r => r.CommunityId == pueblitoIdReservas)
+                    .ToListAsync();
+                var amenidadesTres = new[] { alberca, casaClubResidentes, casaClubEventos }.Where(a => a != null).Cast<Amenity>().ToList();
+                if (amenidadesTres.Count > 0 && pueblitoResidents.Count > 0)
+                {
+                    var rnd = new Random();
+                    var statuses = new[] { "En proceso", "Reservada", "Reservada", "Reservada" };
+                    var reservas = new List<AmenityReservation>();
+                    var today = DateTime.UtcNow.Date;
+                    var daysFromMonday = today.DayOfWeek == DayOfWeek.Sunday ? 6 : (int)today.DayOfWeek - 1;
+                    var lunesActual = today.AddDays(-daysFromMonday);
+                    var lunesAnterior = lunesActual.AddDays(-7);
+                    var lunesSiguiente = lunesActual.AddDays(7);
+                    var horas = new[] { 9, 10, 11, 12, 14, 15, 16, 17, 18 };
+
+                    // 10 reservaciones para la semana en curso (alberca, casa club residentes, casa club eventos)
+                    for (var i = 0; i < 10; i++)
+                    {
+                        var amenity = amenidadesTres[rnd.Next(amenidadesTres.Count)];
+                        var resident = pueblitoResidents[rnd.Next(pueblitoResidents.Count)];
+                        var dia = lunesActual.AddDays(rnd.Next(0, 7));
+                        var hora = horas[rnd.Next(horas.Length)];
+                        var maxHoras = amenity.HorasPorReservacion ?? 4;
+                        reservas.Add(new AmenityReservation
+                        {
+                            Id = Guid.NewGuid(),
+                            AmenityId = amenity.Id,
+                            ResidentId = resident.Id,
+                            Horario = dia.Date.AddHours(hora),
+                            NumPersonas = rnd.Next(1, 8),
+                            HorasReservadas = rnd.Next(1, Math.Max(1, maxHoras) + 1),
+                            Status = statuses[rnd.Next(statuses.Length)],
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                    // Semana anterior: 5 reservaciones
+                    for (var i = 0; i < 5; i++)
+                    {
+                        var amenity = amenidadesTres[rnd.Next(amenidadesTres.Count)];
+                        var resident = pueblitoResidents[rnd.Next(pueblitoResidents.Count)];
+                        var dia = lunesAnterior.AddDays(rnd.Next(0, 7));
+                        var hora = horas[rnd.Next(horas.Length)];
+                        var maxHoras = amenity.HorasPorReservacion ?? 4;
+                        reservas.Add(new AmenityReservation
+                        {
+                            Id = Guid.NewGuid(),
+                            AmenityId = amenity.Id,
+                            ResidentId = resident.Id,
+                            Horario = dia.Date.AddHours(hora),
+                            NumPersonas = rnd.Next(1, 6),
+                            HorasReservadas = rnd.Next(1, Math.Max(1, maxHoras) + 1),
+                            Status = "Reservada",
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                    // Semana siguiente: 5 reservaciones
+                    for (var i = 0; i < 5; i++)
+                    {
+                        var amenity = amenidadesTres[rnd.Next(amenidadesTres.Count)];
+                        var resident = pueblitoResidents[rnd.Next(pueblitoResidents.Count)];
+                        var dia = lunesSiguiente.AddDays(rnd.Next(0, 7));
+                        var hora = horas[rnd.Next(horas.Length)];
+                        var maxHoras = amenity.HorasPorReservacion ?? 4;
+                        reservas.Add(new AmenityReservation
+                        {
+                            Id = Guid.NewGuid(),
+                            AmenityId = amenity.Id,
+                            ResidentId = resident.Id,
+                            Horario = dia.Date.AddHours(hora),
+                            NumPersonas = rnd.Next(1, 6),
+                            HorasReservadas = rnd.Next(1, Math.Max(1, maxHoras) + 1),
+                            Status = statuses[rnd.Next(statuses.Length)],
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                    await _context.AmenityReservations.AddRangeAsync(reservas);
+                    await _context.SaveChangesAsync();
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // Tabla AmenityReservations puede no existir si no se aplicó la migración; se omite este bloque
         }
 
         // Seed CommunityProviders: entre 3 y 7 proveedores por comunidad
@@ -1225,6 +1506,14 @@ public class DummySeeder : IDataSeeder
                 new { BusinessName = "Tortillería y Molino La Guadalupana", TaxId = "TMG890722IJK", Category = "Alimentos", Products = "Tortillas de maíz y harina, masa, nixtamal.", PaymentMethods = "Contado", Rating = (decimal?)4.7m }
             };
 
+            var contactNames = new[]
+            {
+                "María González", "Carlos López", "Ana Martínez", "Roberto Sánchez", "Laura Hernández",
+                "Miguel Rodríguez", "Patricia García", "José Fernández", "Carmen Díaz", "Francisco Pérez",
+                "Rosa Ramírez", "Antonio Torres", "Elena Flores", "Javier Rivera", "Sandra Gómez",
+                "Daniel Morales", "Lucía Reyes", "Pedro Cruz", "Mónica Ortiz", "Ricardo Chávez"
+            };
+
             var rndProvider = new Random();
             var allCommunitiesForProviders = await _context.Communities.ToListAsync();
             List<CommunityProvider> providerList = [];
@@ -1241,6 +1530,7 @@ public class DummySeeder : IDataSeeder
                     var createdAt = DateTime.UtcNow.AddDays(-rndProvider.Next(30, 400));
                     var slugRaw = new string(t.BusinessName.Where(char.IsLetterOrDigit).ToArray()).ToLowerInvariant();
                     var slug = string.IsNullOrEmpty(slugRaw) ? "proveedor" + idx : slugRaw[..Math.Min(12, slugRaw.Length)];
+                    var contactName = contactNames[rndProvider.Next(contactNames.Length)];
                     providerList.Add(new CommunityProvider
                     {
                         Id = Guid.NewGuid(),
@@ -1251,7 +1541,7 @@ public class DummySeeder : IDataSeeder
                         ContactPhones = "442 " + rndProvider.Next(100, 999) + " " + rndProvider.Next(1000, 9999),
                         PrimaryEmail = "contacto@" + slug + ".mx",
                         WebsiteOrSocialMedia = "https://www.ejemplo.mx",
-                        PrimaryContactName = "Contacto principal",
+                        PrimaryContactName = contactName,
                         DirectPhone = "442" + rndProvider.Next(1000000, 9999999),
                         MobilePhone = "442" + rndProvider.Next(1000000, 9999999),
                         ContactEmail = "ventas@" + slug + ".mx",
@@ -1269,6 +1559,59 @@ public class DummySeeder : IDataSeeder
             }
 
             await _context.CommunityProviders.AddRangeAsync(providerList);
+            await _context.SaveChangesAsync();
+        }
+
+        // Seed ProveedorServicio (Directorio de servicios): 2-5 por comunidad
+        if (!await _context.ProveedorServicios.AnyAsync())
+        {
+            var proveedorTemplates = new[]
+            {
+                new { Giro = "Plomería", Nombre = "Plomería y Gas El Tubo", Telefono = "442 123 4567", Email = (string?)"contacto@tubo.mx", Descripcion = "Instalación y reparación de tuberías, fugas. Emergencias 24h.", PaginaWeb = (string?)"https://www.ejemplo.mx", Rating = (decimal?)4.6m },
+                new { Giro = "Electricidad", Nombre = "Electricidad Querétaro", Telefono = "442 234 5678", Email = (string?)"info@elec.mx", Descripcion = "Instalaciones eléctricas, mantenimiento, reparación de cortos.", PaginaWeb = (string?)null, Rating = (decimal?)4.8m },
+                new { Giro = "Jardinería", Nombre = "Jardinería Verde", Telefono = "442 345 6789", Email = (string?)null, Descripcion = "Poda, riego, mantenimiento de áreas verdes.", PaginaWeb = (string?)null, Rating = (decimal?)4.5m },
+                new { Giro = "Limpieza", Nombre = "Limpieza Profesional", Telefono = "442 456 7890", Email = (string?)"limpieza@pro.mx", Descripcion = "Limpieza residencial y de áreas comunes.", PaginaWeb = (string?)"https://limpieza.ejemplo.mx", Rating = (decimal?)4.7m },
+                new { Giro = "Fumigación", Nombre = "Fumigación y Control de Plagas", Telefono = "442 567 8901", Email = (string?)"fumiga@mail.mx", Descripcion = "Fumigación residencial, control de plagas.", PaginaWeb = (string?)null, Rating = (decimal?)4.4m },
+                new { Giro = "Veterinaria", Nombre = "Veterinaria Mascotas Felices", Telefono = "442 678 9012", Email = (string?)"vet@mascotas.mx", Descripcion = "Consulta, vacunas, esterilización.", PaginaWeb = (string?)null, Rating = (decimal?)4.7m },
+                new { Giro = "Cerrajería", Nombre = "Cerrajería Express", Telefono = "442 789 0123", Email = (string?)null, Descripcion = "Cambio de chapas, cerraduras, abrir autos y casas.", PaginaWeb = (string?)null, Rating = (decimal?)4.2m },
+                new { Giro = "Pintura", Nombre = "Pinturas y Recubrimientos Pro", Telefono = "442 890 1234", Email = (string?)"pintura@pro.mx", Descripcion = "Pintura interior y exterior, impermeabilizantes.", PaginaWeb = (string?)null, Rating = (decimal?)4.6m }
+            };
+
+            var roleIdAdminCompany = new Guid("22222222-2222-2222-2222-222222222222");
+            var seedUser = await _context.Users.FirstOrDefaultAsync(u => u.RoleId == roleIdAdminCompany);
+            var allCommunitiesForPs = await _context.Communities.ToListAsync();
+            var rndPs = new Random();
+            var listPs = new List<ProveedorServicio>();
+
+            foreach (var community in allCommunitiesForPs)
+            {
+                var count = rndPs.Next(2, 6);
+                var used = new HashSet<int>();
+                for (int i = 0; i < count; i++)
+                {
+                    int idx;
+                    do { idx = rndPs.Next(proveedorTemplates.Length); } while (!used.Add(idx));
+                    var t = proveedorTemplates[idx];
+                    var createdAt = DateTime.UtcNow.AddDays(-rndPs.Next(10, 200));
+                    listPs.Add(new ProveedorServicio
+                    {
+                        Id = Guid.NewGuid(),
+                        Community = community,
+                        Giro = t.Giro,
+                        Nombre = t.Nombre,
+                        Telefono = t.Telefono,
+                        Email = t.Email,
+                        Descripcion = t.Descripcion,
+                        PaginaWeb = t.PaginaWeb,
+                        Rating = t.Rating,
+                        IsActive = true,
+                        CreatedByUserId = seedUser?.Id,
+                        CreatedAt = createdAt
+                    });
+                }
+            }
+
+            await _context.ProveedorServicios.AddRangeAsync(listPs);
             await _context.SaveChangesAsync();
         }
 
@@ -2222,9 +2565,13 @@ public class DummySeeder : IDataSeeder
         await _context.SaveChangesAsync();
         Console.WriteLine($"AddCargosYPagosMantenimientoPueblito: Added {residents.Count * 24} maintenance cargos (12x2025 + 12x2026) for {residents.Count} residents.");
 
-        // Pagos para cubrir 2025: 12 * 800 = 9600 por residente. Pagos con fechas aleatorias (1 a fin de mes), algunos combinados y/o después del mes corriente.
-        foreach (var resident in residents)
+        // Pagos para cubrir 2025: 12 * 800 = 9600 por residente. Dejamos sin pagos a los primeros 2 residentes para tener morosos de prueba.
+        const int residentesSinPagosParaMorosos = 2;
+        for (int idx = 0; idx < residents.Count; idx++)
         {
+            var resident = residents[idx];
+            if (idx < residentesSinPagosParaMorosos)
+                continue; // Sin pagos → balance alto = moroso
             int numPagos = random.Next(4, 11); // Entre 4 y 10 pagos (algunos combinados)
             List<List<int>> mesesPorPago = [];
             List<int> splitPoints = [0];
@@ -2277,7 +2624,7 @@ public class DummySeeder : IDataSeeder
             await _context.PagosResidente.AddRangeAsync(pagos);
         }
         await _context.SaveChangesAsync();
-        Console.WriteLine("AddCargosYPagosMantenimientoPueblito: Added 2025 coverage payments for all Pueblito residents.");
+        Console.WriteLine($"AddCargosYPagosMantenimientoPueblito: Added 2025 coverage payments (skipped {residentesSinPagosParaMorosos} residents as morosos).");
     }
 
     /// <summary>
@@ -2326,8 +2673,13 @@ public class DummySeeder : IDataSeeder
             }
             await _context.SaveChangesAsync();
 
-            foreach (var resident in residents)
+            // Dejamos sin pagos a los primeros 2 residentes por comunidad para tener morosos de prueba.
+            const int residentesSinPagosParaMorosos = 2;
+            for (int rIdx = 0; rIdx < residents.Count; rIdx++)
             {
+                var resident = residents[rIdx];
+                if (rIdx < residentesSinPagosParaMorosos)
+                    continue; // Sin pagos → balance = 6×800 = 4800 >= 2×800, moroso
                 int numPagos = random.Next(2, 5);
                 for (int i = 0; i < numPagos; i++)
                 {
@@ -2348,7 +2700,7 @@ public class DummySeeder : IDataSeeder
                 }
             }
             await _context.SaveChangesAsync();
-            Console.WriteLine($"AddCargosYPagosMantenimientoParaOtrasComunidades: Added cargos and payments for community {communityId} ({residents.Count} residents).");
+            Console.WriteLine($"AddCargosYPagosMantenimientoParaOtrasComunidades: Added cargos and payments for community {communityId} ({residents.Count} residents, {residentesSinPagosParaMorosos} left as morosos).");
         }
     }
 

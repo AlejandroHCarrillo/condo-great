@@ -51,9 +51,23 @@ export class ProveedorDetailComponent {
     );
   }
 
-  formatRating(rating: number | null | undefined): string {
-    if (rating == null) return '-';
-    return rating.toFixed(1);
+  /** Teléfono en formato XXXX-XX-XXXX. */
+  formatPhone(phone: string | null | undefined): string {
+    if (phone == null || phone === '') return '—';
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length >= 10) {
+      return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 10)}`;
+    }
+    return phone;
+  }
+
+  /** Calificación: estrellas llenas y media. */
+  getRatingStars(rating: number | null | undefined): { full: number; half: boolean } {
+    if (rating == null || rating < 0) return { full: 0, half: false };
+    const clamped = Math.min(5, Math.max(0, rating));
+    const full = Math.floor(clamped);
+    const half = clamped - full >= 0.5;
+    return { full, half };
   }
 
   goBack(): void {

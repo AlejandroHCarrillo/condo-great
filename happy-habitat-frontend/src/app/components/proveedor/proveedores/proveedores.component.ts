@@ -78,7 +78,10 @@ export class ProveedoresComponent implements OnInit {
           cmp = (a.categoryOrIndustry ?? '').localeCompare(b.categoryOrIndustry ?? '');
           break;
         case 'contacto':
-          cmp = (a.primaryContactName ?? a.primaryEmail ?? '').localeCompare(b.primaryContactName ?? b.primaryEmail ?? '');
+          cmp = (a.primaryContactName ?? '').localeCompare(b.primaryContactName ?? '');
+          break;
+        case 'email':
+          cmp = (a.primaryEmail ?? '').localeCompare(b.primaryEmail ?? '');
           break;
         case 'rating':
           cmp = (a.rating ?? 0) - (b.rating ?? 0);
@@ -126,9 +129,24 @@ export class ProveedoresComponent implements OnInit {
     }
   }
 
-  formatRating(rating: number | null | undefined): string {
-    if (rating == null) return '-';
-    return rating.toFixed(1);
+  /** Teléfono en formato XXXX-XX-XXXX (solo dígitos, 10 caracteres). */
+  formatPhone(phone: string | null | undefined): string {
+    if (phone == null || phone === '') return '—';
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length === 10) {
+      return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 10)}`;
+    }
+    if (digits.length >= 10) return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 10)}`;
+    return phone;
+  }
+
+  /** Calificación como número de estrellas llenas (0-5) y si hay media estrella. */
+  getRatingStars(rating: number | null | undefined): { full: number; half: boolean } {
+    if (rating == null || rating < 0) return { full: 0, half: false };
+    const clamped = Math.min(5, Math.max(0, rating));
+    const full = Math.floor(clamped);
+    const half = clamped - full >= 0.5;
+    return { full, half };
   }
 
   ngOnInit(): void {
@@ -136,7 +154,8 @@ export class ProveedoresComponent implements OnInit {
       const comunidadId = params['comunidad'];
       if (comunidadId) {
         this.selectedComunidadId.set(comunidadId);
-        this.adminContext.setSelectedCommunityId(comunidadId);
+        const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === comunidadId)?.nombre ?? '';
+        this.adminContext.setSelectedCommunityId(comunidadId, name);
       } else {
         const stored = this.adminContext.getSelectedCommunityId();
         if (stored) {
@@ -179,7 +198,8 @@ export class ProveedoresComponent implements OnInit {
   }
 
   onComunidadChange(value: string): void {
-    this.adminContext.setSelectedCommunityId(value);
+    const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === value)?.nombre ?? '';
+    this.adminContext.setSelectedCommunityId(value, name);
     this.selectedComunidadId.set(value);
     this.currentPage.set(1);
     this.router.navigate([], {

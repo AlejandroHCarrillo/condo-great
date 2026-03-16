@@ -32,12 +32,14 @@ public class JwtService : IJwtService
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(_key);
 
+        var roleCode = role.Code ?? string.Empty;
+        var roleIdStr = user.RoleId.ToString() ?? string.Empty;
         List<Claim> claims =
         [
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Role, role.Code),
-            new Claim("RoleId", user.RoleId.ToString())
+            new Claim(ClaimTypes.Name, user.Username ?? ""),
+            new Claim(ClaimTypes.Role, roleCode),
+            new Claim("RoleId", roleIdStr)
         ];
 
         var tokenDescriptor = new SecurityTokenDescriptor

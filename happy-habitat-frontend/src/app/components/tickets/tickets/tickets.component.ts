@@ -146,11 +146,18 @@ export class TicketsComponent implements OnInit {
     }
   }
 
+  /** Formato: dd/MMM/yyyy HH:mm (ej. 19/Feb/2025 14:30). */
   formatDate(value: string | undefined): string {
     if (!value) return '—';
     try {
       const d = new Date(value);
-      return isNaN(d.getTime()) ? value : d.toLocaleDateString('es', { dateStyle: 'short' }) + ' ' + d.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
+      if (isNaN(d.getTime())) return value;
+      const dd = String(d.getDate()).padStart(2, '0');
+      const MMM = d.toLocaleDateString('es-MX', { month: 'short' });
+      const yyyy = d.getFullYear();
+      const HH = String(d.getHours()).padStart(2, '0');
+      const mm = String(d.getMinutes()).padStart(2, '0');
+      return `${dd}/${MMM}/${yyyy} ${HH}:${mm}`;
     } catch {
       return value;
     }
@@ -161,7 +168,8 @@ export class TicketsComponent implements OnInit {
       const comunidadId = params['comunidad'];
       if (comunidadId) {
         this.selectedComunidadId.set(comunidadId);
-        this.adminContext.setSelectedCommunityId(comunidadId);
+        const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === comunidadId)?.nombre ?? '';
+        this.adminContext.setSelectedCommunityId(comunidadId, name);
       } else if (!this.isResidentView()) {
         const stored = this.adminContext.getSelectedCommunityId();
         if (stored) {
@@ -223,7 +231,8 @@ export class TicketsComponent implements OnInit {
 
   onComunidadChange(value: string | Event): void {
     const comunidadId = typeof value === 'string' ? value : (value.target as HTMLSelectElement).value;
-    this.adminContext.setSelectedCommunityId(comunidadId);
+    const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === comunidadId)?.nombre ?? '';
+    this.adminContext.setSelectedCommunityId(comunidadId, name);
     this.selectedComunidadId.set(comunidadId);
     this.currentPage.set(1);
     this.router.navigate([], {

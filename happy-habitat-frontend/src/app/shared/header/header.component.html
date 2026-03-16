@@ -20,6 +20,11 @@
                    truncate hidden sm:block">
             {{subtitle}}
         </h2>
+        @if (showCommunityRow()) {
+            <p class="text-xs sm:text-sm md:text-base text-base-content/80 text-left truncate hidden sm:block mt-0.5">
+                {{ selectedCommunityName() }}
+            </p>
+        }
     </div>
     
     <!-- Nav-bar - Responsive: oculto en móvil, visible desde tablet -->

@@ -5,6 +5,12 @@ export interface ReservacionAmenidad {
   amenidadId: string;
   residenteId: string;
   numPersonas?: number;
-  horario: Date;
-  status?: ReservacionStatusEnum;
+  /** Número de horas reservadas. */
+  horasReservadas?: number | null;
+  horario: Date | string;
+  status?: ReservacionStatusEnum | string;
+  /** Nombre de la amenidad (viene del API). */
+  amenityName?: string;
+  /** Nombre del residente (viene del API). */
+  residentName?: string;
 }

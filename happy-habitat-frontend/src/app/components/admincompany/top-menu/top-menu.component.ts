@@ -9,7 +9,7 @@ export interface AdmincompanyMenuItem {
   icon: string;
 }
 
-const GESTIONAR_ROUTES = ['comunicados', 'residentes', 'amenidades', 'proveedores', 'documentos', 'cargos-residente', 'pagos-residente', 'saldo-banco'] as const;
+const GESTIONAR_ROUTES = ['comunicados', 'residentes', 'amenidades', 'reservaciones', 'proveedores', 'proveedores-servicios', 'documentos', 'cargos-residente', 'pagos-residente', 'saldo-banco'] as const;
 
 @Component({
   selector: 'hh-top-menu',
@@ -22,8 +22,9 @@ export class TopMenuComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private navSubscription?: Subscription;
 
-  /** Menú principal: Gestionar, Configuración, Encuestas, Reportes (con submenú) */
+  /** Menú principal: Dashboard, Gestionar, Configuración, Encuestas, Reportes (con submenú) */
   readonly mainMenuItems: AdmincompanyMenuItem[] = [
+    { route: '/dashboard', label: 'Dashboard', icon: 'fa-solid fa-gauge-high' },
     { route: 'comunicados', label: 'Gestionar', icon: 'fa-solid fa-screwdriver-wrench' },
     { route: 'configuracion', label: 'Configuración', icon: 'fa-solid fa-gear' },
     { route: 'precios', label: 'Precios', icon: 'fa-solid fa-tags' },
@@ -51,7 +52,9 @@ export class TopMenuComponent implements OnInit, OnDestroy {
     { route: 'pagos-residente', label: 'Pagos', icon: 'fa-solid fa-money-bill-1-wave' },
     { route: 'saldo-banco', label: 'Saldo banco', icon: 'fa-solid fa-building-columns' },
     { route: 'amenidades', label: 'Amenidades', icon: 'fa-solid fa-people-roof' },
-    { route: 'proveedores', label: 'Proveedores', icon: 'fa-solid fa-phone-volume' }, 
+    { route: 'reservaciones', label: 'Reservaciones', icon: 'fa-solid fa-calendar-check' },
+    { route: 'proveedores', label: 'Proveedores', icon: 'fa-solid fa-phone-volume' },
+    { route: 'proveedores-servicios', label: 'Directorio de servicios', icon: 'fa-solid fa-address-book' },
     { route: 'documentos', label: 'Documentos', icon: 'fa-solid fa-file-lines' },
   ];
 
