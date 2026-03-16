@@ -20,7 +20,7 @@ export class AmenitySchedulesEditorComponent {
 
   amenityId = input.required<string>();
   title = input<string>('Horarios');
-  addButtonLabel = input<string>('Agregar periodo de horario');
+  addButtonLabel = input<string>('Agregar periodo');
   emptyMessage = input<string>('No hay horarios definidos.');
 
   schedules = signal<AmenityScheduleDto[]>([]);

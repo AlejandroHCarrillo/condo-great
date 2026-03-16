@@ -15,6 +15,7 @@
       <span class="ml-4">Cargando...</span>
     </div>
   } @else {
+    <!-- Formulario principal: fondo gris -->
     <div class="bg-base-300 rounded-lg p-6">
       @if (errorMessage()) {
         <div class="alert alert-error mb-4">
@@ -23,7 +24,7 @@
         </div>
       }
 
-    <form class="space-y-4" (ngSubmit)="save()">
+      <form class="space-y-4" (ngSubmit)="save()">
       <div class="form-control w-full">
         <label class="label" for="communityId">
           <span class="label-text font-medium">Comunidad</span>
@@ -93,7 +94,7 @@
             type="number"
             min="0"
             step="0.01"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full text-right"
             [(ngModel)]="form.costo"
             name="costo"
             placeholder="0"
@@ -161,10 +162,10 @@
             id="capacidadMaxima"
             type="number"
             min="0"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full text-right"
             [(ngModel)]="form.capacidadMaxima"
             name="capacidadMaxima"
-            placeholder="Opcional"
+            placeholder="0"
           />
         </div>
         <div class="form-control w-full">
@@ -175,10 +176,10 @@
             id="numeroReservacionesSimultaneas"
             type="number"
             min="0"
-            class="input input-bordered w-full"
+            class="input input-bordered w-full text-right"
             [(ngModel)]="form.numeroReservacionesSimultaneas"
             name="numeroReservacionesSimultaneas"
-            placeholder="Opcional"
+            placeholder="0"
           />
         </div>
       </div>
@@ -201,17 +202,20 @@
         </button>
       </div>
     </form>
+    </div>
 
+    <!-- Modificar horarios: fondo blanco, marco redondeado y sombra (solo en edición) -->
     @if (isEditMode() && amenidadId()) {
-      <div class="mt-8 pt-6 border-t border-base-content/10">
-        <hh-amenity-schedules-editor
-          [amenityId]="amenidadId()!"
-          title="Modificar horarios"
-          addButtonLabel="Agregar periodo"
-          emptyMessage="No hay horarios definidos. Agrega periodos para definir el horario de la amenidad."
-        />
+      <div class="card bg-base-100 shadow-xl rounded-xl mt-6 overflow-hidden">
+        <div class="card-body">
+          <hh-amenity-schedules-editor
+            [amenityId]="amenidadId()!"
+            title="Horarios"
+            addButtonLabel="Agregar periodo"
+            emptyMessage="No hay horarios definidos. Agrega periodos para definir el horario de la amenidad."
+          />
+        </div>
       </div>
     }
-    </div>
   }
 </div>

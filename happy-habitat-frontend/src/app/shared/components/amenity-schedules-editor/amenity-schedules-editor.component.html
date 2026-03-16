@@ -4,7 +4,7 @@
       <i class="fa-solid fa-clock text-primary"></i>
       {{ title() }}
     </h3>
-    <button type="button" class="btn btn-primary btn-sm" (click)="openAddScheduleModal()">
+    <button type="button" class="btn btn-primary text-white btn-sm" (click)="openAddScheduleModal()">
       <i class="fa-solid fa-plus mr-2"></i>
       {{ addButtonLabel() }}
     </button>
@@ -90,7 +90,7 @@
       </div>
       <div class="form-control mt-2">
         <label class="label"><span class="label-text">Nota</span></label>
-        <input type="text" class="input input-bordered w-full" [(ngModel)]="scheduleForm.nota" placeholder="Opcional" />
+        <input type="text" class="input input-bordered w-full" [(ngModel)]="scheduleForm.nota" placeholder="" />
       </div>
       <div class="modal-action">
         <button type="button" class="btn btn-ghost" (click)="closeScheduleModal()">Cancelar</button>
