@@ -26,7 +26,7 @@ public class AuthService : IAuthService
             .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
             .Include(u => u.Resident)
-                .ThenInclude(r => r.Community)
+                .ThenInclude(r => r!.Community)
             .Include(u => u.UserCommunities)
                 .ThenInclude(uc => uc.Community)
             .FirstOrDefaultAsync(u => u.Username == loginDto.Username && u.IsActive);

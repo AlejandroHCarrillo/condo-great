@@ -83,6 +83,8 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
     imagen: '' as string | undefined,
     capacidadMaxima: null as number | null,
     numeroReservacionesSimultaneas: 1 as number | null,
+    personasPorReservacion: null as number | null,
+    horasPorReservacion: null as number | null,
     requiereAprobacion: false
   };
 
@@ -124,6 +126,8 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
     this.form.imagen = '';
     this.form.capacidadMaxima = null;
     this.form.numeroReservacionesSimultaneas = 1;
+    this.form.personasPorReservacion = null;
+    this.form.horasPorReservacion = null;
     this.form.requiereAprobacion = false;
     this.imagePathSignal.set('');
     this.clearImageSelection();
@@ -196,6 +200,8 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
           this.form.imagen = amenidad.imagen ?? '';
           this.form.capacidadMaxima = amenidad.capacidadMaxima ?? null;
           this.form.numeroReservacionesSimultaneas = amenidad.numeroReservacionesSimultaneas ?? 1;
+          this.form.personasPorReservacion = amenidad.personasPorReservacion ?? null;
+          this.form.horasPorReservacion = amenidad.horasPorReservacion ?? null;
           this.form.requiereAprobacion = amenidad.requiereAprobacion ?? false;
           this.imagePathSignal.set(this.form.imagen ?? '');
           this.clearImageSelection();
@@ -274,6 +280,8 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
         communityId,
         capacidadMaxima: this.form.capacidadMaxima,
         numeroReservacionesSimultaneas: this.form.numeroReservacionesSimultaneas,
+        personasPorReservacion: this.form.personasPorReservacion,
+        horasPorReservacion: this.form.horasPorReservacion,
         requiereAprobacion: this.form.requiereAprobacion
       };
       this.amenidadesService.updateAmenity(id, dto).subscribe({
@@ -298,6 +306,8 @@ export class AmenidadFormComponent implements OnInit, OnDestroy {
         communityId,
         capacidadMaxima: this.form.capacidadMaxima,
         numeroReservacionesSimultaneas: this.form.numeroReservacionesSimultaneas,
+        personasPorReservacion: this.form.personasPorReservacion,
+        horasPorReservacion: this.form.horasPorReservacion,
         requiereAprobacion: this.form.requiereAprobacion,
         createdByUserId: currentUser?.id ?? undefined
       };

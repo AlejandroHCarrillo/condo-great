@@ -176,7 +176,8 @@ export class CargoResidenteFormComponent implements OnInit, OnDestroy {
         this.form.monto = 0;
         this.form.estatus = 'Activo';
         this.selectedComunidadId.set(comunidadId);
-        this.adminContext.setSelectedCommunityId(comunidadId);
+        const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === comunidadId)?.nombre ?? '';
+        this.adminContext.setSelectedCommunityId(comunidadId, name);
         this.frecuencia = 'Unico';
         this.loadCommunityName(comunidadId);
         this.loadCargosComunidad(comunidadId);
@@ -199,7 +200,8 @@ export class CargoResidenteFormComponent implements OnInit, OnDestroy {
       const isEdit = !!this.route.snapshot.paramMap.get('id');
       if (comunidadId && !isEdit) {
         this.selectedComunidadId.set(comunidadId);
-        this.adminContext.setSelectedCommunityId(comunidadId);
+        const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === comunidadId)?.nombre ?? '';
+        this.adminContext.setSelectedCommunityId(comunidadId, name);
         this.loadCommunityName(comunidadId);
         this.loadCargosComunidad(comunidadId);
         this.loadResidentsForCommunityFromId(comunidadId);

@@ -131,7 +131,8 @@ export class ConfiguracionesComponent implements OnInit {
       const comunidadId = params['comunidad'];
       if (comunidadId) {
         this.selectedComunidadId.set(comunidadId);
-        this.adminContext.setSelectedCommunityId(comunidadId);
+        const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === comunidadId)?.nombre ?? '';
+        this.adminContext.setSelectedCommunityId(comunidadId, name);
       } else {
         const stored = this.adminContext.getSelectedCommunityId();
         if (stored) {
@@ -174,7 +175,8 @@ export class ConfiguracionesComponent implements OnInit {
   }
 
   onComunidadChange(value: string): void {
-    this.adminContext.setSelectedCommunityId(value);
+    const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === value)?.nombre ?? '';
+    this.adminContext.setSelectedCommunityId(value, name);
     this.selectedComunidadId.set(value);
     this.currentPage.set(1);
     this.router.navigate([], {

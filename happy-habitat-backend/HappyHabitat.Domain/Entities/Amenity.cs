@@ -11,6 +11,10 @@ public class Amenity : AuditBase
     public string? Imagen { get; set; }
     public int? CapacidadMaxima { get; set; }
     public int? NumeroReservacionesSimultaneas { get; set; }
+    /// <summary>Máximo de personas por reservación. Si null, no hay límite por reserva (se usa CapacidadMaxima para el total).</summary>
+    public int? PersonasPorReservacion { get; set; }
+    /// <summary>Máximo de horas por reservación. Si null, no hay límite.</summary>
+    public int? HorasPorReservacion { get; set; }
     public bool IsActive { get; set; } = true;
     /// <summary>Si true, las reservaciones de esta amenidad requieren aprobación antes de confirmarse.</summary>
     public bool RequiereAprobacion { get; set; }

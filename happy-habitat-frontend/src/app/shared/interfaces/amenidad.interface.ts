@@ -10,6 +10,10 @@ export interface Amenidad {
   communityName?: string | null;
   capacidadMaxima?: number | null;
   numeroReservacionesSimultaneas?: number | null;
+  /** Máximo de personas por reservación. */
+  personasPorReservacion?: number | null;
+  /** Máximo de horas por reservación. */
+  horasPorReservacion?: number | null;
   requiereAprobacion?: boolean;
   createdAt?: string;
 }
@@ -25,6 +29,8 @@ export interface CreateAmenityDto {
   communityId: string;
   capacidadMaxima?: number | null;
   numeroReservacionesSimultaneas?: number | null;
+  personasPorReservacion?: number | null;
+  horasPorReservacion?: number | null;
   requiereAprobacion?: boolean;
   createdByUserId?: string | null;
 }
@@ -40,5 +46,7 @@ export interface UpdateAmenityDto {
   communityId: string;
   capacidadMaxima?: number | null;
   numeroReservacionesSimultaneas?: number | null;
+  personasPorReservacion?: number | null;
+  horasPorReservacion?: number | null;
   requiereAprobacion?: boolean;
 }

@@ -157,7 +157,8 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
         this.form.urlComprobante = '';
         this.form.nota = '';
         this.selectedComunidadId.set(comunidadId);
-        this.adminContext.setSelectedCommunityId(comunidadId);
+        const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === comunidadId)?.nombre ?? '';
+        this.adminContext.setSelectedCommunityId(comunidadId, name);
         this.loadCommunityName(comunidadId);
         this.loadResidentsForCommunityFromId(comunidadId);
       } else {
@@ -165,6 +166,8 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
         const cid = comunidadId || this.adminContext.getSelectedCommunityId() || this.comunidadesAsociadas()[0]?.id;
         if (cid) {
           this.selectedComunidadId.set(cid);
+          const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === cid)?.nombre ?? '';
+          this.adminContext.setSelectedCommunityId(cid, name);
           this.loadCommunityName(cid);
           this.loadResidentsForCommunityFromId(cid);
         }
@@ -177,7 +180,8 @@ export class PagoResidenteFormComponent implements OnInit, OnDestroy {
       const isEdit = !!this.route.snapshot.paramMap.get('id');
       if (comunidadId && !isEdit) {
         this.selectedComunidadId.set(comunidadId);
-        this.adminContext.setSelectedCommunityId(comunidadId);
+        const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === comunidadId)?.nombre ?? '';
+        this.adminContext.setSelectedCommunityId(comunidadId, name);
         this.loadCommunityName(comunidadId);
         this.loadResidentsForCommunityFromId(comunidadId);
         if (residenteQuery === 'all') {

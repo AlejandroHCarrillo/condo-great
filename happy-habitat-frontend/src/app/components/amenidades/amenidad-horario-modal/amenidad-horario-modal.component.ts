@@ -1,12 +1,11 @@
 import { Component, input } from '@angular/core';
-import { JsonPipe } from '@angular/common';
 import { Horario } from '../../../shared/interfaces/horario.interface';
 
 @Component({
   selector: 'hh-amenidad-horario-modal',
-  imports: [JsonPipe],
-  templateUrl: './amenidad-horario-modal.component.html',
-  styles: ``
+  standalone: true,
+  imports: [],
+  templateUrl: './amenidad-horario-modal.component.html'
 })
 export class AmenidadHorarioModalComponent {
   horarios = input.required<Horario[]>();

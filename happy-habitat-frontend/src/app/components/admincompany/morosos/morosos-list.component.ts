@@ -82,7 +82,8 @@ export class MorososListComponent implements OnInit {
       const comunidadId = params['comunidad'];
       if (comunidadId) {
         this.selectedComunidadId.set(comunidadId);
-        this.adminContext.setSelectedCommunityId(comunidadId);
+        const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === comunidadId)?.nombre ?? '';
+        this.adminContext.setSelectedCommunityId(comunidadId, name);
         this.loadMorosos(comunidadId);
       } else {
         const stored = this.adminContext.getSelectedCommunityId();
@@ -238,7 +239,8 @@ export class MorososListComponent implements OnInit {
   }
 
   onComunidadChange(value: string): void {
-    this.adminContext.setSelectedCommunityId(value);
+    const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === value)?.nombre ?? '';
+    this.adminContext.setSelectedCommunityId(value, name);
     this.selectedComunidadId.set(value);
     if (value) {
       this.loadMorosos(value);

@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import type { ReservacionAmenidad } from '../shared/interfaces/reservacion-amenidad.interface';
 
-/** Respuesta del API de reservaciones por comunidad. */
+/** Respuesta del API de reservaciones. */
 export interface AmenityReservationDto {
   id: string;
   amenityId: string;
@@ -14,7 +14,16 @@ export interface AmenityReservationDto {
   residentName: string;
   horario: string;
   numPersonas?: number;
+  horasReservadas?: number | null;
   status: string;
+}
+
+/** Payload para crear una reservación (residente). */
+export interface CreateAmenityReservationPayload {
+  amenityId: string;
+  horario: string;
+  numPersonas: number;
+  horasReservadas: number;
 }
 
 @Injectable({
@@ -23,6 +32,30 @@ export interface AmenityReservationDto {
 export class ReservacionesService {
   private http = inject(HttpClient);
   private readonly API_URL = `${environment.apiUrl}/amenityreservations`;
+
+  /** Obtiene las reservaciones del residente logueado. */
+  getMy(): Observable<ReservacionAmenidad[]> {
+    return this.http.get<AmenityReservationDto[]>(`${this.API_URL}/my`).pipe(
+      catchError(() => of([])),
+      map((dtos) => dtos.map((d) => this.mapDtoToReservacion(d)))
+    );
+  }
+
+  /** Crea una reservación (residente). El backend asigna residentId desde el token. */
+  create(payload: CreateAmenityReservationPayload): Observable<ReservacionAmenidad | null> {
+    return this.http.post<AmenityReservationDto>(this.API_URL, payload).pipe(
+      map((d) => this.mapDtoToReservacion(d)),
+      catchError(() => of(null))
+    );
+  }
+
+  /** Cancela una reservación propia (residente). */
+  cancel(id: string): Observable<ReservacionAmenidad | null> {
+    return this.http.patch<AmenityReservationDto>(`${this.API_URL}/${id}/cancel`, {}).pipe(
+      map((d) => this.mapDtoToReservacion(d)),
+      catchError(() => of(null))
+    );
+  }
 
   getByCommunityId(communityId: string): Observable<ReservacionAmenidad[]> {
     return this.http.get<AmenityReservationDto[]>(`${this.API_URL}/community/${communityId}`).pipe(
@@ -48,6 +81,7 @@ export class ReservacionesService {
       amenidadId: d.amenityId,
       residenteId: d.residentId,
       numPersonas: d.numPersonas,
+      horasReservadas: d.horasReservadas ?? undefined,
       horario: d.horario,
       status: d.status,
       amenityName: d.amenityName,

@@ -68,6 +68,12 @@ namespace HappyHabitat.Infrastructure.Migrations
                     b.Property<int?>("NumeroReservacionesSimultaneas")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PersonasPorReservacion")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("HorasPorReservacion")
+                        .HasColumnType("int");
+
                     b.Property<bool>("RequiereAprobacion")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -170,6 +176,9 @@ namespace HappyHabitat.Infrastructure.Migrations
 
                     b.Property<DateTime>("Horario")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("HorasReservadas")
+                        .HasColumnType("int");
 
                     b.Property<int?>("NumPersonas")
                         .HasColumnType("int");

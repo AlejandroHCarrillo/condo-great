@@ -28,6 +28,8 @@ public class AmenityService : IAmenityService
         CommunityName = a.Community?.Nombre,
         CapacidadMaxima = a.CapacidadMaxima,
         NumeroReservacionesSimultaneas = a.NumeroReservacionesSimultaneas,
+        PersonasPorReservacion = a.PersonasPorReservacion,
+        HorasPorReservacion = a.HorasPorReservacion,
         RequiereAprobacion = a.RequiereAprobacion,
         CreatedAt = a.CreatedAt.ToString("O")
     };
@@ -87,6 +89,8 @@ public class AmenityService : IAmenityService
             Community = community,
             CapacidadMaxima = dto.CapacidadMaxima,
             NumeroReservacionesSimultaneas = dto.NumeroReservacionesSimultaneas,
+            PersonasPorReservacion = dto.PersonasPorReservacion,
+            HorasPorReservacion = dto.HorasPorReservacion,
             RequiereAprobacion = dto.RequiereAprobacion,
             CreatedByUserId = dto.CreatedByUserId,
             CreatedAt = DateTime.UtcNow
@@ -119,6 +123,8 @@ public class AmenityService : IAmenityService
         amenity.Community = community;
         amenity.CapacidadMaxima = dto.CapacidadMaxima;
         amenity.NumeroReservacionesSimultaneas = dto.NumeroReservacionesSimultaneas;
+        amenity.PersonasPorReservacion = dto.PersonasPorReservacion;
+        amenity.HorasPorReservacion = dto.HorasPorReservacion;
         amenity.RequiereAprobacion = dto.RequiereAprobacion;
 
         await _context.SaveChangesAsync();

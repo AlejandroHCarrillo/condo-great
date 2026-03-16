@@ -1,141 +1,181 @@
-<!-- <p>{{diasSemana}}</p> -->
-<!-- <pre>Horario del lunes: {{ getHorarioByDayHour("Jueves", "22:00") | json }}</pre> -->
-<!-- <pre>inicioSemana(): {{ inicioSemana()  | json }}</pre> -->
-<!-- <pre>Reservaciones: {{ reservaciones  | json }}</pre> -->
-<!-- <pre> {{ amenidadesOptions  | json }}</pre> -->
-<!-- <pre>Todos los horarios de la amenidad {{horariosAmenidad | json }}</pre> -->
- <!-- <pre>Mis Reservaciones: {{ misReservaciones() | json}}</pre> -->
 <section class="p-2">
-    <div>
-        <!-- <label class="label">Amenidades: </label> -->
-        <select formControlName="amenidadseleccionada" class="select" (change)="onSeleccion($event)">
-            <option>Seleccione una amenidad</option>
-            @for (amenidad of amenidadesOptions; track $index) {
-                <option [value]="amenidad.value">{{ amenidad.text }}</option>
-            }
-        </select>
-<!-- <pre class="text-xs">
-    Amenidad seleccionada: {{amenidad | json}}
-</pre> -->
-    <span><button class="btn btn-primary btn-ghost" (click)="toggleVerReservas()">Mis reservas</button> </span>
+  @if (!residente()) {
+    <div class="alert alert-warning">
+      <span>Debe estar registrado como residente para ver y crear reservaciones.</span>
     </div>
+  } @else {
+    <div class="flex flex-wrap items-center gap-2">
+      <select [(ngModel)]="amenidadId" class="select select-bordered" (ngModelChange)="selectAmenidadById($event)">
+        <option value="">Seleccione una amenidad</option>
+        @for (opt of amenidadesOptions(); track opt.value) {
+          <option [value]="opt.value">{{ opt.text }}</option>
+        }
+      </select>
+      <button type="button" class="btn btn-primary btn-ghost btn-sm" (click)="toggleVerReservas()">Mis reservas</button>
+    </div>
+  }
 </section>
-<section class="p-2">
+
+@if (residente() && amenidadId) {
+  <section class="p-2">
     <table class="table-auto w-full border-2">
-        <thead class="text-center text-lg font-bold bg-base-200">
-            <tr class="border-2">
+      <thead class="text-center text-lg font-bold bg-base-200">
+        <tr class="border-2">
+          @for (dia of diasSemana; track dia; let i = $index) {
+            <td class="py-2 text-nowrap">
+              @if (i === 0) {
+                <div>
+                  <button type="button" class="btn btn-ghost btn-sm btn-primary cursor-pointer" (click)="prevWeek()">&lt;</button>
+                  {{ dia }}
+                </div>
+              } @else if (i === 6) {
+                <div>{{ dia }}
+                  <button type="button" class="btn btn-ghost btn-sm btn-primary cursor-pointer" (click)="nextWeek()">&gt;</button>
+                </div>
+              } @else {
+                <div>{{ dia }}</div>
+              }
+              <div class="text-xs bg-base-100 w-full">{{ sumDays(i) | date: 'dd-MMM' }}</div>
+            </td>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (hora of horasDelDia; track hora) {
+          <tr class="border-1">
             @for (dia of diasSemana; track dia; let i = $index) {
-                <td class="py-2 text-nowrap">
-                    @if(i===0){
-                        <div>
-                            <button class="btn-ghost btn-sm btn-primary cursor-pointer" (click)="prevWeek()"><</button>
-                            {{dia}}
-                        </div>
-                    } @else if (i===6){
-                        <div>{{dia}}
-                            <button class="btn-ghost btn-sm btn-primary cursor-pointer" (click)="nextWeek()">></button>
-                        </div>
-                    } @else {
-                        <div>{{dia}}</div>
+              @let s = getHorarioByDayHour(dia, hora);
+              @let fecha = setDatetime(sumDays(i), hora);
+              @let ocupacion = getReservationsByDate(fecha);
+              <td
+                class="hover:bg-base-300 min-h-[80px] align-top w-1/7 border-1 border-gray-400 p-2 cursor-pointer"
+                [class.bg-base-100]="s.isOpen"
+                [class.bg-red-200]="!s.isOpen"
+                [class.bg-green-200]="ocupacion > 0 && ocupacion <= 10"
+                [class.bg-yellow-200]="ocupacion > 10 && ocupacion <= 20"
+                [class.bg-orange-300]="ocupacion > 20 && ocupacion <= capacidadMaxima"
+                [class.bg-red-400]="ocupacion >= capacidadMaxima"
+                [class.text-bold]="ocupacion >= capacidadMaxima"
+                (click)="s.isOpen && openReservarModal(fecha)"
+              >
+                <div class="text-xs text-right font-semibold">{{ hora }}</div>
+                @if (s.isOpen) {
+                  @if (ocupacion > 0) {
+                    <div class="text-xs font-bold">Ocupación:</div>
+                    <span class="text-sm">{{ ocupacion }} personas.</span>
+                    @if (ocupacion >= capacidadMaxima) {
+                      <div class="text-xs font-extralight">Se ha alcanzado la capacidad máxima.</div>
                     }
-                    <div class="text-xs bg-base-100 w-full">{{sumDays(i) | date: 'dd-MMM'}}</div>
-                </td>
+                  }
+                } @else {
+                  <div class="text-xs text-center">{{ s.nota }}</div>
+                }
+              </td>
             }
-            </tr>
-        </thead>
-        <tbody>
-            @for (hora of horasDelDia; track hora) {
-                <tr class="border-1">
-                    @for (dia of diasSemana; track dia; let i = $index) {
-                        @let s = getHorarioByDayHour(dia, hora);
-                        @let fecha = setDatetime(sumDays(i), hora);
-                        @let ocupacion = getReservationsByDate( fecha );
-
-                        <td class="hover:bg-base-300 min-h-[80px] align-top w-1/7 border-1 border-gray-400 p-2" 
-                            [class.bg-base-100]= "s.isOpen"
-                            [class.bg-red-200]= "!s.isOpen"
-                            [class.bg-green-200]= "ocupacion>0 && ocupacion<=10"
-                            [class.bg-yellow-200]= "ocupacion>10 && ocupacion<=20"
-                            [class.bg-orange-300]= "ocupacion>20 && ocupacion<=capacidadMaxima"
-                            [class.bg-red-400]= "ocupacion>=capacidadMaxima"
-                            [class.text-bold]= "ocupacion>=capacidadMaxima"
-                            (click)="setSelectedDate(fecha)"
-                            onclick="reservarModal.showModal()"
-                        >
-                            <div class="text-xs text-right font-semibold">{{hora}}</div>
-                            @if(s.isOpen){
-                                @if(ocupacion > 0 ){
-                                    <div class="text-xs font-bold">Ocupacion:</div>
-                                    <span class="text-sm ">{{ ocupacion }} personas.</span>
-                                    @if (ocupacion >= capacidadMaxima ) {
-                                        <div class="text-xs font-extralight">Se ha alcanzado la capacidad máxima.</div>
-                                    }
-                                } @else {
-                                    <!-- <span  class="text-xs font-extralight">Libre</span>                                     -->
-                                }
-                                <div></div>
-                            } @else {
-                                <div class="text-xs text-center">{{ s.nota | json }}</div>
-                            }
-                        </td>
-                    }
-                </tr>
-            }
-        </tbody>
+          </tr>
+        }
+      </tbody>
     </table>
-</section>
-
-@if(misReservaciones().length>0 ){
-<section class=" sm:fixed sm:w-[260px] bg-white sm:rounded sm:top-80 sm:right-50 p-5 overflow-y-scroll"
-    [class.h-[10vh]] ="!showMisReservas"
-    [class.h-[40vh]] ="showMisReservas"
->
-    <h2 class="text-xl flex-bold gap-2 ">Mis reservaciones 
-        <button class="btn btn-xs btn-circle btn-ghost absolute right-2 top-5" (click)="toggleVerReservas()" >
-        <span class="text-2xl">
-            @if (showMisReservas) {
-                <i class="fa-solid fa-square-caret-down"></i>
-            }  @else {
-                <i class="fa-solid fa-square-caret-right"></i>
-            }
-        </span>
-        </button>
-    </h2>
- <!-- <pre>Mis Reservaciones: {{ misReservaciones() | json}}</pre> -->
-        @if (showMisReservas) {
-        <ul>
-            @for (reservacion of misReservaciones(); track $index) {
-                <li class="text-xs pt-1">
-                    <button class="btn btn-xs btn-circle btn-ghost " (click)="deleteReservation(reservacion)">✕</button>            
-                    {{ reservacion.horario | date : "dd/MM/yyyy hh:mm"}} {{reservacion.numPersonas}} personas.
-                </li>
-            }
-        </ul>
-    }
-        
-    </section>
+  </section>
 }
-<!-- Open the modal using ID.showModal() method -->
+
+@if (residente() && misReservaciones().length > 0) {
+  <section
+    class="sm:fixed sm:w-[260px] bg-base-100 sm:rounded sm:top-80 sm:right-50 p-5 overflow-y-auto border border-base-300"
+    [class.h-[10vh]]="!showMisReservas()"
+    [class.h-[40vh]]="showMisReservas()"
+  >
+    <h2 class="text-xl font-bold gap-2 flex items-center">
+      Mis reservaciones
+      <button type="button" class="btn btn-xs btn-circle btn-ghost" (click)="toggleVerReservas()">
+        @if (showMisReservas()) {
+          <i class="fa-solid fa-square-caret-down"></i>
+        } @else {
+          <i class="fa-solid fa-square-caret-right"></i>
+        }
+      </button>
+    </h2>
+    @if (showMisReservas()) {
+      <ul class="list-none p-0 mt-2">
+        @for (reservacion of misReservaciones(); track reservacion.id) {
+          <li class="text-xs pt-1 flex items-center gap-1">
+            <button type="button" class="btn btn-xs btn-circle btn-ghost" (click)="deleteReservation(reservacion)" aria-label="Cancelar">✕</button>
+            {{ reservacion.horario | date: 'dd/MM/yyyy HH:mm' }} — {{ reservacion.numPersonas ?? 0 }} personas. @if (reservacion.horasReservadas) { {{ reservacion.horasReservadas }} h }
+          </li>
+        }
+      </ul>
+    }
+  </section>
+}
+
 @if (amenidad) {
-<dialog id="reservarModal" class="modal modal-bottom sm:modal-middle">
-  <div class="modal-box">
-    <form method="dialog">
-      <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-    </form>
-    <h1 class="text-lg font-bold pt-3 pl-2">Reservar: {{ amenidad.nombre }}</h1>
-    <h3 class="text-md font-semibold  pl-2 pb-2">Horario: {{ fechaSeleccionada | date : "EEEE dd MMMM yyyy hh:mm"}}</h3>
-    <p class="font-bold py-5 bg-base-200 rounded-2xl p-3 mb-2">
-        Residente Casa: <span>{{residente.casa}}</span>
-    <br>Numero de personas: <span>5</span></p>
-    <p class="bg-base-200 p-3 rounded-2xl text-xs" [innerHTML]="sanitizeHTML(amenidad.reglas)"></p>
-    <p class="text-sm">He leido y acepto las reglas para reservar la {{amenidad.nombre | lowercase }}</p>
-    <div class="modal-action">
-        <!-- <p class="py-4 text-xs font-extralight">Para salir presione la tecla ESC o click en el boton cerrar de abajo.</p> -->
+  <dialog #reservarModal class="modal modal-bottom sm:modal-middle" (close)="closeReservarModal()">
+    <div class="modal-box">
       <form method="dialog">
-        <!-- if there is a button in form, it will close the modal -->
-        <button class="btn" (click)="doReservation(fechaSeleccionada, 5)">Reservar</button>
+        <button type="button" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" (click)="closeReservarModal()">✕</button>
       </form>
+      <h1 class="text-lg font-bold pt-3 pl-2">Reservar: {{ amenidad.nombre }}</h1>
+      <h3 class="text-md font-semibold pl-2 pb-2">Horario: {{ fechaSeleccionada | date: 'EEEE dd MMMM yyyy HH:mm' }}</h3>
+      <p class="font-bold py-3 bg-base-200 rounded-2xl p-3 mb-2">
+        Residente Casa: <span>{{ residente()?.casa ?? '—' }}</span>
+      </p>
+      <div class="form-control mb-3">
+        <label class="label" for="numPersonas">Número de personas</label>
+        <input
+          id="numPersonas"
+          type="number"
+          min="1"
+          [max]="maxPersonasPorReservacion"
+          class="input input-bordered w-24"
+          [ngModel]="numPersonasModal()"
+          (ngModelChange)="setNumPersonasModal($event)"
+        />
+        <p class="text-xs text-base-content/70 mt-1">Máximo: {{ maxPersonasPorReservacion }} personas por reservación.</p>
+      </div>
+      <div class="form-control mb-3">
+        <label class="label" for="horasReservadas">Horas a reservar</label>
+        <input
+          id="horasReservadas"
+          type="number"
+          min="1"
+          [max]="maxHorasPorReservacion"
+          class="input input-bordered w-24"
+          [ngModel]="horasReservadasModal()"
+          (ngModelChange)="setHorasReservadasModal($event)"
+        />
+        <p class="text-xs text-base-content/70 mt-1">Máximo: {{ maxHorasPorReservacion }} horas por reservación.</p>
+      </div>
+      <p class="bg-base-200 p-3 rounded-2xl text-xs mb-2" [innerHTML]="sanitizeHTML(amenidad.reglas)"></p>
+      <label class="flex items-center gap-2 cursor-pointer mb-3">
+        <input
+          type="checkbox"
+          class="checkbox checkbox-sm"
+          [ngModel]="rulesAccepted()"
+          (ngModelChange)="rulesAccepted.set($event)"
+        />
+        <span class="text-sm">He leído y acepto las reglas para reservar la {{ amenidad.nombre | lowercase }}.</span>
+      </label>
+      @if (reservationMessage()) {
+        <div class="alert mb-2" [class.alert-success]="reservationMessage()?.type === 'success'" [class.alert-error]="reservationMessage()?.type === 'error'">
+          {{ reservationMessage()?.text }}
+        </div>
+      }
+      <div class="modal-action">
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="!rulesAccepted() || isSubmittingReservation()"
+          (click)="doReservation()"
+        >
+          @if (isSubmittingReservation()) {
+            <span class="loading loading-spinner loading-sm"></span>
+          }
+          Reservar
+        </button>
+      </div>
     </div>
-  </div>
-</dialog>
+    <form method="dialog" class="modal-backdrop">
+      <button type="button" (click)="closeReservarModal()">cerrar</button>
+    </form>
+  </dialog>
 }

@@ -49,7 +49,8 @@ export class SaldoBancoListComponent implements OnInit {
       const comunidadId = params['comunidad'];
       if (comunidadId) {
         this.selectedComunidadId.set(comunidadId);
-        this.adminContext.setSelectedCommunityId(comunidadId);
+        const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === comunidadId)?.nombre ?? '';
+        this.adminContext.setSelectedCommunityId(comunidadId, name);
         this.loadSaldos(comunidadId);
       } else {
         const stored = this.adminContext.getSelectedCommunityId();
@@ -113,7 +114,8 @@ export class SaldoBancoListComponent implements OnInit {
   }
 
   onComunidadChange(value: string): void {
-    this.adminContext.setSelectedCommunityId(value);
+    const name = this.comunidadesAsociadas().find(c => (c.id ?? '') === value)?.nombre ?? '';
+    this.adminContext.setSelectedCommunityId(value, name);
     this.selectedComunidadId.set(value);
     if (value) {
       this.loadSaldos(value);

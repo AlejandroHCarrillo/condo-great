@@ -184,6 +184,39 @@
         </div>
       </div>
 
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="form-control w-full">
+          <label class="label" for="personasPorReservacion">
+            <span class="label-text font-medium">Personas por reservación</span>
+          </label>
+          <input
+            id="personasPorReservacion"
+            type="number"
+            min="0"
+            class="input input-bordered w-full text-right"
+            [(ngModel)]="form.personasPorReservacion"
+            name="personasPorReservacion"
+            placeholder="Sin límite"
+          />
+          <p class="text-sm text-base-content/70 mt-1">Máximo de personas por reserva. Vacío = sin límite.</p>
+        </div>
+        <div class="form-control w-full">
+          <label class="label" for="horasPorReservacion">
+            <span class="label-text font-medium">Horas por reservación</span>
+          </label>
+          <input
+            id="horasPorReservacion"
+            type="number"
+            min="0"
+            class="input input-bordered w-full text-right"
+            [(ngModel)]="form.horasPorReservacion"
+            name="horasPorReservacion"
+            placeholder="Sin límite"
+          />
+          <p class="text-sm text-base-content/70 mt-1">Máximo de horas por reserva. Vacío = sin límite.</p>
+        </div>
+      </div>
+
       <div class="flex justify-center gap-3 pt-4">
         <button
           type="submit"

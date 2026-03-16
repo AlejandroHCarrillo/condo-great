@@ -1,32 +1,53 @@
-<section class="bg-base-300">
-    <div class="grid grid-cols-1 lg:grid-cols-2">
-        @for (amenidad of amenidades(); track amenidad.id) {            
-            <div class="card bg-base-100 w-96 shadow-sm m-5">
-                <figure class="max-h-40 w-full">
-                    <img [src]="amenidad.imagen"
-                    [alt]="amenidad.nombre" />
-                </figure>
-                <div class="card-body">
-                    <h2 class="card-title">
-                        {{amenidad.nombre}}
-                    </h2>
-                    <p>{{amenidad.descripcion}}</p>
-                    <p>{{amenidad.reglas}}</p>
-                    <p class="text-right">Costo: 
-                        <span class="badge badge-outline">{{amenidad.costo}}</span>
-                    </p>
-                    <div class="card-actions self-center">
-                        <!-- Open the modal using ID.showModal() method -->
-                         <hh-amenidad-horario-modal [horarios]="getHorariosAmenidad(amenidad.id!)"/>
-                        <div class="badge badge-secondary">Reservar</div>
-                    </div>
-                </div>
-            </div>
-
-        }
+<section class="bg-base-300 min-h-[200px]">
+  @if (isLoading()) {
+    <div class="flex justify-center items-center py-16">
+      <span class="loading loading-spinner loading-lg"></span>
+      <span class="ml-4">Cargando amenidades...</span>
     </div>
+  } @else if (errorMessage()) {
+    <div class="alert alert-warning mx-5 mt-5">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  } @else if (amenidades().length === 0) {
+    <div class="text-center py-16 text-base-content/70">
+      @if (noCommunitySelected()) {
+        <i class="fa-solid fa-building text-4xl mb-4"></i>
+        <p>Seleccione una comunidad (desde Amenidades u otra sección) para ver sus amenidades aquí.</p>
+      } @else {
+        <i class="fa-solid fa-people-roof text-4xl mb-4"></i>
+        <p>No hay amenidades disponibles.</p>
+      }
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 p-5">
+      @for (amenidad of amenidades(); track amenidad.id) {
+        <div class="card bg-base-100 w-full max-w-md shadow-md rounded-xl overflow-hidden">
+          <figure class="max-h-40 w-full bg-base-200">
+            <img
+              [src]="getImagenUrl(amenidad)"
+              [alt]="amenidad.nombre"
+              class="w-full h-40 object-cover"
+              (error)="$any($event.target).src = defaultImage"
+            />
+          </figure>
+          <div class="card-body">
+            <h2 class="card-title text-lg">{{ amenidad.nombre }}</h2>
+            <p class="text-sm text-base-content/80 line-clamp-2">{{ amenidad.descripcion }}</p>
+            @if (amenidad.reglas) {
+              <p class="text-xs text-base-content/70 line-clamp-2">{{ amenidad.reglas }}</p>
+            }
+            <p class="text-right mt-2">
+              Costo:
+              <span class="badge badge-outline">{{ formatCosto(amenidad.costo) }}</span>
+            </p>
+            <div class="card-actions justify-end mt-2">
+              <hh-amenidad-horario-modal [horarios]="getHorariosAmenidad(amenidad.id)" />
+              <a [routerLink]="['/resident/reservaciones']" [queryParams]="{ amenidadId: amenidad.id }" class="badge badge-secondary cursor-pointer hover:badge-primary">Reservar</a>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
 </section>
-aqui deben verse las amenidades
-<pre>
-    {{ amenidades() | json }}
-</pre>

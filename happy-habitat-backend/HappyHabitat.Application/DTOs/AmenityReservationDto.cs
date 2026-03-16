@@ -9,5 +9,6 @@ public class AmenityReservationDto
     public string ResidentName { get; set; } = string.Empty;
     public DateTime Horario { get; set; }
     public int? NumPersonas { get; set; }
+    public int? HorasReservadas { get; set; }
     public string Status { get; set; } = string.Empty;
 }

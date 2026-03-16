@@ -1111,15 +1111,15 @@ public class DummySeeder : IDataSeeder
         var comunicadosTemplates = new[]
         {
             new { Titulo = "Propuesta de reglamento revisión", Subtitulo = "Participación vecinal", Contenido = "Estimados condóminos: Durante el taller de revisión del reglamento no fue posible concluir con todas las preguntas. La administración compartirá el reglamento con el texto resaltado. Envíen sus dudas o sugerencias por Whatsapp. Fecha límite: 12 de Septiembre.", Fecha = new DateTime(2025, 9, 8), Imagen = (string?)null },
-            new { Titulo = "Mantenimiento de la alberca", Subtitulo = "Cierre temporal por limpieza", Contenido = "La alberca estará cerrada el 2025-09-12 para realizar limpieza profunda y revisión del sistema de filtrado.", Fecha = new DateTime(2025, 9, 12), Imagen = "images/anuncios/manenimiento_alberca.png" },
-            new { Titulo = "Jornada de reciclaje", Subtitulo = "Trae tus residuos separados", Contenido = "Este sábado 2025-09-14 se instalará un punto de acopio en el parque central para reciclaje de papel, plástico y electrónicos.", Fecha = new DateTime(2025, 9, 14), Imagen = "images/anuncios/jornada-reciclaje.png" },
-            new { Titulo = "Fumigación preventiva", Subtitulo = "Control de plagas en áreas comunes", Contenido = "El lunes 2025-09-16 se realizará fumigación en jardines y pasillos. Evita transitar por zonas tratadas durante ese día.", Fecha = new DateTime(2025, 9, 16), Imagen = "images/anuncios/fumigacion.png" },
-            new { Titulo = "Reunión vecinal mensual", Subtitulo = "Temas de seguridad y mantenimiento", Contenido = "La reunión se llevará a cabo el 2025-09-20 a las 18:00 hrs en el salón común. Participa y haz escuchar tu voz.", Fecha = new DateTime(2025, 9, 20), Imagen = "images/anuncios/reunion-mensual.png" },
-            new { Titulo = "Instalación de cámaras", Subtitulo = "Mejora de seguridad perimetral", Contenido = "El 2025-09-22 se instalarán nuevas cámaras en los accesos principales. Habrá personal técnico en el área.", Fecha = new DateTime(2025, 9, 22), Imagen = "images/anuncios/instalacion-camaras.png" },
-            new { Titulo = "Decoración de otoño", Subtitulo = "Convocatoria para voluntarios", Contenido = "El comité invita a decorar áreas comunes con temática otoñal el 2025-09-25. Puedes donar adornos o ayudar en el montaje.", Fecha = new DateTime(2025, 9, 25), Imagen = "images/anuncios/decoracion-otono.png" },
-            new { Titulo = "Poda de árboles", Subtitulo = "Mantenimiento de áreas verdes", Contenido = "El 2025-09-28 se realizará poda en los jardines del lado norte. Favor de retirar objetos personales cercanos.", Fecha = new DateTime(2025, 9, 28), Imagen = "images/anuncios/poda-arboles.png" },
-            new { Titulo = "Taller de compostaje", Subtitulo = "Aprende a reducir residuos orgánicos", Contenido = "El 2025-10-01 se impartirá un taller gratuito sobre compostaje en el salón común. Cupo limitado, regístrate con anticipación.", Fecha = new DateTime(2025, 10, 1), Imagen = "images/anuncios/taller-compostaje.png" },
-            new { Titulo = "Festival comunitario", Subtitulo = "Música, comida y juegos", Contenido = "El 2025-10-06 se celebrará el festival anual en el parque central. ¡Trae a tu familia y disfruta!", Fecha = new DateTime(2025, 10, 6), Imagen = "images/anuncios/festival-comunitario.png" }
+            new { Titulo = "Mantenimiento de la alberca", Subtitulo = "Cierre temporal por limpieza", Contenido = "La alberca estará cerrada el 2025-09-12 para realizar limpieza profunda y revisión del sistema de filtrado.", Fecha = new DateTime(2025, 9, 12), Imagen = (string?)"images/anuncios/mantenimiento_alberca.png" },
+            new { Titulo = "Jornada de reciclaje", Subtitulo = "Trae tus residuos separados", Contenido = "Este sábado 2025-09-14 se instalará un punto de acopio en el parque central para reciclaje de papel, plástico y electrónicos.", Fecha = new DateTime(2025, 9, 14), Imagen = (string?)"images/anuncios/jornada-reciclaje.png" },
+            new { Titulo = "Fumigación preventiva", Subtitulo = "Control de plagas en áreas comunes", Contenido = "El lunes 2025-09-16 se realizará fumigación en jardines y pasillos. Evita transitar por zonas tratadas durante ese día.", Fecha = new DateTime(2025, 9, 16), Imagen = (string?)"images/anuncios/fumigacion.png" },
+            new { Titulo = "Reunión vecinal mensual", Subtitulo = "Temas de seguridad y mantenimiento", Contenido = "La reunión se llevará a cabo el 2025-09-20 a las 18:00 hrs en el salón común. Participa y haz escuchar tu voz.", Fecha = new DateTime(2025, 9, 20), Imagen = (string?)"images/anuncios/reunion-mensual.png" },
+            new { Titulo = "Instalación de cámaras", Subtitulo = "Mejora de seguridad perimetral", Contenido = "El 2025-09-22 se instalarán nuevas cámaras en los accesos principales. Habrá personal técnico en el área.", Fecha = new DateTime(2025, 9, 22), Imagen = (string?)"images/anuncios/instalacion-camaras.png" },
+            new { Titulo = "Decoración de otoño", Subtitulo = "Convocatoria para voluntarios", Contenido = "El comité invita a decorar áreas comunes con temática otoñal el 2025-09-25. Puedes donar adornos o ayudar en el montaje.", Fecha = new DateTime(2025, 9, 25), Imagen = (string?)"images/anuncios/decoracion-otono.png" },
+            new { Titulo = "Poda de árboles", Subtitulo = "Mantenimiento de áreas verdes", Contenido = "El 2025-09-28 se realizará poda en los jardines del lado norte. Favor de retirar objetos personales cercanos.", Fecha = new DateTime(2025, 9, 28), Imagen = (string?)"images/anuncios/poda-arboles.png" },
+            new { Titulo = "Taller de compostaje", Subtitulo = "Aprende a reducir residuos orgánicos", Contenido = "El 2025-10-01 se impartirá un taller gratuito sobre compostaje en el salón común. Cupo limitado, regístrate con anticipación.", Fecha = new DateTime(2025, 10, 1), Imagen = (string?)"images/anuncios/taller-compostaje.png" },
+            new { Titulo = "Festival comunitario", Subtitulo = "Música, comida y juegos", Contenido = "El 2025-10-06 se celebrará el festival anual en el parque central. ¡Trae a tu familia y disfruta!", Fecha = new DateTime(2025, 10, 6), Imagen = (string?)"images/anuncios/festival-comunitario.png" }
         };
 
         if (allCommunitiesForComunicados.Count > 0)
@@ -1198,14 +1198,14 @@ public class DummySeeder : IDataSeeder
         var allCommunitiesForAmenities = await _context.Communities.ToListAsync();
         var amenityTemplates = new[]
         {
-            new { Nombre = "Casa club eventos", Descripcion = "Casa club para eventos", Reglas = "Fines de semana y días festivos reservar por cuatro horas con un costo de 1500 pesos. Uso de asador con costo de 500 pesos extra.", Costo = 1500m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-casa-club.png", CapacidadMaxima = (int?)35, NumeroReservacionesSimultaneas = (int?)1, RequiereAprobacion = true },
-            new { Nombre = "Alberca", Descripcion = "Alberca de la comunidad.", Reglas = "Capacidad máxima 35 personas. 5 personas por casa. Máximo 3 horas por reservación por día. No se permiten bebidas embriagantes.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-alberca.jpg", CapacidadMaxima = (int?)35, NumeroReservacionesSimultaneas = (int?)7, RequiereAprobacion = true },
-            new { Nombre = "Casa club residentes", Descripcion = "Casa club para residentes", Reglas = "Lunes a viernes se puede reservar sin costo durante 2 horas.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-casa-club.png", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)1, RequiereAprobacion = false },
-            new { Nombre = "Escalera", Descripcion = "Escalera de aluminio", Reglas = "Todo residente puede usarla registrándose en el sistema por 48 horas.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-escalera.png", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)1, RequiereAprobacion = true },
-            new { Nombre = "Cancha de pádel", Descripcion = "Cancha de pádel", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, RequiereAprobacion = false },
-            new { Nombre = "Cancha de fútbol rápido", Descripcion = "Cancha de fútbol rápido", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, RequiereAprobacion = false },
-            new { Nombre = "Cancha de basquetbol", Descripcion = "Cancha de basquetbol", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, RequiereAprobacion = false },
-            new { Nombre = "Gimnasio", Descripcion = "Gimnasio de la comunidad", Reglas = "Próximamente.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, RequiereAprobacion = false }
+            new { Nombre = "Casa club eventos", Descripcion = "Casa club para eventos", Reglas = "Fines de semana y días festivos reservar por cuatro horas con un costo de 1500 pesos. Uso de asador con costo de 500 pesos extra.", Costo = 1500m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-casa-club.png", CapacidadMaxima = (int?)35, NumeroReservacionesSimultaneas = (int?)1, PersonasPorReservacion = (int?)35, HorasPorReservacion = (int?)4, RequiereAprobacion = true },
+            new { Nombre = "Alberca", Descripcion = "Alberca de la comunidad.", Reglas = "Capacidad máxima 35 personas. 5 personas por casa. Máximo 3 horas por reservación por día. No se permiten bebidas embriagantes.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-alberca.jpg", CapacidadMaxima = (int?)35, NumeroReservacionesSimultaneas = (int?)7, PersonasPorReservacion = (int?)5, HorasPorReservacion = (int?)3, RequiereAprobacion = true },
+            new { Nombre = "Casa club residentes", Descripcion = "Casa club para residentes", Reglas = "Lunes a viernes se puede reservar sin costo durante 2 horas.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-casa-club.png", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)1, PersonasPorReservacion = (int?)20, HorasPorReservacion = (int?)2, RequiereAprobacion = false },
+            new { Nombre = "Escalera", Descripcion = "Escalera de aluminio", Reglas = "Todo residente puede usarla registrándose en el sistema por 48 horas.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/coto-berlin-escalera.png", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)1, PersonasPorReservacion = (int?)null, HorasPorReservacion = (int?)48, RequiereAprobacion = true },
+            new { Nombre = "Cancha de pádel", Descripcion = "Cancha de pádel", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, PersonasPorReservacion = (int?)4, HorasPorReservacion = (int?)2, RequiereAprobacion = false },
+            new { Nombre = "Cancha de fútbol rápido", Descripcion = "Cancha de fútbol rápido", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, PersonasPorReservacion = (int?)14, HorasPorReservacion = (int?)2, RequiereAprobacion = false },
+            new { Nombre = "Cancha de basquetbol", Descripcion = "Cancha de basquetbol", Reglas = "Debe registrarse en el sistema o al teléfono.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, PersonasPorReservacion = (int?)10, HorasPorReservacion = (int?)2, RequiereAprobacion = false },
+            new { Nombre = "Gimnasio", Descripcion = "Gimnasio de la comunidad", Reglas = "Próximamente.", Costo = 0m, FechaAlta = new DateTime(2025, 11, 8), Imagen = "images/amenidades/", CapacidadMaxima = (int?)null, NumeroReservacionesSimultaneas = (int?)null, PersonasPorReservacion = (int?)null, HorasPorReservacion = (int?)null, RequiereAprobacion = false }
         };
 
         if (allCommunitiesForAmenities.Count > 0)
@@ -1235,6 +1235,8 @@ public class DummySeeder : IDataSeeder
                                 Imagen = t.Imagen,
                                 CapacidadMaxima = t.CapacidadMaxima,
                                 NumeroReservacionesSimultaneas = t.NumeroReservacionesSimultaneas,
+                                PersonasPorReservacion = t.PersonasPorReservacion,
+                                HorasPorReservacion = t.HorasPorReservacion,
                                 RequiereAprobacion = t.RequiereAprobacion,
                                 CreatedAt = DateTime.UtcNow
                             });
@@ -1258,6 +1260,8 @@ public class DummySeeder : IDataSeeder
                                 Imagen = t.Imagen,
                                 CapacidadMaxima = t.CapacidadMaxima,
                                 NumeroReservacionesSimultaneas = t.NumeroReservacionesSimultaneas,
+                                PersonasPorReservacion = t.PersonasPorReservacion,
+                                HorasPorReservacion = t.HorasPorReservacion,
                                 RequiereAprobacion = t.RequiereAprobacion,
                                 CreatedAt = DateTime.UtcNow
                             });
@@ -1296,6 +1300,8 @@ public class DummySeeder : IDataSeeder
                                 Imagen = t.Imagen,
                                 CapacidadMaxima = t.CapacidadMaxima,
                                 NumeroReservacionesSimultaneas = t.NumeroReservacionesSimultaneas,
+                                PersonasPorReservacion = t.PersonasPorReservacion,
+                                HorasPorReservacion = t.HorasPorReservacion,
                                 RequiereAprobacion = t.RequiereAprobacion,
                                 CreatedAt = DateTime.UtcNow
                             }).ToList();
@@ -1375,7 +1381,7 @@ public class DummySeeder : IDataSeeder
             // Tabla AmenitySchedules puede no existir si no se aplicó la migración; se omite
         }
 
-        // Seed 10 reservaciones de amenidades para Residencial El Pueblito (tabla AmenityReservations debe existir; si falla, se omite)
+        // Seed reservaciones de amenidades para Residencial El Pueblito: semana en curso (10), semana anterior y siguiente (varias)
         try
         {
             var pueblitoIdReservas = new Guid("fcdc9a85-88b7-4109-84b3-a75107392d87");
@@ -1384,39 +1390,82 @@ public class DummySeeder : IDataSeeder
                 var pueblitoAmenities = await _context.Amenities
                     .Where(a => EF.Property<Guid>(a, "CommunityId") == pueblitoIdReservas)
                     .ToListAsync();
+                var alberca = pueblitoAmenities.FirstOrDefault(a => a.Nombre == "Alberca");
+                var casaClubResidentes = pueblitoAmenities.FirstOrDefault(a => a.Nombre == "Casa club residentes");
+                var casaClubEventos = pueblitoAmenities.FirstOrDefault(a => a.Nombre == "Casa club eventos");
                 var pueblitoResidents = await _context.Residents
                     .Where(r => r.CommunityId == pueblitoIdReservas)
                     .ToListAsync();
-                if (pueblitoAmenities.Count > 0 && pueblitoResidents.Count > 0)
+                var amenidadesTres = new[] { alberca, casaClubResidentes, casaClubEventos }.Where(a => a != null).Cast<Amenity>().ToList();
+                if (amenidadesTres.Count > 0 && pueblitoResidents.Count > 0)
                 {
-                    var rndRes = new Random();
+                    var rnd = new Random();
                     var statuses = new[] { "En proceso", "Reservada", "Reservada", "Reservada" };
                     var reservas = new List<AmenityReservation>();
-                    var horariosBase = new[]
-                    {
-                        new DateTime(2025, 2, 15, 10, 0, 0),
-                        new DateTime(2025, 2, 16, 12, 0, 0),
-                        new DateTime(2025, 2, 17, 14, 0, 0),
-                        new DateTime(2025, 2, 18, 9, 0, 0),
-                        new DateTime(2025, 2, 19, 16, 0, 0),
-                        new DateTime(2025, 2, 20, 11, 0, 0),
-                        new DateTime(2025, 2, 21, 15, 0, 0),
-                        new DateTime(2025, 2, 22, 10, 30, 0),
-                        new DateTime(2025, 2, 23, 13, 0, 0),
-                        new DateTime(2025, 2, 24, 17, 0, 0)
-                    };
+                    var today = DateTime.UtcNow.Date;
+                    var daysFromMonday = today.DayOfWeek == DayOfWeek.Sunday ? 6 : (int)today.DayOfWeek - 1;
+                    var lunesActual = today.AddDays(-daysFromMonday);
+                    var lunesAnterior = lunesActual.AddDays(-7);
+                    var lunesSiguiente = lunesActual.AddDays(7);
+                    var horas = new[] { 9, 10, 11, 12, 14, 15, 16, 17, 18 };
+
+                    // 10 reservaciones para la semana en curso (alberca, casa club residentes, casa club eventos)
                     for (var i = 0; i < 10; i++)
                     {
-                        var amenity = pueblitoAmenities[rndRes.Next(pueblitoAmenities.Count)];
-                        var resident = pueblitoResidents[rndRes.Next(pueblitoResidents.Count)];
+                        var amenity = amenidadesTres[rnd.Next(amenidadesTres.Count)];
+                        var resident = pueblitoResidents[rnd.Next(pueblitoResidents.Count)];
+                        var dia = lunesActual.AddDays(rnd.Next(0, 7));
+                        var hora = horas[rnd.Next(horas.Length)];
+                        var maxHoras = amenity.HorasPorReservacion ?? 4;
                         reservas.Add(new AmenityReservation
                         {
                             Id = Guid.NewGuid(),
                             AmenityId = amenity.Id,
                             ResidentId = resident.Id,
-                            Horario = horariosBase[i],
-                            NumPersonas = rndRes.Next(1, 8),
-                            Status = statuses[rndRes.Next(statuses.Length)],
+                            Horario = dia.Date.AddHours(hora),
+                            NumPersonas = rnd.Next(1, 8),
+                            HorasReservadas = rnd.Next(1, Math.Max(1, maxHoras) + 1),
+                            Status = statuses[rnd.Next(statuses.Length)],
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                    // Semana anterior: 5 reservaciones
+                    for (var i = 0; i < 5; i++)
+                    {
+                        var amenity = amenidadesTres[rnd.Next(amenidadesTres.Count)];
+                        var resident = pueblitoResidents[rnd.Next(pueblitoResidents.Count)];
+                        var dia = lunesAnterior.AddDays(rnd.Next(0, 7));
+                        var hora = horas[rnd.Next(horas.Length)];
+                        var maxHoras = amenity.HorasPorReservacion ?? 4;
+                        reservas.Add(new AmenityReservation
+                        {
+                            Id = Guid.NewGuid(),
+                            AmenityId = amenity.Id,
+                            ResidentId = resident.Id,
+                            Horario = dia.Date.AddHours(hora),
+                            NumPersonas = rnd.Next(1, 6),
+                            HorasReservadas = rnd.Next(1, Math.Max(1, maxHoras) + 1),
+                            Status = "Reservada",
+                            CreatedAt = DateTime.UtcNow
+                        });
+                    }
+                    // Semana siguiente: 5 reservaciones
+                    for (var i = 0; i < 5; i++)
+                    {
+                        var amenity = amenidadesTres[rnd.Next(amenidadesTres.Count)];
+                        var resident = pueblitoResidents[rnd.Next(pueblitoResidents.Count)];
+                        var dia = lunesSiguiente.AddDays(rnd.Next(0, 7));
+                        var hora = horas[rnd.Next(horas.Length)];
+                        var maxHoras = amenity.HorasPorReservacion ?? 4;
+                        reservas.Add(new AmenityReservation
+                        {
+                            Id = Guid.NewGuid(),
+                            AmenityId = amenity.Id,
+                            ResidentId = resident.Id,
+                            Horario = dia.Date.AddHours(hora),
+                            NumPersonas = rnd.Next(1, 6),
+                            HorasReservadas = rnd.Next(1, Math.Max(1, maxHoras) + 1),
+                            Status = statuses[rnd.Next(statuses.Length)],
                             CreatedAt = DateTime.UtcNow
                         });
                     }
@@ -1518,14 +1567,14 @@ public class DummySeeder : IDataSeeder
         {
             var proveedorTemplates = new[]
             {
-                new { Giro = "Plomería", Nombre = "Plomería y Gas El Tubo", Telefono = "442 123 4567", Email = "contacto@tubo.mx", Descripcion = "Instalación y reparación de tuberías, fugas. Emergencias 24h.", PaginaWeb = "https://www.ejemplo.mx", Rating = (decimal?)4.6m },
-                new { Giro = "Electricidad", Nombre = "Electricidad Querétaro", Telefono = "442 234 5678", Email = "info@elec.mx", Descripcion = "Instalaciones eléctricas, mantenimiento, reparación de cortos.", PaginaWeb = (string?)null, Rating = (decimal?)4.8m },
+                new { Giro = "Plomería", Nombre = "Plomería y Gas El Tubo", Telefono = "442 123 4567", Email = (string?)"contacto@tubo.mx", Descripcion = "Instalación y reparación de tuberías, fugas. Emergencias 24h.", PaginaWeb = (string?)"https://www.ejemplo.mx", Rating = (decimal?)4.6m },
+                new { Giro = "Electricidad", Nombre = "Electricidad Querétaro", Telefono = "442 234 5678", Email = (string?)"info@elec.mx", Descripcion = "Instalaciones eléctricas, mantenimiento, reparación de cortos.", PaginaWeb = (string?)null, Rating = (decimal?)4.8m },
                 new { Giro = "Jardinería", Nombre = "Jardinería Verde", Telefono = "442 345 6789", Email = (string?)null, Descripcion = "Poda, riego, mantenimiento de áreas verdes.", PaginaWeb = (string?)null, Rating = (decimal?)4.5m },
-                new { Giro = "Limpieza", Nombre = "Limpieza Profesional", Telefono = "442 456 7890", Email = "limpieza@pro.mx", Descripcion = "Limpieza residencial y de áreas comunes.", PaginaWeb = "https://limpieza.ejemplo.mx", Rating = (decimal?)4.7m },
-                new { Giro = "Fumigación", Nombre = "Fumigación y Control de Plagas", Telefono = "442 567 8901", Email = "fumiga@mail.mx", Descripcion = "Fumigación residencial, control de plagas.", PaginaWeb = (string?)null, Rating = (decimal?)4.4m },
-                new { Giro = "Veterinaria", Nombre = "Veterinaria Mascotas Felices", Telefono = "442 678 9012", Email = "vet@mascotas.mx", Descripcion = "Consulta, vacunas, esterilización.", PaginaWeb = (string?)null, Rating = (decimal?)4.7m },
+                new { Giro = "Limpieza", Nombre = "Limpieza Profesional", Telefono = "442 456 7890", Email = (string?)"limpieza@pro.mx", Descripcion = "Limpieza residencial y de áreas comunes.", PaginaWeb = (string?)"https://limpieza.ejemplo.mx", Rating = (decimal?)4.7m },
+                new { Giro = "Fumigación", Nombre = "Fumigación y Control de Plagas", Telefono = "442 567 8901", Email = (string?)"fumiga@mail.mx", Descripcion = "Fumigación residencial, control de plagas.", PaginaWeb = (string?)null, Rating = (decimal?)4.4m },
+                new { Giro = "Veterinaria", Nombre = "Veterinaria Mascotas Felices", Telefono = "442 678 9012", Email = (string?)"vet@mascotas.mx", Descripcion = "Consulta, vacunas, esterilización.", PaginaWeb = (string?)null, Rating = (decimal?)4.7m },
                 new { Giro = "Cerrajería", Nombre = "Cerrajería Express", Telefono = "442 789 0123", Email = (string?)null, Descripcion = "Cambio de chapas, cerraduras, abrir autos y casas.", PaginaWeb = (string?)null, Rating = (decimal?)4.2m },
-                new { Giro = "Pintura", Nombre = "Pinturas y Recubrimientos Pro", Telefono = "442 890 1234", Email = "pintura@pro.mx", Descripcion = "Pintura interior y exterior, impermeabilizantes.", PaginaWeb = (string?)null, Rating = (decimal?)4.6m }
+                new { Giro = "Pintura", Nombre = "Pinturas y Recubrimientos Pro", Telefono = "442 890 1234", Email = (string?)"pintura@pro.mx", Descripcion = "Pintura interior y exterior, impermeabilizantes.", PaginaWeb = (string?)null, Rating = (decimal?)4.6m }
             };
 
             var roleIdAdminCompany = new Guid("22222222-2222-2222-2222-222222222222");
