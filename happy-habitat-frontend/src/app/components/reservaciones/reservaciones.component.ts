@@ -35,6 +35,7 @@ function getMondayOfWeek(d: Date): Date {
 export class ReservacionesComponent implements OnInit, OnDestroy {
 
   @ViewChild('reservarModal') reservarModalRef!: ElementRef<HTMLDialogElement>;
+  @ViewChild('bloqueoModal') bloqueoModalRef!: ElementRef<HTMLDialogElement>;
 
   private sanitizer = inject(DomSanitizer);
   private route = inject(ActivatedRoute);
@@ -93,6 +94,8 @@ export class ReservacionesComponent implements OnInit, OnDestroy {
   showReservarModal = signal(false);
   isSubmittingReservation = signal(false);
   reservationMessage = signal<{ type: 'success' | 'error'; text: string } | null>(null);
+  /** Mensaje cuando no se puede reservar (máx. personas o máx. reservaciones simultáneas). */
+  bloqueoReservaMessage = signal<string | null>(null);
 
   sanitizeHTML(htmlString: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(htmlString ?? '');
@@ -129,6 +132,7 @@ export class ReservacionesComponent implements OnInit, OnDestroy {
 
   /** Abre el modal de reserva y fija la fecha/hora seleccionada. */
   openReservarModal(fecha: Date): void {
+    this.bloqueoReservaMessage.set(null);
     this.fechaSeleccionada = new Date(fecha);
     this.rulesAccepted.set(false);
     this.reservationMessage.set(null);
@@ -227,16 +231,67 @@ export class ReservacionesComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Ocupación en una celda: solo reservaciones de la amenidad actual en esa fecha/hora. */
+  /**
+   * Ocupación en una celda: suma de personas de todas las reservaciones de la amenidad actual
+   * que ocupan esa fecha/hora. Si una reservación es de más de 1 hora, cuenta en cada hora que abarca.
+   */
   getReservationsByDate(fechaBuscada: Date): number {
     const list = this.reservaciones();
     const amenidadId = this.amenidadId;
+    const cellTime = fechaBuscada.getTime();
     return list.reduce((total, r) => {
       if (r.amenidadId !== amenidadId) return total;
-      const horarioDate = typeof r.horario === 'string' ? new Date(r.horario) : r.horario;
-      const mismaHora = horarioDate.getTime() === fechaBuscada.getTime();
-      return total + (mismaHora ? r.numPersonas ?? 0 : 0);
+      const start = typeof r.horario === 'string' ? new Date(r.horario) : new Date(r.horario);
+      const horas = r.horasReservadas ?? 1;
+      const end = new Date(start);
+      end.setHours(end.getHours() + horas);
+      const startTime = start.getTime();
+      const endTime = end.getTime();
+      const ocupaEstaCelda = cellTime >= startTime && cellTime < endTime;
+      return total + (ocupaEstaCelda ? r.numPersonas ?? 0 : 0);
     }, 0);
+  }
+
+  /** Número de reservaciones que ocupan esa fecha/hora (para límite de reservaciones simultáneas). */
+  getReservationCountByDate(fechaBuscada: Date): number {
+    const list = this.reservaciones();
+    const amenidadId = this.amenidadId;
+    const cellTime = fechaBuscada.getTime();
+    return list.filter(r => {
+      if (r.amenidadId !== amenidadId) return false;
+      const start = typeof r.horario === 'string' ? new Date(r.horario) : new Date(r.horario);
+      const horas = r.horasReservadas ?? 1;
+      const end = new Date(start);
+      end.setHours(end.getHours() + horas);
+      return cellTime >= start.getTime() && cellTime < end.getTime();
+    }).length;
+  }
+
+  /** Intenta abrir el modal de reserva; si hay límite de personas o reservaciones, muestra modal de aviso. */
+  tryOpenReservarModal(fecha: Date): void {
+    this.bloqueoReservaMessage.set(null);
+    const ocupacion = this.getReservationsByDate(fecha);
+    if (ocupacion >= this.capacidadMaxima) {
+      this.bloqueoReservaMessage.set('Máximo número de personas alcanzado.');
+      setTimeout(() => this.bloqueoModalRef?.nativeElement?.showModal?.(), 0);
+      return;
+    }
+    const maxReservas = this.amenidad?.numeroReservacionesSimultaneas;
+    if (maxReservas != null && maxReservas > 0) {
+      const count = this.getReservationCountByDate(fecha);
+      if (count >= maxReservas) {
+        this.bloqueoReservaMessage.set('Número máximo de reservaciones alcanzado.');
+        setTimeout(() => this.bloqueoModalRef?.nativeElement?.showModal?.(), 0);
+        return;
+      }
+    }
+    this.openReservarModal(fecha);
+  }
+
+  /** Cierra el modal de bloqueo (mensaje de máximo personas o reservaciones). */
+  closeBloqueoModal(): void {
+    this.bloqueoModalRef?.nativeElement?.close?.();
+    this.bloqueoReservaMessage.set(null);
   }
 
   nextWeek(): void {
@@ -261,6 +316,17 @@ export class ReservacionesComponent implements OnInit, OnDestroy {
     this.loadAmenidadAndSchedules(amenidadId);
   }
 
+  /** Formato de fecha/hora local para el API (evita que 10:00 se envíe como 16:00 UTC). */
+  private toLocalISOString(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const h = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    const s = String(d.getSeconds()).padStart(2, '0');
+    return `${y}-${m}-${day}T${h}:${min}:${s}`;
+  }
+
   doReservation(): void {
     const resident = this.residente();
     if (!resident || !this.amenidadId || !this.amenidad) return;
@@ -272,18 +338,21 @@ export class ReservacionesComponent implements OnInit, OnDestroy {
     this.reservationMessage.set(null);
     this.reservacionesService.create({
       amenityId: this.amenidadId,
-      horario: horario.toISOString(),
+      horario: this.toLocalISOString(horario),
       numPersonas,
       horasReservadas
     }).subscribe({
-      next: created => {
+      next: result => {
         this.isSubmittingReservation.set(false);
-        if (created) {
-          this.reservaciones.update(list => [...list, created]);
+        if (result.created) {
           this.reservationMessage.set({ type: 'success', text: 'Reservación registrada.' });
           this.closeReservarModal();
+          this.loadMyReservations();
         } else {
-          this.reservationMessage.set({ type: 'error', text: 'No se pudo crear la reservación.' });
+          this.reservationMessage.set({
+            type: 'error',
+            text: result.error ?? 'No se pudo crear la reservación.'
+          });
         }
       },
       error: () => {
@@ -312,9 +381,15 @@ export class ReservacionesComponent implements OnInit, OnDestroy {
     this.numPersonasModal.set((n >= 1 && n <= max) ? n : 1);
   }
 
+  /** Fija las horas a reservar; el valor se limita al máximo de la amenidad (horasPorReservacion). */
   setHorasReservadasModal(value: unknown): void {
     const n = typeof value === 'number' ? value : Number(value);
+    if (Number.isNaN(n)) {
+      this.horasReservadasModal.set(1);
+      return;
+    }
     const max = this.maxHorasPorReservacion;
-    this.horasReservadasModal.set((n >= 1 && n <= max) ? n : 1);
+    const clamped = Math.max(1, Math.min(n, max));
+    this.horasReservadasModal.set(clamped);
   }
 }

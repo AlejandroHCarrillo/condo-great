@@ -1,4 +1,4 @@
-<section class="p-2">
+<section class="p-2 text-left">
   @if (!residente()) {
     <div class="alert alert-warning">
       <span>Debe estar registrado como residente para ver y crear reservaciones.</span>
@@ -17,9 +17,9 @@
 </section>
 
 @if (residente() && amenidadId) {
-  <section class="p-2">
+  <section class="p-2 text-left relative">
     <table class="table-auto w-full border-2">
-      <thead class="text-center text-lg font-bold bg-base-200">
+      <thead class="text-left text-lg font-bold bg-base-200">
         <tr class="border-2">
           @for (dia of diasSemana; track dia; let i = $index) {
             <td class="py-2 text-nowrap">
@@ -56,9 +56,9 @@
                 [class.bg-orange-300]="ocupacion > 20 && ocupacion <= capacidadMaxima"
                 [class.bg-red-400]="ocupacion >= capacidadMaxima"
                 [class.text-bold]="ocupacion >= capacidadMaxima"
-                (click)="s.isOpen && openReservarModal(fecha)"
+                (click)="s.isOpen && tryOpenReservarModal(fecha)"
               >
-                <div class="text-xs text-right font-semibold">{{ hora }}</div>
+                <div class="text-xs text-left font-semibold">{{ hora }}</div>
                 @if (s.isOpen) {
                   @if (ocupacion > 0) {
                     <div class="text-xs font-bold">Ocupación:</div>
@@ -68,7 +68,7 @@
                     }
                   }
                 } @else {
-                  <div class="text-xs text-center">{{ s.nota }}</div>
+                  <div class="text-xs text-left">{{ s.nota }}</div>
                 }
               </td>
             }
@@ -76,12 +76,26 @@
         }
       </tbody>
     </table>
+
+    <dialog #bloqueoModal class="modal modal-bottom sm:modal-middle" (close)="closeBloqueoModal()">
+      <div class="modal-box">
+        @if (bloqueoReservaMessage()) {
+          <p class="text-lg font-semibold">{{ bloqueoReservaMessage() }}</p>
+        }
+        <div class="modal-action">
+          <button type="button" class="btn btn-primary text-white" (click)="closeBloqueoModal()">Entendido</button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button type="button" (click)="closeBloqueoModal()">cerrar</button>
+      </form>
+    </dialog>
   </section>
 }
 
 @if (residente() && misReservaciones().length > 0) {
   <section
-    class="sm:fixed sm:w-[260px] bg-base-100 sm:rounded sm:top-80 sm:right-50 p-5 overflow-y-auto border border-base-300"
+    class="sm:fixed sm:w-[260px] bg-base-100 sm:rounded sm:top-80 sm:right-50 p-5 overflow-y-auto border border-base-300 text-left"
     [class.h-[10vh]]="!showMisReservas()"
     [class.h-[40vh]]="showMisReservas()"
   >
@@ -110,43 +124,50 @@
 
 @if (amenidad) {
   <dialog #reservarModal class="modal modal-bottom sm:modal-middle" (close)="closeReservarModal()">
-    <div class="modal-box">
+    <div class="modal-box text-left">
       <form method="dialog">
         <button type="button" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" (click)="closeReservarModal()">✕</button>
       </form>
-      <h1 class="text-lg font-bold pt-3 pl-2">Reservar: {{ amenidad.nombre }}</h1>
-      <h3 class="text-md font-semibold pl-2 pb-2">Horario: {{ fechaSeleccionada | date: 'EEEE dd MMMM yyyy HH:mm' }}</h3>
-      <p class="font-bold py-3 bg-base-200 rounded-2xl p-3 mb-2">
-        Residente Casa: <span>{{ residente()?.casa ?? '—' }}</span>
-      </p>
-      <div class="form-control mb-3">
-        <label class="label" for="numPersonas">Número de personas</label>
+      <h1 class="text-lg font-bold pt-3 pl-2">
+        <i class="fa-solid fa-calendar-check text-primary text-xl"></i>
+        Reservar: {{ amenidad.nombre }}</h1>
+        
+        <p class="font-bold py-3 bg-base-200 rounded-2xl p-3 mb-2">
+          Casa: <span>{{ residente()?.casa ?? '—' }}</span>
+        </p>
+  
+      <h3 class="text-md font-semibold pl-2 pb-2">Fecha: {{ fechaSeleccionada | date: 'dd MMM yyyy' }} 
+        <br>
+        Hora: {{ fechaSeleccionada | date: 'HH:mm' }}</h3>
+      <div class="form-control mb-3 flex items-center gap-2">
+        <label class="label font-bold text-black" for="numPersonas">Número de personas:&nbsp;</label>
         <input
           id="numPersonas"
           type="number"
           min="1"
           [max]="maxPersonasPorReservacion"
-          class="input input-bordered w-24"
+          class="input input-bordered w-15"
           [ngModel]="numPersonasModal()"
           (ngModelChange)="setNumPersonasModal($event)"
         />
-        <p class="text-xs text-base-content/70 mt-1">Máximo: {{ maxPersonasPorReservacion }} personas por reservación.</p>
+        <span class="text-xs text-base-content/70 mt-1">Máximo: {{ maxPersonasPorReservacion }} personas por reservación.</span>
       </div>
-      <div class="form-control mb-3">
-        <label class="label" for="horasReservadas">Horas a reservar</label>
+      <div class="form-control mb-3 flex items-center gap-2">
+        <label class="label font-bold text-black" for="horasReservadas">Horas a reservar:&nbsp;</label>
         <input
           id="horasReservadas"
           type="number"
           min="1"
           [max]="maxHorasPorReservacion"
-          class="input input-bordered w-24"
+          class="input input-bordered w-15"
           [ngModel]="horasReservadasModal()"
           (ngModelChange)="setHorasReservadasModal($event)"
         />
-        <p class="text-xs text-base-content/70 mt-1">Máximo: {{ maxHorasPorReservacion }} horas por reservación.</p>
+        <span class="text-xs text-base-content/70 mt-1">Máximo: {{ maxHorasPorReservacion }} horas por reservación.</span>
       </div>
       <p class="bg-base-200 p-3 rounded-2xl text-xs mb-2" [innerHTML]="sanitizeHTML(amenidad.reglas)"></p>
-      <label class="flex items-center gap-2 cursor-pointer mb-3">
+      <label class="flex items-center gap-2 cursor-pointer 
+                    font-bold py-3 bg-base-200 rounded-2xl p-3 mb-2">
         <input
           type="checkbox"
           class="checkbox checkbox-sm"
@@ -163,7 +184,7 @@
       <div class="modal-action">
         <button
           type="button"
-          class="btn btn-primary"
+          class="btn btn-primary text-white"
           [disabled]="!rulesAccepted() || isSubmittingReservation()"
           (click)="doReservation()"
         >

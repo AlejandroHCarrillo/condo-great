@@ -26,6 +26,12 @@ export interface CreateAmenityReservationPayload {
   horasReservadas: number;
 }
 
+/** Resultado de crear reservación: creada o mensaje de error del API. */
+export interface CreateReservationResult {
+  created: ReservacionAmenidad | null;
+  error?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -41,11 +47,14 @@ export class ReservacionesService {
     );
   }
 
-  /** Crea una reservación (residente). El backend asigna residentId desde el token. */
-  create(payload: CreateAmenityReservationPayload): Observable<ReservacionAmenidad | null> {
+  /** Crea una reservación (residente). El backend asigna residentId desde el token y valida capacidad/reservaciones simultáneas. */
+  create(payload: CreateAmenityReservationPayload): Observable<CreateReservationResult> {
     return this.http.post<AmenityReservationDto>(this.API_URL, payload).pipe(
-      map((d) => this.mapDtoToReservacion(d)),
-      catchError(() => of(null))
+      map((d) => ({ created: this.mapDtoToReservacion(d) })),
+      catchError((err) => {
+        const message = err?.error?.message ?? 'No se pudo crear la reservación.';
+        return of({ created: null, error: message });
+      })
     );
   }
 

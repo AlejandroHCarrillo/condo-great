@@ -15,24 +15,27 @@ public class AmenityService : IAmenityService
         _context = context;
     }
 
-    private static AmenityDto MapToDto(Amenity a) => new AmenityDto
+    private static AmenityDto MapToDto(Amenity a)
     {
-        Id = a.Id,
-        Nombre = a.Nombre,
-        Descripcion = a.Descripcion,
-        Reglas = a.Reglas,
-        Costo = a.Costo,
-        FechaAlta = a.FechaAlta,
-        Imagen = a.Imagen,
-        CommunityId = a.Community?.Id,
-        CommunityName = a.Community?.Nombre,
-        CapacidadMaxima = a.CapacidadMaxima,
-        NumeroReservacionesSimultaneas = a.NumeroReservacionesSimultaneas,
-        PersonasPorReservacion = a.PersonasPorReservacion,
-        HorasPorReservacion = a.HorasPorReservacion,
-        RequiereAprobacion = a.RequiereAprobacion,
-        CreatedAt = a.CreatedAt.ToString("O")
-    };
+        return new AmenityDto
+        {
+            Id = a.Id,
+            Nombre = a.Nombre ?? string.Empty,
+            Descripcion = a.Descripcion ?? string.Empty,
+            Reglas = a.Reglas ?? string.Empty,
+            Costo = a.Costo,
+            FechaAlta = a.FechaAlta,
+            Imagen = a.Imagen,
+            CommunityId = a.Community?.Id,
+            CommunityName = a.Community?.Nombre,
+            CapacidadMaxima = a.CapacidadMaxima,
+            NumeroReservacionesSimultaneas = a.NumeroReservacionesSimultaneas,
+            PersonasPorReservacion = a.PersonasPorReservacion,
+            HorasPorReservacion = a.HorasPorReservacion,
+            RequiereAprobacion = a.RequiereAprobacion,
+            CreatedAt = a.CreatedAt == default ? string.Empty : a.CreatedAt.ToString("O")
+        };
+    }
 
     public async Task<IEnumerable<AmenityDto>> GetAllAmenitiesAsync(bool includeInactive = false)
     {

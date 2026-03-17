@@ -55,6 +55,10 @@ public class AmenityReservationService : IAmenityReservationService
         if (amenity.HorasPorReservacion.HasValue && horasReservadas > amenity.HorasPorReservacion.Value)
             horasReservadas = amenity.HorasPorReservacion.Value;
 
+        var validationErrors = await ValidateReservationSlotsAsync(dto.AmenityId, dto.Horario, horasReservadas, numPersonas, amenity);
+        if (validationErrors.Count > 0)
+            throw new InvalidOperationException(string.Join(" ", validationErrors));
+
         var entity = new Domain.Entities.AmenityReservation
         {
             Id = Guid.NewGuid(),
@@ -87,6 +91,63 @@ public class AmenityReservationService : IAmenityReservationService
             HorasReservadas = entity.HorasReservadas,
             Status = entity.Status ?? ""
         };
+    }
+
+    /// <summary>
+    /// Valida que en cada hora que abarca la reservación no se supere capacidad máxima ni máximo de reservaciones simultáneas.
+    /// Incluye la nueva reservación (numPersonas, horasReservadas) en el cálculo.
+    /// </summary>
+    private async Task<List<string>> ValidateReservationSlotsAsync(Guid amenityId, DateTime horario, int horasReservadas, int numPersonas, Domain.Entities.Amenity amenity)
+    {
+        var errors = new List<string>();
+        var rangeStart = TruncateToHour(horario);
+        var rangeEnd = rangeStart.AddHours(horasReservadas);
+
+        var allForAmenity = await _context.AmenityReservations
+            .Where(r => r.AmenityId == amenityId
+                && (r.Status == "En proceso" || r.Status == "Reservada")
+                && r.Horario < rangeEnd)
+            .ToListAsync();
+
+        var existing = allForAmenity.Where(r =>
+        {
+            var rStart = TruncateToHour(r.Horario);
+            var rEnd = rStart.AddHours(r.HorasReservadas ?? 1);
+            return rEnd > rangeStart;
+        }).ToList();
+
+        for (var hourOffset = 0; hourOffset < horasReservadas; hourOffset++)
+        {
+            var slotStart = rangeStart.AddHours(hourOffset);
+            var slotEnd = slotStart.AddHours(1);
+
+            var totalPersonas = numPersonas;
+            var countReservas = 1;
+
+            foreach (var r in existing)
+            {
+                var rStart = TruncateToHour(r.Horario);
+                var rEnd = rStart.AddHours(r.HorasReservadas ?? 1);
+                if (slotStart < rEnd && slotEnd > rStart)
+                {
+                    totalPersonas += r.NumPersonas ?? 0;
+                    countReservas++;
+                }
+            }
+
+            var horaTexto = slotStart.ToString("HH:mm");
+            if (amenity.CapacidadMaxima.HasValue && totalPersonas > amenity.CapacidadMaxima.Value)
+                errors.Add($"A las {horaTexto} se supera el máximo de personas ({amenity.CapacidadMaxima.Value}).");
+            if (amenity.NumeroReservacionesSimultaneas.HasValue && countReservas > amenity.NumeroReservacionesSimultaneas.Value)
+                errors.Add($"A las {horaTexto} se alcanzó el máximo de reservaciones simultáneas ({amenity.NumeroReservacionesSimultaneas.Value}).");
+        }
+
+        return errors;
+    }
+
+    private static DateTime TruncateToHour(DateTime d)
+    {
+        return new DateTime(d.Year, d.Month, d.Day, d.Hour, 0, 0, DateTimeKind.Unspecified);
     }
 
     public async Task<AmenityReservationDto?> CancelByResidentAsync(Guid id, Guid residentId)

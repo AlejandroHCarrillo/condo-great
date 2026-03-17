@@ -44,6 +44,7 @@ public class AmenityReservationsController : ControllerBase
 
     /// <summary>
     /// Create a reservation (resident). ResidentId is set from token.
+    /// Valida que en cada hora no se supere capacidad máxima ni reservaciones simultáneas.
     /// </summary>
     [HttpPost]
     public async Task<ActionResult<AmenityReservationDto>> Create([FromBody] CreateAmenityReservationDto dto)
@@ -51,10 +52,17 @@ public class AmenityReservationsController : ControllerBase
         var resident = await GetResidentFromToken();
         if (resident == null)
             return this.BadRequestApiError("BAD_REQUEST", "Usuario no está registrado como residente.");
-        var created = await _service.CreateAsync(resident.Id, dto);
-        if (created == null)
-            return this.BadRequestApiError("BAD_REQUEST", "Amenidad no encontrada o datos inválidos.");
-        return CreatedAtAction(nameof(GetMy), created);
+        try
+        {
+            var created = await _service.CreateAsync(resident.Id, dto);
+            if (created == null)
+                return this.BadRequestApiError("BAD_REQUEST", "Amenidad no encontrada o datos inválidos.");
+            return CreatedAtAction(nameof(GetMy), created);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return this.BadRequestApiError("RESERVATION_VALIDATION", ex.Message);
+        }
     }
 
     /// <summary>
